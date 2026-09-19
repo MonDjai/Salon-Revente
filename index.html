@@ -1,0 +1,3212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#11141a" />
+<title>MonDjai/Revente</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" href="icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<style>
+  :root{
+    --bg:#11141a;
+    --card:#1b2029;
+    --card-2:#20262f;
+    --border:#2a303c;
+    --text:#eef1f6;
+    --text-dim:#b7bfcc;
+    --accent:#f5a623;
+    --accent-dark:#c9840f;
+    --green:#34b37e;
+    --red:#ff6b5e;
+    --blue:#5b8def;
+    --turquoise:#4fd1c5;
+    --pink:#e8788c;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    height:100%; overscroll-behavior-y:none; color-scheme:dark;}
+  #app{min-height:100%; display:flex; flex-direction:column;}
+  a{color:inherit;}
+  button{font-family:inherit; color:inherit;}
+
+  /* ---------- Header ---------- */
+  .header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:calc(14px + var(--safe-top)) 16px 12px;
+    background:linear-gradient(180deg,#161b23,#11141a);
+    border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:5;
+  }
+  .brand{display:flex; align-items:center; gap:8px; min-width:0;}
+  .brand-emoji{font-size:22px; flex:none;}
+  .brand-text{display:flex; flex-direction:column; line-height:1.15; min-width:0;}
+  .brand-title{font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .brand-sub{font-size:10.5px; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .icon-btn{
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    width:38px; height:38px; border-radius:12px; font-size:17px;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .icon-btn:active{background:var(--card-2);}
+  .icon-btn.epargne-shortcut{
+    width:auto; padding:0 10px; gap:5px; flex-direction:row; font-size:15px; font-weight:800;
+  }
+  .icon-btn.epargne-shortcut .es-emoji{font-size:15px;}
+  .icon-btn.epargne-shortcut .es-val{font-size:11px; font-weight:800; color:var(--text); white-space:nowrap;}
+
+  /* ---------- Main ---------- */
+  .main{flex:1; padding:14px 16px calc(24px + var(--safe-bottom)); display:flex; flex-direction:column;}
+  .main.with-tabbar{padding-bottom: calc(96px + var(--safe-bottom));}
+
+  .section-title{font-size:13px; font-weight:700; color:var(--text-dim); text-transform:uppercase;
+    letter-spacing:.04em; margin:4px 0 10px;}
+  .hint{font-size:12.5px; color:var(--text-dim); line-height:1.5;}
+  .hint.tight{margin-top:4px;}
+
+  /* ---------- Onboarding / full pages (no tabbar) ---------- */
+  .onb{flex:1; display:flex; flex-direction:column; padding:calc(20px + var(--safe-top)) 20px calc(28px + var(--safe-bottom)); min-height:100%;}
+  .onb-head{margin-bottom:18px;}
+  .onb-emoji{font-size:40px;}
+  .onb-title{font-size:22px; font-weight:800; margin:10px 0 6px;}
+  .onb-desc{font-size:14px; color:var(--text-dim); line-height:1.5;}
+  .onb-body{flex:1; display:flex; flex-direction:column; justify-content:center;}
+
+  .choice-grid{display:flex; flex-direction:column; gap:12px;}
+  .choice-card{
+    display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1.5px solid var(--border); border-radius:16px;
+    padding:16px 14px; text-align:left;
+  }
+  .choice-card.selected{border-color:var(--accent); background:linear-gradient(135deg,#241d10,#1c2029);}
+  .choice-card .emoji{font-size:30px; width:40px; text-align:center; flex:none;}
+  .choice-card .cc-text{flex:1; min-width:0;}
+  .choice-card .cc-title{font-size:15.5px; font-weight:700;}
+  .choice-card .cc-desc{font-size:12.5px; color:var(--text-dim); margin-top:2px; line-height:1.4;}
+  .choice-card .cc-check{
+    width:24px; height:24px; border-radius:8px; border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; flex:none; font-size:14px;
+    color:transparent; background:var(--card-2);
+  }
+  .choice-card.selected .cc-check{background:var(--accent); border-color:var(--accent); color:#1b1200;}
+
+  .error-text{color:var(--red); font-size:12.5px; margin-top:10px; line-height:1.4;}
+
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    border:none; border-radius:14px; padding:14px 16px; font-size:15px; font-weight:700;
+    width:100%;
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark)); color:#1b1200;}
+  .btn-secondary{background:var(--card); color:var(--text); border:1px solid var(--border);}
+  .btn-ghost{background:transparent; color:var(--accent); border:none; padding:10px;}
+  .btn-danger{background:rgba(255,107,94,.12); color:var(--red); border:1px solid rgba(255,107,94,.4);}
+  .btn:active{opacity:.85;}
+  .btn:disabled{opacity:.4; pointer-events:none;}
+  .btn-row{display:flex; gap:10px; margin-top:14px;}
+  .btn-row .btn{width:auto; flex:1;}
+
+  /* ---------- Tab bar ---------- */
+  .tabbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:6;
+    display:flex; background:#161b23; border-top:1px solid var(--border);
+    padding:8px 6px calc(8px + var(--safe-bottom));
+  }
+  .tab{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:transparent; border:none; color:var(--text-dim); padding:6px 2px; border-radius:12px;
+  }
+  .tab .tab-emoji{font-size:20px;}
+  .tab .tab-label{font-size:10.5px; font-weight:600;}
+  .tab.active{color:var(--accent);}
+  .tab.active .tab-emoji{transform:translateY(-1px);}
+
+  /* ---------- List cards ---------- */
+  .entry-list{display:flex; flex-direction:column; gap:10px; margin-top:4px;}
+  .entry-card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:13px 14px; display:flex; align-items:center; gap:12px; text-align:left;
+  }
+  .entry-card:active{background:var(--card-2);}
+  .entry-ico{
+    width:38px; height:38px; border-radius:11px; flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    background:rgba(245,166,35,.12); color:var(--accent);
+  }
+  .entry-main{flex:1; min-width:0;}
+  .entry-title{font-size:14.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .entry-sub{font-size:12px; color:var(--text-dim); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .entry-amount{font-size:14px; font-weight:700; color:var(--accent); flex:none; white-space:nowrap;}
+  .entry-amount.neg{color:var(--red);}
+
+  /* ---------- Cartes agrandies Achats / Ventes ---------- */
+  .entry-list-lg{flex:1;}
+  .entry-card-lg{
+    flex:1; min-height:108px; flex-direction:column; justify-content:center;
+    align-items:center; text-align:center; gap:8px; padding:22px 16px;
+  }
+  .entry-card-lg .entry-ico{width:50px; height:50px; font-size:23px;}
+  .entry-card-lg .entry-main{width:100%;}
+  .entry-card-lg .entry-title{white-space:normal; font-size:16px;}
+  .entry-card-lg .entry-sub{white-space:normal; margin-top:3px;}
+  .entry-card-lg .entry-amount{font-size:21px; margin-top:2px;}
+  .badge{
+    display:inline-block; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px;
+    background:rgba(91,141,239,.15); color:var(--blue); margin-left:6px;
+  }
+
+  .empty-state{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:30px 10px; color:var(--text-dim); gap:8px;
+  }
+  .empty-state .es-emoji{font-size:38px; opacity:.7;}
+  .empty-state .es-title{font-size:14.5px; font-weight:700; color:var(--text);}
+  .empty-state .es-desc{font-size:12.5px; max-width:260px; line-height:1.5;}
+
+  .fab{
+    position:fixed; right:18px; bottom:calc(92px + var(--safe-bottom)); z-index:7;
+    width:56px; height:56px; border-radius:18px; border:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+    color:#1b1200; font-size:26px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 20px rgba(245,166,35,.35);
+  }
+  .fab:active{transform:scale(.96);}
+
+  /* ---------- Forms ---------- */
+  .field{margin-bottom:16px;}
+  .field .label{display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:7px;}
+  .field .label .req{color:var(--accent);}
+  .input, .select, .textarea{
+    width:100%; background:var(--card-2); border:1px solid var(--border); color:var(--text);
+    border-radius:12px; padding:12px 13px; font-size:15px; appearance:none;
+  }
+  .select{background-image:linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+    background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+    padding-right:36px;}
+  .input:focus, .select:focus, .textarea:focus{outline:2px solid var(--accent); outline-offset:0;}
+  .field-error{color:var(--red); font-size:12px; margin-top:6px;}
+  .field-note{color:var(--text-dim); font-size:11.5px; margin-top:6px; line-height:1.4;}
+  .inline-new{margin-top:10px; display:flex; gap:8px;}
+  .inline-new .input{flex:1;}
+  .inline-new .btn{width:auto; padding:10px 14px; font-size:13px;}
+
+  .radio-row{display:flex; gap:10px;}
+  .radio-opt{
+    flex:1; text-align:center; background:var(--card-2); border:1.5px solid var(--border); color:var(--text-dim);
+    border-radius:12px; padding:12px 8px; font-size:13px; font-weight:700;
+  }
+  .radio-opt.active{border-color:var(--accent); color:var(--accent); background:rgba(245,166,35,.1);}
+
+  .chip-wrap{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    background:var(--card-2); border:1.5px solid var(--border); color:var(--text-dim);
+    border-radius:999px; padding:9px 14px; font-size:13px; font-weight:600;
+  }
+  .chip.active{border-color:var(--accent); color:var(--accent); background:rgba(245,166,35,.1);}
+  .chip.dashed{border-style:dashed;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(6,8,12,.6); z-index:20;
+    display:flex; align-items:flex-end;
+  }
+  .modal{
+    width:100%; max-height:88vh; overflow-y:auto; background:var(--bg);
+    border-radius:20px 20px 0 0; border-top:1px solid var(--border);
+    padding:18px 18px calc(20px + var(--safe-bottom));
+  }
+  .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+  .modal-title{font-size:17px; font-weight:800;}
+  .modal-close{background:var(--card); border:1px solid var(--border); color:var(--text-dim);
+    width:32px; height:32px; border-radius:10px; font-size:15px; display:flex; align-items:center; justify-content:center;}
+
+  .detail-row{display:flex; justify-content:space-between; gap:14px; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px;}
+  .detail-row:last-of-type{border-bottom:none;}
+  .detail-row .dk{color:var(--text-dim);}
+  .detail-row .dv{font-weight:700; text-align:right;}
+
+  .confirm-box{background:rgba(255,107,94,.08); border:1px solid rgba(255,107,94,.3); border-radius:14px; padding:14px; margin-top:14px;}
+  .confirm-box p{margin:0 0 12px; font-size:13.5px; color:var(--text);}
+
+  /* ---------- Réglages / À propos ---------- */
+  .reglages-section{margin-bottom:22px;}
+  .reglages-section .rs-title{font-size:13px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; margin-bottom:10px;}
+  .profil-row{
+    display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:13px 14px; margin-bottom:10px;
+  }
+  .profil-row.soon{opacity:1;}
+  .profil-row .pr-emoji{font-size:22px; width:30px; text-align:center; flex:none;}
+  .profil-row .pr-text{flex:1;}
+  .profil-row .pr-title{font-size:14.5px; font-weight:700; display:flex; align-items:center; gap:8px;}
+  .profil-row .pr-desc{font-size:11.5px; color:var(--text-dim); margin-top:2px;}
+  .badge-soon{
+    display:inline-block; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;
+    background:rgba(245,166,35,.14); color:var(--accent); text-transform:uppercase; letter-spacing:.03em;
+  }
+  .switch{
+    width:46px; height:28px; border-radius:999px; background:var(--card-2); border:1px solid var(--border);
+    position:relative; flex:none;
+  }
+  .switch.on{background:var(--accent); border-color:var(--accent);}
+  .switch .knob{position:absolute; top:2px; left:2px; width:22px; height:22px; border-radius:50%; background:#fff; transition:left .15s;}
+  .switch.on .knob{left:20px; background:#1b1200;}
+
+  .about-line{font-size:14px; color:var(--text-dim); line-height:1.6; margin-bottom:10px;}
+  .mission{font-size:15.5px; font-weight:700; color:var(--text); margin:18px 0 8px;}
+
+  /* ---------- Aujourd'hui ---------- */
+  .dash-solde{
+    background:linear-gradient(135deg,var(--card),var(--card-2)); border:1px solid var(--border);
+    border-radius:18px; padding:20px 18px; text-align:center; margin-bottom:14px;
+  }
+  .dash-solde .ds-label{font-size:12px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em;}
+  .dash-solde .ds-amount{font-size:32px; font-weight:800; margin-top:6px;}
+  .dash-solde .ds-amount.neg{color:var(--red);}
+  .dash-perte{
+    margin-top:12px; background:rgba(255,107,94,.12); border:1px solid rgba(255,107,94,.35);
+    border-radius:12px; padding:9px 12px; font-size:12.5px; color:var(--red); font-weight:600; line-height:1.4;
+  }
+  .solde-mini-stats{display:flex; margin-top:16px; padding-top:14px; border-top:1px solid var(--border);}
+  .solde-mini-stats .sms-col{flex:1; text-align:center;}
+  .solde-mini-stats .sms-label{font-size:11.5px; color:var(--text-dim);}
+  .solde-mini-stats .sms-val{font-size:15px; font-weight:800; margin-top:4px;}
+  .solde-mini-stats .sms-val.neg{color:var(--red);}
+  .dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;}
+  .dash-block{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:26px 12px; text-align:center; appearance:none; -webkit-appearance:none; font:inherit;}
+  .dash-block .db-emoji{font-size:34px;}
+  .dash-block .db-label{font-size:12px; color:var(--text-dim); margin-top:6px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;}
+  .dash-block .db-amount{font-size:24px; font-weight:800; margin-top:10px;}
+  .dash-block.charges .db-amount{color:var(--red);}
+  .dash-block.info{border-style:dashed;}
+  .dash-block.info .db-amount{color:var(--text-dim);}
+  .charges-card-wrap{margin-top:26px;}
+  .charges-row{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:12px 14px; appearance:none; -webkit-appearance:none; font:inherit; color:var(--text);
+  }
+  .charges-row .cr-emoji{font-size:19px; flex:none; line-height:1;}
+  .charges-row .cr-label{flex:1; min-width:0; font-size:12px; font-weight:700; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:.03em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .charges-row .cr-amount{font-size:16px; font-weight:800; color:var(--red); flex:none; white-space:nowrap;}
+  .charges-row.charges-row-vide{border-style:dashed;}
+  .charges-row.charges-row-vide .cr-label{color:var(--text-dim);}
+
+  .caisse-zone{margin-bottom:22px;}
+  .caisse-zone:last-child{margin-bottom:6px;}
+
+  /* ---------- F4 : Suivi de stock ---------- */
+  .stock-card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 14px; margin-bottom:10px;}
+  .stock-card .sc-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .stock-card .sc-nom{font-size:14.5px; font-weight:700;}
+  .stock-card .sc-alerte{font-size:10.5px; font-weight:700; color:var(--accent); background:rgba(245,166,35,.14); padding:3px 8px; border-radius:999px;}
+  .stock-card .sc-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:12.5px;}
+  .stock-card .sc-grid .sk{color:var(--text-dim);}
+  .stock-card .sc-grid .sv{font-weight:700; text-align:right;}
+  .stock-card .sc-seuil{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);}
+  .stock-card .sc-seuil label{font-size:11.5px; color:var(--text-dim);}
+  .stock-card .sc-seuil input{width:60px; background:var(--card-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:6px 8px; font-size:13px; text-align:center;}
+
+  /* ---------- Mon état ---------- */
+  .etat-tabs{display:flex; gap:8px; margin-bottom:14px;}
+  .etat-tab{flex:1; text-align:center; background:var(--card); border:1.5px solid var(--border); color:var(--text-dim);
+    border-radius:12px; padding:10px 6px; font-size:13px; font-weight:700;}
+  .etat-tab.active{border-color:var(--accent); color:var(--accent); background:rgba(245,166,35,.1);}
+  .etat-nav{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .etat-nav .en-btn{background:var(--card); border:1px solid var(--border); color:var(--text); width:36px; height:36px;
+    border-radius:10px; font-size:16px; display:flex; align-items:center; justify-content:center;}
+  .etat-nav .en-btn:disabled{opacity:.35;}
+  .etat-nav .en-label{font-size:13.5px; font-weight:700; text-align:center; flex:1;}
+  .etat-stats{display:flex; flex-direction:column; gap:8px; margin-bottom:16px;}
+  .etat-stat-row{display:flex; justify-content:space-between; align-items:center; background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:11px 14px;}
+  .etat-stat-row .er-label{font-size:13px; color:var(--text-dim);}
+  .etat-stat-row .er-val{font-size:15px; font-weight:800;}
+  .etat-stat-row .er-val.neg{color:var(--red);}
+  .etat-breakdown{margin-top:6px; margin-bottom:18px;}
+  .etat-breakdown .eb-title{font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;}
+  .eb-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px;}
+  .eb-row:last-child{border-bottom:none;}
+  .eb-row .eb-nom{color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .eb-row .eb-val{font-weight:700; white-space:nowrap;}
+  .eb-row .eb-sub{color:var(--text-dim); font-weight:600; font-size:11.5px;}
+  .top-produit-card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:16px;
+    display:flex; align-items:center; gap:12px;}
+  .top-produit-card .tp-emoji{font-size:28px; flex:none;}
+  .top-produit-card .tp-nom{font-size:15px; font-weight:800;}
+  .top-produit-card .tp-sub{font-size:12px; color:var(--text-dim); margin-top:2px;}
+
+  /* ---------- Header : plusieurs icônes ---------- */
+  .header-icons{display:flex; align-items:center; gap:6px;}
+
+  /* ---------- Code d'accès / PIN ---------- */
+  .code-acces-onb .onb-body{align-items:center; text-align:center;}
+  .code-acces-onb .onb-title, .code-acces-onb .onb-desc{width:100%;}
+  .code-acces-lock{font-size:52px; margin-bottom:4px;}
+  .code-acces-field{width:100%; margin-top:22px; margin-bottom:0;}
+  .code-acces-input{
+    text-align:center; letter-spacing:.2em; text-transform:uppercase;
+    font-size:19px; font-weight:800; border:2px solid var(--accent);
+    background:rgba(245,166,35,.07);
+  }
+  .code-acces-input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .code-acces-mention{
+    margin-top:16px; font-size:11px; color:var(--text-dim); text-align:center; line-height:1.5;
+  }
+  .pin-dots{display:flex; justify-content:center; gap:14px; margin:18px 0 22px;}
+  .pin-dot{width:16px; height:16px; border-radius:50%; border:1.5px solid var(--border); background:var(--card-2);}
+  .pin-dot.filled{background:var(--accent); border-color:var(--accent);}
+  .pin-dot.filled.err{background:var(--red); border-color:var(--red);}
+  .pin-keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:280px; margin:0 auto;}
+  .pin-key{
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    border-radius:16px; font-size:20px; font-weight:700; padding:16px 0;
+  }
+  .pin-key:active{background:var(--card-2);}
+  .pin-key-empty{background:transparent; border:none;}
+
+  /* ---------- Objectif d'épargne ---------- */
+  .objectif-rappel{
+    background:rgba(91,141,239,.1); border:1px solid rgba(91,141,239,.3); border-radius:14px;
+    padding:12px 14px; font-size:12.5px; color:var(--text); line-height:1.5; margin-bottom:16px;
+  }
+  .objectif-card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px;}
+  .objectif-card .oc-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .objectif-card .oc-emoji{font-size:22px;}
+  .objectif-card .oc-nom{font-size:15px; font-weight:800; flex:1;}
+  .objectif-card .oc-montant{font-size:22px; font-weight:800; color:var(--accent);}
+  .objectif-card .oc-sub{font-size:12px; color:var(--text-dim); margin-top:2px;}
+  .objectif-card .oc-actions{display:flex; gap:8px; margin-top:12px;}
+  .objectif-card .oc-actions .btn{font-size:12.5px; padding:10px;}
+  .objectif-slot-vide{
+    background:var(--card-2); border:1.5px dashed var(--border); border-radius:16px; padding:16px;
+    margin-bottom:12px; text-align:center; position:relative; overflow:hidden;
+  }
+  .objectif-slot-vide .osv-ghost-icons{font-size:26px; letter-spacing:12px; opacity:.35; filter:blur(0.5px);}
+  .objectif-slot-vide .osv-badge{
+    display:inline-block; margin-top:10px; font-size:11.5px; font-weight:800; color:var(--accent);
+    background:rgba(245,166,35,.14); border:1px solid rgba(245,166,35,.4); border-radius:999px; padding:5px 12px;
+  }
+
+  /* ---------- étape « Vous mettez de côté pour quoi ? » (modèles) ---------- */
+  .modele-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
+  .modele-tile{
+    background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:18px 10px;
+    text-align:center; appearance:none; -webkit-appearance:none; font:inherit; color:var(--text);
+  }
+  .modele-tile.active{border-color:var(--accent); background:rgba(245,166,35,.1);}
+  .modele-tile .mt-emoji{font-size:30px; margin-bottom:8px;}
+  .modele-tile .mt-nom{font-size:14px; font-weight:800;}
+  .modele-tile .mt-desc{font-size:11px; color:var(--text-dim); margin-top:4px; line-height:1.3;}
+
+  /* ---------- Télécharger ---------- */
+  .partager-canvas-wrap{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:10px; margin-bottom:16px; overflow:hidden;}
+  .partager-canvas-wrap canvas{width:100%; height:auto; display:block; border-radius:10px;}
+  .tc-blur-layer{
+    position:absolute; left:0; top:0; right:0;
+    filter:blur(16px);
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent 28%, black 36%, black 100%);
+    mask-image:linear-gradient(to bottom, transparent 0%, transparent 28%, black 36%, black 100%);
+  }
+  .partager-overlay-abo{
+    position:absolute; left:50%; top:74%; transform:translate(-50%,-50%);
+    background:rgba(17,20,26,.75); border:1px solid rgba(245,166,35,.5); color:var(--accent);
+    font-size:14px; font-weight:800; text-align:center; padding:12px 20px; border-radius:14px;
+    max-width:80%; line-height:1.4;
+  }
+
+  /* ---------- Autres charges (rubriques) ---------- */
+  .rub-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .rub-tile{
+    display:flex; flex-direction:column; align-items:center; gap:6px; background:var(--card-2);
+    border:1.5px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center;
+  }
+  .rub-tile.selected{border-color:var(--accent); background:rgba(245,166,35,.1);}
+  .rub-tile .rub-icon{font-size:20px;}
+  .rub-tile .rub-nom{font-size:11px; font-weight:600; line-height:1.25;}
+  .rub-manage-row{
+    display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:11px 14px; margin-bottom:8px;
+  }
+  .rub-manage-row .rm-emoji{font-size:18px; width:26px; text-align:center; flex:none;}
+  .rub-manage-row .rm-nom{flex:1; font-size:13.5px; font-weight:600;}
+  .rub-manage-row .rm-del{background:none; border:none; color:var(--text-dim); font-size:15px; padding:4px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+  "use strict";
+
+  // MonDjai/Revente — Sprint Revente-B. Troisième application indépendante de
+  // la famille MonDjai, après MonDjai/Coiffure. Fork de la structure « profil
+  // unique » de MonDjai/Coiffure (Sprint 7bis) : porte d'entrée par code
+  // d'accès, navigation, Réglages, Objectif d'épargne, Télécharger (avec le
+  // flou réellement calculé sur les pixels exportés, voir construireCanvasExport
+  // ci-dessous). Toute la logique Achats/Ventes/Stock & réassort est reprise
+  // à l'identique de MonDjai/Salon F Sprint 4C (F2/F3/F4).
+  //
+  // Décisions actées avant le Sprint Revente-A (cahier des charges v1, section 11) :
+  //  - Écran Aujourd'hui : blocs cliquables (Achats/Ventes/Épargne), le bloc
+  //    Bénéfice reste informatif, non cliquable.
+  //  - Base de calcul de l'épargne automatique : le Bénéfice réalisé (la
+  //    vraie marge), jamais les Ventes encaissées (chiffre d'affaires brut).
+  //  - 4 modèles d'objectif d'épargne propres à Revente (OBJECTIF_MODELES).
+  //  - Nom retenu : « MonDjai/Revente » (nom court « Revente »).
+  //  - Pas de migration guidée depuis Salon F pour ce sprint : Revente
+  //    démarre sans données (l'utilisatrice reste libre de restaurer, plus
+  //    tard, une sauvegarde JSON Salon F si le besoin s'en fait sentir — le
+  //    format achats[]/ventes[]/config.produits est compatible).
+  //
+  // Sprint Revente-B (par-dessus la structure livrée au Sprint Revente-A) :
+  //  - Accès mensuel : bornes calendaires (mois civil), sur le modèle exact de
+  //    MonDjai/Coiffure Sprint 5B. Le mois d'installation reste le mois d'essai
+  //    gratuit avec le code d'accès initial (HKETCK, inchangé) : avant le 15 du
+  //    mois d'installation → essai jusqu'à la fin de ce même mois civil ; à
+  //    partir du 15 → essai jusqu'à la fin du mois civil suivant. Ensuite, à
+  //    chaque fin de mois civil, le code de réabonnement du mois en cours est
+  //    demandé (fonction de calcul déterministe locale, aucun appel réseau).
+  //  - Secret de calcul du code mensuel propre à Revente (SECRET_MENSUEL_REVENTE),
+  //    distinct de ceux de Coiffure et de Salon F : les codes des trois
+  //    applications ne sont jamais interchangeables.
+  //  - Réglages → Sauvegarde : au moment de l'export, proposition du dossier de
+  //    destination via l'API File System Access (showSaveFilePicker) quand le
+  //    navigateur la supporte ; repli automatique et silencieux sur le
+  //    téléchargement dans le dossier par défaut sinon (notamment
+  //    Safari/iPhone) — aucune perte de fonctionnalité ni de donnée.
+  //  - Aucun appel réseau n'est introduit par ces changements ; tout le calcul
+  //    (code du mois, bornes calendaires) reste entièrement local.
+
+  var STORAGE_KEY = "mondjai_revente_state_v1";
+
+  /* ================= Helpers ================= */
+
+  function uid(prefix){
+    return prefix + "_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8);
+  }
+  function pad2(n){ return n < 10 ? "0"+n : ""+n; }
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate());
+  }
+  function formatDateFr(s){
+    if(!s) return "";
+    var parts = s.split("-");
+    if(parts.length !== 3) return s;
+    return parts[2] + "/" + parts[1] + "/" + parts[0];
+  }
+  function formatFCFA(n){
+    var num = Math.round(Number(n) || 0);
+    var neg = num < 0;
+    num = Math.abs(num);
+    var s = String(num).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s + " F";
+  }
+  function toNum(v){
+    var n = parseFloat(String(v === undefined || v === null ? "" : v).replace(",", "."));
+    return isNaN(n) ? 0 : n;
+  }
+  function esc(s){
+    return String(s === undefined || s === null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function byId(id){ return document.getElementById(id); }
+
+  /* ================= Données par défaut ================= */
+
+  function seedRubriquesChargesDefaut(){
+    return RUBRIQUES_CHARGES_DEFAUT.map(function(r){
+      return { id:r.id, nom:r.nom, emoji:r.emoji, actif:r.actif, perso:false };
+    });
+  }
+  var RUBRIQUES_CHARGES_DEFAUT = [
+    { id:"loyer", nom:"Loyer / local de stockage", emoji:"🏠", actif:true },
+    { id:"transport_general", nom:"Transport / déplacement", emoji:"🚚", actif:true },
+    { id:"publicite", nom:"Publicité", emoji:"📣", actif:true },
+    { id:"emballage", nom:"Emballage / conditionnement", emoji:"📦", actif:false },
+    { id:"communication", nom:"Crédit téléphone / communication", emoji:"📱", actif:false },
+    { id:"autre", nom:"Autre", emoji:"📝", actif:true }
+  ];
+
+  function defaultState(){
+    return {
+      version: 1,
+      config: {
+        produits: [],                 // { id, nom, dernierPrixAchat, dernierPrixVenteEstime, seuilReassort }
+        rubriquesCharges: seedRubriquesChargesDefaut(),
+        codeAccesOk: false,
+        derniereValidationAcces: null,
+        moisAccesValide: null,        // { mois, annee } — dernier mois civil couvert par l'accès (essai ou code mensuel)
+        pinActif: false,
+        pinCode: null
+      },
+      achats: [],
+      ventes: [],
+      autresCharges: [],
+      objectifEpargne: null,          // { id, nom, emoji, type:'auto'|'manuel', pourcentage/montant, dateCreation }
+      objectifsVerrouilles: [],       // emplacements grisés en annonce (jamais affichés en détail)
+      meta: { creation: todayStr(), derniereSauvegarde: null }
+    };
+  }
+
+  function merge(base, extra){
+    var out = {};
+    for(var k in base) out[k] = base[k];
+    if(extra) for(var k2 in extra) if(extra[k2] !== undefined) out[k2] = extra[k2];
+    return out;
+  }
+
+  var state;
+
+  // Fusion défensive d'un état chargé (localStorage) ou importé (JSON) avec
+  // l'état par défaut. Accepte aussi, en repli, une sauvegarde faite depuis
+  // MonDjai/Salon F (mêmes champs achats/ventes/config.produits de base) —
+  // toute donnée propre aux autres profils (prestations coiffure/pédicure)
+  // est simplement ignorée, sans faire échouer tout l'import.
+  function normaliserEtatImporte(parsed){
+    var base = defaultState();
+    if(!parsed || typeof parsed !== "object") return base;
+    var out = merge(base, parsed);
+    out.config = merge(base.config, parsed.config || {});
+    if(!Array.isArray(out.config.produits)) out.config.produits = [];
+    if(!Array.isArray(out.config.rubriquesCharges) || !out.config.rubriquesCharges.length) out.config.rubriquesCharges = base.config.rubriquesCharges;
+    if(!Array.isArray(out.achats)) out.achats = [];
+    if(!Array.isArray(out.ventes)) out.ventes = [];
+    if(!Array.isArray(out.autresCharges)) out.autresCharges = [];
+    if(!Array.isArray(out.objectifsVerrouilles)) out.objectifsVerrouilles = [];
+    if(out.objectifEpargne && typeof out.objectifEpargne !== "object") out.objectifEpargne = null;
+    out.meta = merge(base.meta, parsed.meta || {});
+    migrerValidationAcces(out);
+    migrerAccesCalendaire(out);
+    return out;
+  }
+
+  // Amendement Sprint Revente-B (repris tel quel de Coiffure Sprint 4C/5B) : un
+  // état déjà validé (codeAccesOk vrai) mais sans horodatage de dernière
+  // validation vient forcément d'un état Sprint Revente-A — on lui accorde un
+  // horodatage "maintenant" plutôt que de considérer l'accès expiré dès la
+  // mise à jour de l'application.
+  function migrerValidationAcces(out){
+    if(out.config.codeAccesOk && !out.config.derniereValidationAcces){
+      out.config.derniereValidationAcces = Date.now();
+    }
+  }
+
+  // Sprint Revente-B : un état déjà validé (codeAccesOk vrai) qui n'a pas
+  // encore de `moisAccesValide` vient forcément du Sprint Revente-A (accès
+  // initial simple, sans accès mensuel calendaire). On calcule le mois d'essai
+  // qui aurait dû s'appliquer à partir de la date d'installation réelle
+  // (`meta.creation`, fixée dès le tout premier lancement et jamais réécrite) ;
+  // si une validation plus récente existe déjà, on ne fait jamais reculer
+  // l'accès déjà acquis — on couvre au moins son mois. Une migration technique
+  // ne doit jamais bloquer immédiatement une utilisatrice déjà à jour.
+  function migrerAccesCalendaire(out){
+    if(!out.config.codeAccesOk) return;
+    if(out.config.moisAccesValide) return;
+    var installation = parseDateStr(out.meta.creation) || new Date();
+    var couverture = finEssaiPourInstallation(installation);
+    if(out.config.derniereValidationAcces){
+      var dv = new Date(out.config.derniereValidationAcces);
+      var moisValidation = { mois: dv.getMonth()+1, annee: dv.getFullYear() };
+      if(compareMoisAnnee(moisValidation, couverture) > 0) couverture = moisValidation;
+    }
+    out.config.moisAccesValide = couverture;
+  }
+
+  function loadState(){
+    var raw;
+    try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ raw = null; }
+    if(!raw) return defaultState();
+    var parsed;
+    try{ parsed = JSON.parse(raw); }catch(e){ return defaultState(); }
+    return normaliserEtatImporte(parsed);
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ /* stockage indisponible : on continue quand même */ }
+  }
+
+  /* ================= Sauvegarde / restauration JSON ================= */
+  // Sprint Revente-B (repris à l'identique de Coiffure Sprint 5B, F11) : quand
+  // le navigateur propose l'API File System Access (Chrome/Edge/Android), on
+  // laisse l'utilisatrice choisir le dossier de destination. Sinon (notamment
+  // Safari/iPhone), repli automatique et silencieux sur le téléchargement dans
+  // le dossier par défaut — comportement du Sprint Revente-A, inchangé. Aucun
+  // appel réseau dans les deux cas.
+
+  function exporterJson(){
+    var filename = "mondjai-revente-" + todayStr() + ".json";
+    var contenu = JSON.stringify(state, null, 2);
+    if(typeof window.showSaveFilePicker === "function"){
+      exporterJsonAvecChoixDossier(contenu, filename);
+    } else {
+      exporterJsonTelechargementDirect(contenu, filename);
+    }
+  }
+  function marquerSauvegardeReussie(message){
+    state.meta.derniereSauvegarde = todayStr();
+    saveState();
+    ui.backupMsg = message;
+    render();
+  }
+  function exporterJsonTelechargementDirect(contenu, filename){
+    try{
+      var blob = new Blob([contenu], { type:"application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      marquerSauvegardeReussie("Sauvegarde téléchargée.");
+    }catch(e){
+      ui.backupMsg = "Impossible de générer le fichier sur cet appareil.";
+      render();
+    }
+  }
+  function exporterJsonAvecChoixDossier(contenu, filename){
+    window.showSaveFilePicker({
+      suggestedName: filename,
+      types: [{ description: "Sauvegarde MonDjai/Revente", accept: { "application/json": [".json"] } }]
+    }).then(function(handle){
+      return handle.createWritable().then(function(writable){
+        return writable.write(contenu).then(function(){ return writable.close(); });
+      });
+    }).then(function(){
+      marquerSauvegardeReussie("Sauvegarde enregistrée.");
+    }).catch(function(err){
+      if(err && err.name === "AbortError"){
+        // L'utilisatrice a annulé la boîte de dialogue : choix délibéré, on ne
+        // force pas de second téléchargement et on ne signale pas d'erreur.
+        return;
+      }
+      // Tout autre échec (permission refusée, navigateur capricieux…) : jamais
+      // laisser l'utilisatrice sans sauvegarde — repli automatique et silencieux.
+      exporterJsonTelechargementDirect(contenu, filename);
+    });
+  }
+
+  function importerJsonDepuisFichier(file, callback){
+    if(!file){ callback(false); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      var parsed;
+      try{ parsed = JSON.parse(reader.result); }catch(e){ callback(false); return; }
+      state = normaliserEtatImporte(parsed);
+      saveState();
+      callback(true);
+    };
+    reader.onerror = function(){ callback(false); };
+    reader.readAsText(file);
+  }
+
+  /* ================= UI (non persisté) ================= */
+
+  var ui = {
+    tab: "aujourdhui",
+    overlay: null,       // null | 'reglages' | 'apropos' | 'objectif' | 'habitudes' | 'telecharger'
+    modal: null,
+    draft: {},
+    errors: {},
+    pendingAutofocus: false,
+    locked: false,
+    codeAccesInput: "",
+    codeAccesErreur: "",
+    objDraft: null,
+    etatPeriode: "jour",
+    etatSemaineRef: null,
+    etatMoisRef: null,
+    etatSelSemaine: null,
+    etatSelJour: null,
+    habitudesPeriode: "jour",
+    habitudesSemaineRef: null,
+    habitudesMoisRef: null,
+    telechargerPeriode: "jour",
+    telechargerSemaineRef: null,
+    telechargerMoisRef: null,
+    reglagesMsg: "",
+    backupMsg: "",
+    modalReturnTo: null,
+    abonnementToggles: {}
+  };
+
+  var TAB_DEFS = [
+    { key:"aujourdhui", label:"Aujourd’hui", emoji:"🏠" },
+    { key:"achats", label:"Achats", emoji:"📦" },
+    { key:"ventes", label:"Ventes", emoji:"🛍️" },
+    { key:"etat", label:"Mon état", emoji:"📊" }
+  ];
+
+  /* ================= Produits ================= */
+
+  function findOrCreateProduit(nom, prixAchat, prixVente){
+    nom = String(nom || "").trim();
+    if(!nom) return null;
+    var list = state.config.produits;
+    var existing = list.filter(function(p){ return p.nom.toLowerCase() === nom.toLowerCase(); })[0];
+    if(existing){
+      if(prixAchat !== undefined && prixAchat !== null) existing.dernierPrixAchat = prixAchat;
+      if(prixVente !== undefined && prixVente !== null) existing.dernierPrixVenteEstime = prixVente;
+      return existing;
+    }
+    var item = { id: uid("prod"), nom: nom,
+      dernierPrixAchat: (prixAchat===undefined?null:prixAchat),
+      dernierPrixVenteEstime: (prixVente===undefined?null:prixVente) };
+    list.push(item);
+    return item;
+  }
+  function findProduitById(id){
+    var list = state.config.produits;
+    for(var i=0;i<list.length;i++) if(list[i].id === id) return list[i];
+    return null;
+  }
+
+  /* ================= Rendu racine ================= */
+
+  function render(){
+    var app = byId("app");
+    if(!state.config.codeAccesOk){
+      app.innerHTML = renderCodeAcces("initial");
+      afterRender();
+      return;
+    }
+    if(accesMensuelExpire()){
+      app.innerHTML = renderCodeAcces("renouvellement");
+      afterRender();
+      return;
+    }
+    if(ui.locked){
+      var htmlLock = renderPinLock();
+      if(ui.modal) htmlLock += renderModal();
+      app.innerHTML = htmlLock;
+      afterRender();
+      return;
+    }
+    var html = "";
+    if(ui.overlay === "reglages"){
+      html = renderReglages();
+    } else if(ui.overlay === "apropos"){
+      html = renderApropos();
+    } else if(ui.overlay === "objectif"){
+      html = renderObjectifOverlay();
+    } else if(ui.overlay === "habitudes"){
+      html = renderHabitudesOverlay();
+    } else if(ui.overlay === "telecharger"){
+      html = renderTelechargerOverlay();
+    } else {
+      html = renderHeader() + renderMain() + renderTabBar();
+    }
+    if(ui.modal){
+      html += renderModal();
+    }
+    app.innerHTML = html;
+    afterRender();
+  }
+
+  function afterRender(){
+    if(ui.pendingAutofocus){
+      var autoFocus = document.querySelector("[data-autofocus]");
+      if(autoFocus){
+        try{ autoFocus.focus(); }catch(e){}
+      }
+      ui.pendingAutofocus = false;
+    }
+    if(ui.overlay === "telecharger" && !ui.modal){
+      dessinerCarteTelecharger();
+    }
+  }
+
+  /* ================= Écran « Code d'accès » ================= */
+  // Sprint Revente-A : code initial partagé. Sprint Revente-B : accès mensuel
+  // à bornes calendaires (voir plus bas), sur le modèle exact de Coiffure
+  // Sprint 5B — même écran, seul le sous-titre change selon le mode.
+
+  var CODE_ACCES_ATTENDU = "HKETCK";
+  function normaliserCode(s){
+    return String(s||"").toUpperCase().replace(/\s+/g,"");
+  }
+
+  // ----- Accès mensuel calendaire (Sprint Revente-B, repris de Coiffure 5B) -----
+
+  // Secret propre à Revente, jamais interchangeable avec celui de Coiffure
+  // (MDJ-COIFFURE-2026-R4XN) ni de Salon F (MDJ-SALONF-2026-K7QT). Utilisé
+  // également par l'outil séparé outil-code-mensuel-revente.html (non livré
+  // aux utilisatrices) pour calculer les codes de réabonnement — toute
+  // modification future du secret ou de l'algorithme dans l'un des deux
+  // fichiers doit être répercutée à l'identique dans l'autre.
+  var SECRET_MENSUEL_REVENTE = "MDJ-REVENTE-2026-T8VM";
+  var LETTRES_CODE_MENSUEL = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+  function hashFnv1a(str){
+    var h = 2166136261;
+    for(var i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+  function fmix32(h){
+    h ^= h >>> 16;
+    h = Math.imul(h, 0x85ebca6b) >>> 0;
+    h ^= h >>> 13;
+    h = Math.imul(h, 0xc2b2ae35) >>> 0;
+    h ^= h >>> 16;
+    return h >>> 0;
+  }
+  function codeAccesDuMois(mois, annee, secret){
+    var base = String(secret) + "|" + String(annee) + "-" + pad2(mois) + "|";
+    var code = "";
+    for(var i=0;i<6;i++){
+      var h = fmix32(hashFnv1a(base + i));
+      code += LETTRES_CODE_MENSUEL.charAt(h % LETTRES_CODE_MENSUEL.length);
+    }
+    return code;
+  }
+  function codeAccesDuMoisAttenduAujourdhui(){
+    var d = new Date();
+    return codeAccesDuMois(d.getMonth()+1, d.getFullYear(), SECRET_MENSUEL_REVENTE);
+  }
+
+  // Parse une date "YYYY-MM-DD" (format utilisé par todayStr/meta.creation) en
+  // objet Date local — jamais via `new Date(chaine)`, qui peut être interprété
+  // en UTC selon le moteur et décaler le jour d'une unité près de minuit.
+  function parseDateStr(s){
+    if(!s) return null;
+    var parts = String(s).split("-");
+    if(parts.length !== 3) return null;
+    var y = parseInt(parts[0],10), m = parseInt(parts[1],10), d = parseInt(parts[2],10);
+    if(!y || !m || !d) return null;
+    return new Date(y, m-1, d);
+  }
+  function moisSuivant(mois, annee){
+    mois = mois + 1;
+    if(mois > 12){ mois = 1; annee = annee + 1; }
+    return { mois: mois, annee: annee };
+  }
+  // Compare deux { mois, annee } : négatif si a < b, positif si a > b, 0 si égal.
+  function compareMoisAnnee(a, b){
+    if(a.annee !== b.annee) return a.annee - b.annee;
+    return a.mois - b.mois;
+  }
+  // Installation avant le 15 du mois → essai jusqu'à la fin de ce même mois
+  // civil ; à partir du 15 → essai jusqu'à la fin du mois civil suivant
+  // (garantit dans tous les cas au moins deux semaines pleines d'essai).
+  function finEssaiPourInstallation(dateInstallation){
+    var jour = dateInstallation.getDate();
+    var mois = dateInstallation.getMonth()+1;
+    var annee = dateInstallation.getFullYear();
+    if(jour < 15) return { mois: mois, annee: annee };
+    return moisSuivant(mois, annee);
+  }
+  // Accès expiré dès que le mois civil en cours dépasse le dernier mois
+  // couvert (`moisAccesValide`). Comme pour le code d'accès initial : aucune
+  // donnée n'est jamais supprimée pendant qu'un renouvellement est en attente,
+  // seul l'accès est bloqué.
+  function accesMensuelExpire(){
+    if(!state.config.codeAccesOk) return false;
+    var couverture = state.config.moisAccesValide;
+    if(!couverture) return false; // état inattendu (migration en attente) : ne jamais bloquer par sécurité
+    var d = new Date();
+    var actuel = { mois: d.getMonth()+1, annee: d.getFullYear() };
+    return compareMoisAnnee(actuel, couverture) > 0;
+  }
+
+  function renderCodeAcces(mode){
+    var estRenouvellement = (mode === "renouvellement");
+    var desc = estRenouvellement
+      ? "Votre accès du mois est arrivé à échéance. Entrez le code reçu pour continuer."
+      : "Entrez le code qui vous a été communiqué pour ouvrir MonDjai/Revente.";
+    return (
+      '<div class="onb code-acces-onb">' +
+        '<div class="onb-body">' +
+          '<div class="code-acces-lock">🔐</div>' +
+          '<div class="onb-title">Code d’accès</div>' +
+          '<div class="onb-desc">' + desc + '</div>' +
+          '<div class="field code-acces-field">' +
+            '<input type="text" class="input code-acces-input" id="f-codeAcces" autocapitalize="characters" autocomplete="off" ' +
+              'placeholder="Ex. ABCDEF" value="' + esc(ui.codeAccesInput||"") + '" data-autofocus data-action-change="capture-code-acces">' +
+            (ui.codeAccesErreur ? '<div class="error-text" style="text-align:center;">' + esc(ui.codeAccesErreur) + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="btn btn-primary" data-action="valider-code-acces">Continuer</button>' +
+        '<div class="code-acces-mention">Application protégée. Toute reproduction ou utilisation non autorisée est interdite.</div>' +
+      '</div>'
+    );
+  }
+
+  /* ================= Verrouillage PIN ================= */
+
+  function renderPinDots(n, actif, erreur){
+    var dots = "";
+    for(var i=0;i<4;i++){
+      dots += '<div class="pin-dot' + (i<n?" filled":"") + (erreur?" err":"") + '"></div>';
+    }
+    return '<div class="pin-dots">' + dots + '</div>';
+  }
+  function renderPinKeypad(idPrefix){
+    var touches = ["1","2","3","4","5","6","7","8","9","","0","del"];
+    var cells = touches.map(function(t){
+      if(t === "") return '<div class="pin-key pin-key-empty"></div>';
+      if(t === "del") return '<button type="button" class="pin-key" data-action="pin-key" data-id="' + idPrefix + '" data-val="del">⌫</button>';
+      return '<button type="button" class="pin-key" data-action="pin-key" data-id="' + idPrefix + '" data-val="' + t + '">' + t + '</button>';
+    }).join("");
+    return '<div class="pin-keypad">' + cells + '</div>';
+  }
+  function renderPinLock(){
+    var saisie = ui.pinLockInput || "";
+    var erreur = !!ui.pinLockErreur;
+    return (
+      '<div class="onb">' +
+        '<div class="onb-head">' +
+          '<div class="onb-emoji">🔒</div>' +
+          '<div class="onb-title">Code PIN</div>' +
+          '<div class="onb-desc">Entrez votre code à 4 chiffres pour ouvrir l’application.</div>' +
+        '</div>' +
+        '<div class="onb-body">' +
+          renderPinDots(saisie.length, saisie.length>0, erreur) +
+          (erreur ? '<div class="error-text" style="text-align:center;">Code incorrect, réessayez.</div>' : '') +
+          renderPinKeypad("lock") +
+          '<button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="pin-oublie">Code oublié ?</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+  function renderPinSetupModal(){
+    var step = ui.pinSetupStep || "premier";
+    var input = ui.pinSetupInput || "";
+    var titre = step === "premier" ? "Choisissez un code à 4 chiffres" : "Confirmez le code";
+    return (
+      '<div>' +
+        '<div class="hint" style="text-align:center; margin-bottom:6px;">' + esc(titre) + '</div>' +
+        renderPinDots(input.length, input.length>0, false) +
+        (ui.pinSetupErreur ? '<div class="error-text" style="text-align:center;">Les deux codes ne correspondent pas, recommencez.</div>' : '') +
+        renderPinKeypad("setup") +
+      '</div>'
+    );
+  }
+  function renderPinOublieModal(){
+    if(ui.modal.confirmErase){
+      return (
+        '<div class="confirm-box"><p>Effacer toutes les données de l’appareil ? Achats, ventes, charges et objectif — tout sera perdu, cette action est définitive.</p>' +
+          '<div class="btn-row">' +
+            '<button type="button" class="btn btn-secondary" data-action="annuler-erase">Annuler</button>' +
+            '<button type="button" class="btn btn-danger" data-action="confirmer-erase">Oui, tout effacer</button>' +
+          '</div></div>'
+      );
+    }
+    return (
+      '<div>' +
+        '<div class="hint" style="margin-bottom:14px;">Vous pouvez restaurer une sauvegarde JSON — le code PIN qu’elle contient s’appliquera, sans connaître le code actuel — ou repartir de zéro.</div>' +
+        '<label class="btn btn-secondary" style="display:flex; cursor:pointer; margin-bottom:10px;">📂 Restaurer une sauvegarde JSON' +
+          '<input type="file" accept="application/json" style="display:none;" data-action-change="importer-json-lock"></label>' +
+        (ui.backupMsg ? '<div class="hint tight" style="margin-bottom:10px;">' + esc(ui.backupMsg) + '</div>' : '') +
+        '<button type="button" class="btn btn-danger" data-action="demander-erase">🗑️ Effacer toutes les données</button>' +
+      '</div>'
+    );
+  }
+  function handlePinKey(prefix, val){
+    if(prefix === "lock"){
+      if(ui.pinLockErreur){ ui.pinLockInput = ""; ui.pinLockErreur = false; }
+      if(val === "del"){ ui.pinLockInput = (ui.pinLockInput||"").slice(0,-1); render(); return; }
+      var cur = ui.pinLockInput || "";
+      if(cur.length >= 4) return;
+      cur += val;
+      ui.pinLockInput = cur;
+      if(cur.length === 4){
+        if(cur === state.config.pinCode){
+          ui.locked = false; ui.pinLockInput = "";
+        } else {
+          ui.pinLockErreur = true;
+        }
+      }
+      render();
+      return;
+    }
+    if(prefix === "setup"){
+      if(val === "del"){ ui.pinSetupInput = (ui.pinSetupInput||"").slice(0,-1); render(); return; }
+      var cur2 = ui.pinSetupInput || "";
+      if(cur2.length >= 4) return;
+      cur2 += val;
+      ui.pinSetupInput = cur2;
+      if(cur2.length === 4){
+        if((ui.pinSetupStep||"premier") === "premier"){
+          ui.pinSetupPremier = cur2;
+          ui.pinSetupInput = "";
+          ui.pinSetupStep = "confirmer";
+          ui.pinSetupErreur = false;
+        } else {
+          if(cur2 === ui.pinSetupPremier){
+            state.config.pinActif = true;
+            state.config.pinCode = cur2;
+            saveState();
+            closeModal();
+            return;
+          }
+          ui.pinSetupErreur = true;
+          ui.pinSetupStep = "premier";
+          ui.pinSetupPremier = "";
+          ui.pinSetupInput = "";
+        }
+      }
+      render();
+      return;
+    }
+  }
+
+  /* ================= Header + tabbar ================= */
+
+  function renderHeader(){
+    return (
+      '<div class="header">' +
+        '<div class="brand">' +
+          '<div class="brand-emoji">🛍️</div>' +
+          '<div class="brand-text">' +
+            '<div class="brand-title">MonDjai/Revente</div>' +
+            '<div class="brand-sub">Achats, ventes &amp; stock</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="header-icons">' +
+          '<button type="button" class="icon-btn" data-action="ouvrir-habitudes" aria-label="Mes habitudes">📈</button>' +
+          '<button type="button" class="icon-btn" data-action="ouvrir-telecharger" aria-label="Télécharger">⬇️</button>' +
+          renderEpargneShortcut() +
+          '<button type="button" class="icon-btn" data-action="ouvrir-reglages" aria-label="Réglages">⚙️</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderEpargneShortcut(){
+    var epargne = state.objectifEpargne ? epargneJour(todayStr()) : 0;
+    var val = state.objectifEpargne ? formatFCFA(epargne) : "Aucun";
+    return (
+      '<button type="button" class="icon-btn epargne-shortcut" data-action="ouvrir-objectif" aria-label="Objectif épargne">' +
+        '<span class="es-emoji">' + esc(epargneEmoji()) + '</span><span class="es-val">' + esc(val) + '</span>' +
+      '</button>'
+    );
+  }
+
+  function renderTabBar(){
+    var items = TAB_DEFS.map(function(t){
+      return (
+        '<button type="button" class="tab' + (ui.tab===t.key?" active":"") + '" data-action="go-tab" data-tab="' + t.key + '">' +
+          '<span class="tab-emoji">' + t.emoji + '</span>' +
+          '<span class="tab-label">' + t.label + '</span>' +
+        '</button>'
+      );
+    }).join("");
+    return '<div class="tabbar">' + items + '</div>';
+  }
+
+  function renderMain(){
+    var body = "";
+    switch(ui.tab){
+      case "aujourdhui": body = renderAujourdhui(); break;
+      case "achats": body = renderListeAchats(); break;
+      case "ventes": body = renderListeVentes(); break;
+      case "etat": body = renderMonEtat(); break;
+      default: body = "";
+    }
+    var fab = renderFab();
+    return '<div class="main with-tabbar">' + body + '</div>' + fab;
+  }
+
+  function renderFab(){
+    var action = { achats:"add-achat", ventes:"add-vente" }[ui.tab];
+    if(!action) return "";
+    return '<button type="button" class="fab" data-action="' + action + '" aria-label="Ajouter">+</button>';
+  }
+
+  /* ================= Calculs de dates/périodes ================= */
+
+  function sortByDateDesc(arr){
+    return arr.slice().sort(function(a,b){
+      if(a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return (b.ts||0) - (a.ts||0);
+    });
+  }
+  function dateFromStr(s){
+    var p = s.split("-");
+    return new Date(+p[0], +p[1]-1, +p[2]);
+  }
+  function dateKey(d){ return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate()); }
+
+  function getDayRange(d){ var k = dateKey(d); return { start:k, end:k }; }
+  function getWeekRange(d){
+    var day = d.getDay();
+    var diffLundi = (day === 0) ? -6 : (1 - day);
+    var lundi = new Date(d); lundi.setDate(d.getDate() + diffLundi);
+    var dimanche = new Date(lundi); dimanche.setDate(lundi.getDate() + 6);
+    return { start: dateKey(lundi), end: dateKey(dimanche) };
+  }
+  function getMonthRange(d){
+    var premier = new Date(d.getFullYear(), d.getMonth(), 1);
+    var dernier = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    return { start: dateKey(premier), end: dateKey(dernier) };
+  }
+  function rangeForPeriode(periode, ref){
+    if(periode === "semaine") return getWeekRange(ref);
+    if(periode === "mois") return getMonthRange(ref);
+    return getDayRange(ref);
+  }
+  function inRange(dateStr, range){ return !!dateStr && dateStr >= range.start && dateStr <= range.end; }
+  function filterRange(arr, range){ return arr.filter(function(x){ return inRange(x.date, range); }); }
+  function sumBy(arr, fn){ return arr.reduce(function(s,x){ return s + (Number(fn(x)) || 0); }, 0); }
+
+  function allActivityDates(){
+    var set = {};
+    state.achats.forEach(function(a){ if(a.date) set[a.date] = 1; });
+    state.ventes.forEach(function(v){ if(v.date) set[v.date] = 1; });
+    state.autresCharges.forEach(function(c){ if(c.date) set[c.date] = 1; });
+    return Object.keys(set).sort();
+  }
+  function earliestActivityWeekStart(){
+    var dates = allActivityDates();
+    if(!dates.length) return getWeekRange(new Date()).start;
+    return getWeekRange(dateFromStr(dates[0])).start;
+  }
+  function earliestActivityMonthStart(){
+    var dates = allActivityDates();
+    if(!dates.length) return getMonthRange(new Date()).start;
+    return getMonthRange(dateFromStr(dates[0])).start;
+  }
+  // Un jour est "actif" (pour le mode Manuel de l'épargne) dès qu'un achat ou
+  // une vente y a été enregistré.
+  function joursActifsDansPeriode(range){
+    var set = {};
+    state.achats.forEach(function(a){ if(inRange(a.date, range)) set[a.date] = 1; });
+    state.ventes.forEach(function(v){ if(inRange(v.date, range)) set[v.date] = 1; });
+    return Object.keys(set).length;
+  }
+
+  function chargesCommunesTotal(range){
+    return sumBy(filterRange(state.autresCharges, range), function(c){ return c.montant; });
+  }
+
+  /* ================= F4 : Suivi de stock & réassort (repris de Salon F) ================= */
+
+  var SEUIL_REASSORT_DEFAUT = 3;
+
+  function computeStockProduit(p){
+    var achatsP = state.achats.filter(function(a){ return a.produitId === p.id; });
+    var ventesP = state.ventes.filter(function(v){ return v.produitId === p.id; });
+    var ventesStock = ventesP.filter(function(v){ return v.typeVente !== "commande_speciale"; });
+    var ventesCommande = ventesP.filter(function(v){ return v.typeVente === "commande_speciale"; });
+
+    var totalAchatQte = sumBy(achatsP, function(a){ return a.quantite; });
+    var totalAchatValeur = sumBy(achatsP, function(a){ return a.quantite * a.prixAchatUnitaire; });
+    var coutMoyen = totalAchatQte > 0 ? totalAchatValeur / totalAchatQte : 0;
+
+    var qteVendueStock = sumBy(ventesStock, function(v){ return v.quantite; });
+    var stockRestant = Math.max(0, totalAchatQte - qteVendueStock);
+
+    var prixVenteRef = (p.dernierPrixVenteEstime === null || p.dernierPrixVenteEstime === undefined) ? 0 : p.dernierPrixVenteEstime;
+
+    var caStock = sumBy(ventesStock, function(v){ return v.montantEncaisse; });
+    var beneficeStock = caStock - qteVendueStock * coutMoyen;
+    var caCommande = sumBy(ventesCommande, function(v){ return v.montantEncaisse; });
+    var beneficeCommande = sumBy(ventesCommande, function(v){ return v.montantEncaisse - (v.prixPayeRevendeur||0); });
+
+    var beneficeAttendu = sumBy(achatsP, function(a){ return a.quantite * ((a.prixVenteUnitaireEstime||0) - (a.prixAchatUnitaire||0)); });
+
+    var seuil = (p.seuilReassort===undefined || p.seuilReassort===null) ? SEUIL_REASSORT_DEFAUT : p.seuilReassort;
+
+    return {
+      produit: p, totalAchatQte: totalAchatQte, coutMoyen: coutMoyen, stockRestant: stockRestant,
+      valeurStockCout: stockRestant * coutMoyen, valeurStockVente: stockRestant * prixVenteRef,
+      caTotal: caStock + caCommande, beneficeRealise: beneficeStock + beneficeCommande,
+      beneficeAttendu: beneficeAttendu, seuil: seuil, alerte: stockRestant <= seuil
+    };
+  }
+
+  function renderStockSection(){
+    var produits = state.config.produits.slice().sort(function(a,b){ return a.nom.localeCompare(b.nom); });
+    if(!produits.length) return "";
+    var cards = produits.map(function(p){
+      var s = computeStockProduit(p);
+      return (
+        '<div class="stock-card">' +
+          '<div class="sc-head">' +
+            '<div class="sc-nom">' + esc(p.nom) + '</div>' +
+            (s.alerte ? '<div class="sc-alerte">Stock bas</div>' : '') +
+          '</div>' +
+          '<div class="sc-grid">' +
+            '<div class="sk">Stock restant</div><div class="sv">' + s.stockRestant + ' paquet(s)</div>' +
+            '<div class="sk">Coût moyen</div><div class="sv">' + formatFCFA(s.coutMoyen) + '</div>' +
+            '<div class="sk">Valeur (coût)</div><div class="sv">' + formatFCFA(s.valeurStockCout) + '</div>' +
+            '<div class="sk">Valeur (vente est.)</div><div class="sv">' + formatFCFA(s.valeurStockVente) + '</div>' +
+            '<div class="sk">Bénéfice réalisé</div><div class="sv">' + formatFCFA(s.beneficeRealise) + '</div>' +
+            '<div class="sk">Bénéfice attendu</div><div class="sv">' + formatFCFA(s.beneficeAttendu) + '</div>' +
+          '</div>' +
+          '<div class="sc-seuil">' +
+            '<label>Seuil de réassort</label>' +
+            '<input type="number" min="0" step="1" value="' + s.seuil + '" data-action-change="set-seuil-reassort" data-id="' + p.id + '">' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+    return '<div class="reglages-section"><div class="rs-title">Suivi de stock &amp; réassort</div>' + cards + '</div>';
+  }
+
+  // Bénéfice réalisé (marge réelle) — même méthode que le Suivi de stock F4.
+  function beneficeReventePeriode(range){
+    return sumBy(filterRange(state.ventes, range), function(v){
+      if(v.typeVente === "commande_speciale") return v.montantEncaisse - (v.prixPayeRevendeur||0);
+      var p = findProduitById(v.produitId);
+      var coutMoyen = p ? computeStockProduit(p).coutMoyen : 0;
+      return v.montantEncaisse - v.quantite * coutMoyen;
+    });
+  }
+  function beneficeReventeTotal(){
+    return sumBy(state.config.produits, function(p){ return computeStockProduit(p).beneficeRealise; });
+  }
+
+  function emptyState(emoji, titre, desc){
+    return '<div class="empty-state"><div class="es-emoji">' + emoji + '</div>' +
+      '<div class="es-title">' + esc(titre) + '</div>' +
+      '<div class="es-desc">' + esc(desc) + '</div></div>';
+  }
+
+  /* ================= Objectif d'épargne — base : Bénéfice réalisé ================= */
+  // Cahier des charges v1, section 6 (point tranché) : l'épargne automatique
+  // est un pourcentage du Bénéfice réalisé (la vraie marge), jamais des
+  // Ventes encaissées (chiffre d'affaires brut, qui inclut le coût des
+  // mèches déjà payées à l'achat) — pour ne jamais proposer une épargne non
+  // soutenable une fois le stock racheté.
+  function epargnePeriode(range){
+    if(!state.objectifEpargne) return 0;
+    var o = state.objectifEpargne;
+    if(o.type === "manuel"){
+      return joursActifsDansPeriode(range) * (o.montant || 0);
+    }
+    return beneficeReventePeriode(range) * (o.pourcentage || 0) / 100;
+  }
+  function epargneJour(dateStr){ return epargnePeriode({ start:dateStr, end:dateStr }); }
+
+  // 4 modèles d'objectif d'épargne propres à Revente (cahier, section 7,
+  // point confirmé par Hamadou sans ajustement).
+  var OBJECTIF_MODELES = [
+    { id:"stock", emoji:"📦", nom:"Agrandir le stock", desc:"Racheter plus de produits, diversifier les références" },
+    { id:"transport", emoji:"🚚", nom:"Transport & livraison", desc:"Moto, frais de livraison aux clientes, déplacement fournisseur" },
+    { id:"famille", emoji:"👨‍👩‍👧", nom:"Famille", desc:"Mariage, scolarité, santé" },
+    { id:"libre", emoji:"💰", nom:"Épargne libre", desc:"Juste mettre de côté, sans montant précis" }
+  ];
+  function findObjectifModele(id){
+    for(var i=0;i<OBJECTIF_MODELES.length;i++) if(OBJECTIF_MODELES[i].id === id) return OBJECTIF_MODELES[i];
+    return null;
+  }
+  function epargneEmoji(){
+    return (state.objectifEpargne && state.objectifEpargne.emoji) || "💰";
+  }
+
+  // Solde net (Mon état / Télécharger) = Bénéfice réalisé − Épargne − Charges
+  // communes, même principe que Coiffure (Main d’œuvre − Épargne − Charges).
+  function soldeNetPeriode(range){
+    return beneficeReventePeriode(range) - epargnePeriode(range) - chargesCommunesTotal(range);
+  }
+  function soldeNetJour(dateStr){ return soldeNetPeriode({ start:dateStr, end:dateStr }); }
+
+  /* ================= Écran « Aujourd’hui » ================= */
+  // Cahier des charges v1, section 5.1 (point tranché, option B) : blocs
+  // cliquables Achats/Ventes/Épargne, chaque bloc ouvre le détail du jour
+  // correspondant ; le bloc Bénéfice reste informatif (non cliquable).
+
+  function renderAujourdhui(){
+    var today = todayStr();
+    var range = { start: today, end: today };
+    var achatsJour = sumBy(filterRange(state.achats, range), function(a){ return (a.quantite||0)*(a.prixAchatUnitaire||0) + (a.charges||0); });
+    var ventesJour = sumBy(filterRange(state.ventes, range), function(v){ return v.montantEncaisse; });
+    var beneficeTotal = beneficeReventeTotal();
+    var epargne = state.objectifEpargne ? epargneJour(today) : 0;
+
+    var blocks =
+      '<button type="button" class="dash-block" style="color:var(--text);" data-action="voir-jour-achats">' +
+        '<div class="db-emoji">📦</div><div class="db-amount">' + formatFCFA(achatsJour) + '</div><div class="db-label">Achats du jour</div>' +
+      '</button>' +
+      '<button type="button" class="dash-block" style="color:var(--text);" data-action="voir-jour-ventes">' +
+        '<div class="db-emoji">🛍️</div><div class="db-amount">' + formatFCFA(ventesJour) + '</div><div class="db-label">Ventes du jour</div>' +
+      '</button>' +
+      '<div class="dash-block info">' +
+        '<div class="db-emoji">💹</div><div class="db-amount">' + formatFCFA(beneficeTotal) + '</div><div class="db-label">Bénéfice (à date)</div>' +
+      '</div>' +
+      '<button type="button" class="dash-block" style="color:var(--text);" data-action="ouvrir-objectif">' +
+        '<div class="db-emoji">' + esc(epargneEmoji()) + '</div><div class="db-amount">' + (state.objectifEpargne ? formatFCFA(epargne) : "Aucun") + '</div><div class="db-label">Épargne</div>' +
+      '</button>';
+
+    return (
+      '<div class="section-title">Aujourd’hui · ' + formatDateFr(today) + '</div>' +
+      '<div class="dash-grid">' + blocks + '</div>' +
+      '<div class="charges-card-wrap">' + renderChargesCommunesCard() + '</div>'
+    );
+  }
+
+  function renderChargesCommunesCard(){
+    var today = todayStr();
+    var total = chargesCommunesTotal({ start: today, end: today });
+    if(!state.autresCharges.length){
+      return (
+        '<div class="caisse-zone">' +
+          '<button type="button" class="charges-row charges-row-vide" data-action="voir-charges-jour">' +
+            '<span class="cr-emoji">🧾</span><span class="cr-label">Charges communes</span>' +
+          '</button>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="caisse-zone">' +
+        '<button type="button" class="charges-row" data-action="voir-charges-jour">' +
+          '<span class="cr-emoji">💸</span><span class="cr-label">Charges communes</span><span class="cr-amount">' + formatFCFA(total) + '</span>' +
+        '</button>' +
+      '</div>'
+    );
+  }
+
+  /* ================= Blocs « Achats du jour » / « Ventes du jour » (Aujourd’hui) ================= */
+
+  function renderJourAchatsModal(){
+    var today = todayStr();
+    var items = sortByDateDesc(state.achats.filter(function(a){ return a.date === today; }));
+    if(!items.length){
+      return emptyState("📦", "Aucun achat aujourd’hui", "Les achats enregistrés aujourd’hui apparaîtront ici.");
+    }
+    return '<div class="entry-list">' + items.map(function(a){
+      return (
+        '<button type="button" class="entry-card" data-action="voir-achat-du-jour" data-id="' + a.id + '">' +
+          '<div class="entry-ico">📦</div>' +
+          '<div class="entry-main">' +
+            '<div class="entry-title">' + esc(a.produitNom) + '</div>' +
+            '<div class="entry-sub">' + a.quantite + ' paquet(s) · ' + formatFCFA(a.prixAchatUnitaire) + '/u</div>' +
+          '</div>' +
+          '<div class="entry-amount">' + formatFCFA(a.quantite*a.prixAchatUnitaire + (a.charges||0)) + '</div>' +
+        '</button>'
+      );
+    }).join("") + '</div>';
+  }
+  function renderJourVentesModal(){
+    var today = todayStr();
+    var items = sortByDateDesc(state.ventes.filter(function(v){ return v.date === today; }));
+    if(!items.length){
+      return emptyState("🛍️", "Aucune vente aujourd’hui", "Les ventes enregistrées aujourd’hui apparaîtront ici.");
+    }
+    return '<div class="entry-list">' + items.map(function(v){
+      var badge = v.typeVente === "commande_speciale" ? ' <span class="badge">Commande spéciale</span>' : "";
+      return (
+        '<button type="button" class="entry-card" data-action="voir-vente-du-jour" data-id="' + v.id + '">' +
+          '<div class="entry-ico">🛍️</div>' +
+          '<div class="entry-main">' +
+            '<div class="entry-title">' + esc(v.produitNom) + badge + '</div>' +
+            '<div class="entry-sub">' + v.quantite + ' vendu(s)</div>' +
+          '</div>' +
+          '<div class="entry-amount">' + formatFCFA(v.montantEncaisse) + '</div>' +
+        '</button>'
+      );
+    }).join("") + '</div>';
+  }
+
+  /* ================= Formulaires : capture / options communes ================= */
+
+  function optionsProduits(selectedId, placeholder){
+    var list = state.config.produits.slice().sort(function(a,b){ return a.nom.localeCompare(b.nom); });
+    var opts = '<option value="" disabled' + (!selectedId?" selected":"") + '>' + esc(placeholder||"Choisir un produit") + '</option>';
+    opts += list.map(function(it){
+      return '<option value="' + it.id + '"' + (it.id===selectedId?" selected":"") + '>' + esc(it.nom) + '</option>';
+    }).join("");
+    opts += '<option value="__new__"' + (selectedId==="__new__"?" selected":"") + '>+ Nouveau produit…</option>';
+    return opts;
+  }
+  function fieldErr(key){
+    return ui.errors[key] ? '<div class="field-error">' + esc(ui.errors[key]) + '</div>' : "";
+  }
+  function captureDraft(fieldIds){
+    fieldIds.forEach(function(id){
+      var el = byId(id);
+      if(el) ui.draft[id] = el.value;
+    });
+  }
+
+  /* ---------- F2 : Achats ---------- */
+
+  var ACHAT_FIELDS = ["f-date","f-produitSel","f-produitNouveauNom","f-quantite","f-prixAchat","f-prixVente","f-charges"];
+
+  function renderFormAchat(){
+    var d = ui.draft;
+    var produitSel = d["f-produitSel"] || "";
+    var isNew = produitSel === "__new__";
+    return (
+      '<div>' +
+        '<div class="field"><div class="label">Date d’acquisition <span class="req">*</span></div>' +
+          '<input type="date" class="input" id="f-date" max="' + todayStr() + '" value="' + esc(d["f-date"] || todayStr()) + '" data-action-change="capture-achat">' +
+          fieldErr("date") +
+        '</div>' +
+        '<div class="field"><div class="label">Produit <span class="req">*</span></div>' +
+          '<select class="select" id="f-produitSel" data-action-change="produit-achat-change">' + optionsProduits(produitSel) + '</select>' +
+          (isNew ? '<div class="inline-new"><input type="text" class="input" id="f-produitNouveauNom" placeholder="Nom du nouveau produit" value="' + esc(d["f-produitNouveauNom"]||"") + '" data-autofocus data-action-change="capture-achat"></div>' : '') +
+          fieldErr("produit") +
+        '</div>' +
+        '<div class="field"><div class="label">Quantité achetée (paquets) <span class="req">*</span></div>' +
+          '<input type="number" inputmode="decimal" step="0.1" min="0" class="input" id="f-quantite" placeholder="Ex. 2 ou 0,5" value="' + esc(d["f-quantite"]||"") + '" data-action-change="capture-achat">' +
+          fieldErr("quantite") +
+        '</div>' +
+        '<div class="field"><div class="label">Prix d’achat unitaire (FCFA) <span class="req">*</span></div>' +
+          '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-prixAchat" value="' + esc(d["f-prixAchat"]||"") + '" data-action-change="capture-achat">' +
+          fieldErr("prixAchat") +
+        '</div>' +
+        '<div class="field"><div class="label">Prix de vente unitaire estimé (FCFA) <span class="req">*</span></div>' +
+          '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-prixVente" value="' + esc(d["f-prixVente"]||"") + '" data-action-change="capture-achat">' +
+          '<div class="field-note">Sert seulement à estimer le bénéfice attendu.</div>' +
+          fieldErr("prixVente") +
+        '</div>' +
+        '<div class="field"><div class="label">Charges (transport, livraison…) (FCFA)</div>' +
+          '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-charges" placeholder="0" value="' + esc(d["f-charges"]||"") + '" data-action-change="capture-achat">' +
+        '</div>' +
+        '<button type="button" class="btn btn-primary" data-action="enregistrer-achat">Enregistrer</button>' +
+      '</div>'
+    );
+  }
+
+  function onProduitAchatChange(){
+    captureDraft(ACHAT_FIELDS);
+    var sel = ui.draft["f-produitSel"];
+    if(sel && sel !== "__new__"){
+      var p = findProduitById(sel);
+      if(p){
+        if(p.dernierPrixAchat !== null && p.dernierPrixAchat !== undefined) ui.draft["f-prixAchat"] = String(p.dernierPrixAchat);
+        if(p.dernierPrixVenteEstime !== null && p.dernierPrixVenteEstime !== undefined) ui.draft["f-prixVente"] = String(p.dernierPrixVenteEstime);
+      }
+    }
+  }
+
+  function enregistrerAchat(){
+    captureDraft(ACHAT_FIELDS);
+    var d = ui.draft;
+    var errors = {};
+    var date = d["f-date"] || todayStr();
+    var produitSel = d["f-produitSel"];
+    var produitNom = produitSel === "__new__" ? (d["f-produitNouveauNom"]||"").trim() : (findProduitById(produitSel)||{}).nom;
+    var quantite = toNum(d["f-quantite"]);
+    var prixAchat = toNum(d["f-prixAchat"]);
+    var prixVente = toNum(d["f-prixVente"]);
+    var charges = toNum(d["f-charges"]);
+
+    if(!date) errors.date = "Choisissez une date.";
+    if(!produitSel || (produitSel==="__new__" && !produitNom)) errors.produit = "Choisissez ou créez un produit.";
+    if(!(quantite > 0)) errors.quantite = "Indiquez une quantité supérieure à 0.";
+    if(!(prixAchat >= 0) || d["f-prixAchat"]==="") errors.prixAchat = "Indiquez le prix d’achat unitaire.";
+    if(!(prixVente >= 0) || d["f-prixVente"]==="") errors.prixVente = "Indiquez le prix de vente estimé.";
+
+    if(Object.keys(errors).length){ ui.errors = errors; render(); return; }
+
+    var produit = produitSel === "__new__" ? findOrCreateProduit(produitNom, prixAchat, prixVente) : findProduitById(produitSel);
+    if(produit){ produit.dernierPrixAchat = prixAchat; produit.dernierPrixVenteEstime = prixVente; }
+
+    state.achats.push({
+      id: uid("achat"), date: date,
+      produitId: produit ? produit.id : null,
+      produitNom: produit ? produit.nom : produitNom,
+      quantite: quantite, prixAchatUnitaire: prixAchat, prixVenteUnitaireEstime: prixVente,
+      charges: charges, ts: Date.now()
+    });
+    saveState();
+    closeModal();
+  }
+
+  function renderListeAchats(){
+    var stockHtml = renderStockSection();
+    var items = sortByDateDesc(state.achats);
+    var head = '<div class="section-title">Achats</div>';
+    if(!items.length){
+      return stockHtml + head + emptyState("📦","Aucun achat enregistré","Touchez le bouton + pour enregistrer votre premier réapprovisionnement.");
+    }
+    var rows = items.map(function(a){
+      return (
+        '<button type="button" class="entry-card entry-card-lg" data-action="voir-achat" data-id="' + a.id + '">' +
+          '<div class="entry-ico">📦</div>' +
+          '<div class="entry-main">' +
+            '<div class="entry-title">' + esc(a.produitNom) + '</div>' +
+            '<div class="entry-sub">' + formatDateFr(a.date) + ' · ' + a.quantite + ' paquet(s) · ' + formatFCFA(a.prixAchatUnitaire) + '/u</div>' +
+          '</div>' +
+          '<div class="entry-amount">' + formatFCFA(a.quantite * a.prixAchatUnitaire + (a.charges||0)) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+    return stockHtml + head + '<div class="entry-list entry-list-lg">' + rows + '</div>';
+  }
+
+  function renderDetailAchat(){
+    var a = state.achats.filter(function(x){ return x.id === ui.modal.id; })[0];
+    if(!a) return "";
+    var rows =
+      drow("Date", formatDateFr(a.date)) +
+      drow("Produit", esc(a.produitNom)) +
+      drow("Quantité", a.quantite + " paquet(s)") +
+      drow("Prix d’achat unitaire", formatFCFA(a.prixAchatUnitaire)) +
+      drow("Prix de vente estimé", formatFCFA(a.prixVenteUnitaireEstime)) +
+      drow("Charges", formatFCFA(a.charges||0)) +
+      drow("Total dépensé", formatFCFA(a.quantite*a.prixAchatUnitaire + (a.charges||0)));
+    return detailShell(rows, "achat", a.id);
+  }
+
+  /* ---------- F3 : Ventes ---------- */
+
+  var VENTE_FIELDS = ["f-date","f-produitSel","f-produitNouveauNom","f-quantite","f-montant","f-typeVente","f-prixRevendeur"];
+
+  function renderFormVente(){
+    var d = ui.draft;
+    var produitSel = d["f-produitSel"] || "";
+    var isNew = produitSel === "__new__";
+    var typeVente = d["f-typeVente"] || "stock";
+    return (
+      '<div>' +
+        '<div class="field"><div class="label">Date de la vente <span class="req">*</span></div>' +
+          '<input type="date" class="input" id="f-date" max="' + todayStr() + '" value="' + esc(d["f-date"] || todayStr()) + '" data-action-change="capture-vente">' +
+          fieldErr("date") +
+        '</div>' +
+        '<div class="field"><div class="label">Produit vendu <span class="req">*</span></div>' +
+          '<select class="select" id="f-produitSel" data-action-change="produit-vente-change">' + optionsProduits(produitSel, state.config.produits.length? "Choisir un produit" : "Aucun produit — créez-en un") + '</select>' +
+          (isNew ? '<div class="inline-new"><input type="text" class="input" id="f-produitNouveauNom" placeholder="Nom du produit" value="' + esc(d["f-produitNouveauNom"]||"") + '" data-autofocus data-action-change="capture-vente"></div>' : '') +
+          (state.config.produits.length ? '' : '<div class="field-note">Aucun achat enregistré pour l’instant — vous pouvez quand même noter le nom du produit vendu.</div>') +
+          fieldErr("produit") +
+        '</div>' +
+        '<div class="field"><div class="label">Quantité vendue <span class="req">*</span></div>' +
+          '<input type="number" inputmode="decimal" step="0.1" min="0" class="input" id="f-quantite" placeholder="Ex. 1 ou 0,5" value="' + esc(d["f-quantite"]||"") + '" data-action-change="capture-vente">' +
+          fieldErr("quantite") +
+        '</div>' +
+        '<div class="field"><div class="label">Montant total encaissé (FCFA) <span class="req">*</span></div>' +
+          '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-montant" value="' + esc(d["f-montant"]||"") + '" data-action-change="capture-vente">' +
+          fieldErr("montant") +
+        '</div>' +
+        '<div class="field"><div class="label">Type de vente <span class="req">*</span></div>' +
+          '<div class="radio-row">' +
+            '<button type="button" class="radio-opt' + (typeVente==="stock"?" active":"") + '" data-action="set-type-vente" data-val="stock">Depuis le stock</button>' +
+            '<button type="button" class="radio-opt' + (typeVente==="commande_speciale"?" active":"") + '" data-action="set-type-vente" data-val="commande_speciale">Commande spéciale</button>' +
+          '</div>' +
+        '</div>' +
+        (typeVente==="commande_speciale" ?
+          '<div class="field"><div class="label">Prix payé au revendeur (FCFA) <span class="req">*</span></div>' +
+            '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-prixRevendeur" value="' + esc(d["f-prixRevendeur"]||"") + '" data-action-change="capture-vente">' +
+            '<div class="field-note">La marge se calcule automatiquement (montant encaissé − prix payé au revendeur).</div>' +
+            fieldErr("prixRevendeur") +
+          '</div>' : '') +
+        '<button type="button" class="btn btn-primary" data-action="enregistrer-vente">Enregistrer</button>' +
+      '</div>'
+    );
+  }
+
+  function enregistrerVente(){
+    captureDraft(VENTE_FIELDS);
+    var d = ui.draft;
+    var errors = {};
+    var date = d["f-date"] || todayStr();
+    var produitSel = d["f-produitSel"];
+    var produitNomNouveau = (d["f-produitNouveauNom"]||"").trim();
+    var quantite = toNum(d["f-quantite"]);
+    var montant = toNum(d["f-montant"]);
+    var typeVente = d["f-typeVente"] || "stock";
+    var prixRevendeur = toNum(d["f-prixRevendeur"]);
+
+    if(!date) errors.date = "Choisissez une date.";
+    if(!produitSel || (produitSel==="__new__" && !produitNomNouveau)) errors.produit = "Choisissez ou créez un produit.";
+    if(!(quantite > 0)) errors.quantite = "Indiquez une quantité supérieure à 0.";
+    if(!(montant >= 0) || d["f-montant"]==="") errors.montant = "Indiquez le montant encaissé.";
+    if(typeVente === "commande_speciale" && (d["f-prixRevendeur"]==="" || !(prixRevendeur >= 0))) errors.prixRevendeur = "Indiquez le prix payé au revendeur.";
+
+    if(Object.keys(errors).length){ ui.errors = errors; render(); return; }
+
+    var produit = produitSel === "__new__" ? findOrCreateProduit(produitNomNouveau) : findProduitById(produitSel);
+
+    state.ventes.push({
+      id: uid("vente"), date: date,
+      produitId: produit ? produit.id : null,
+      produitNom: produit ? produit.nom : produitNomNouveau,
+      quantite: quantite, montantEncaisse: montant, typeVente: typeVente,
+      prixPayeRevendeur: typeVente==="commande_speciale" ? prixRevendeur : null,
+      ts: Date.now()
+    });
+    saveState();
+    closeModal();
+  }
+
+  function renderListeVentes(){
+    var items = sortByDateDesc(state.ventes);
+    var head = '<div class="section-title">Ventes</div>';
+    if(!items.length){
+      return head + emptyState("🛍️","Aucune vente enregistrée","Touchez le bouton + pour enregistrer votre première vente.");
+    }
+    var rows = items.map(function(v){
+      var badge = v.typeVente === "commande_speciale" ? '<span class="badge">Commande spéciale</span>' : "";
+      return (
+        '<button type="button" class="entry-card entry-card-lg" data-action="voir-vente" data-id="' + v.id + '">' +
+          '<div class="entry-ico">🛍️</div>' +
+          '<div class="entry-main">' +
+            '<div class="entry-title">' + esc(v.produitNom) + badge + '</div>' +
+            '<div class="entry-sub">' + formatDateFr(v.date) + ' · ' + v.quantite + ' vendu(s)</div>' +
+          '</div>' +
+          '<div class="entry-amount">' + formatFCFA(v.montantEncaisse) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+    return head + '<div class="entry-list entry-list-lg">' + rows + '</div>';
+  }
+
+  function renderDetailVente(){
+    var v = state.ventes.filter(function(x){ return x.id === ui.modal.id; })[0];
+    if(!v) return "";
+    var rows =
+      drow("Date", formatDateFr(v.date)) +
+      drow("Produit", esc(v.produitNom)) +
+      drow("Quantité", v.quantite + "") +
+      drow("Montant encaissé", formatFCFA(v.montantEncaisse)) +
+      drow("Type de vente", v.typeVente==="commande_speciale" ? "Commande spéciale" : "Depuis le stock");
+    if(v.typeVente === "commande_speciale"){
+      rows += drow("Prix payé au revendeur", formatFCFA(v.prixPayeRevendeur||0));
+      rows += drow("Marge", formatFCFA(v.montantEncaisse - (v.prixPayeRevendeur||0)));
+    }
+    return detailShell(rows, "vente", v.id);
+  }
+
+  /* ================= Autres charges (rubriques) ================= */
+
+  function rubriquesActives(){
+    return state.config.rubriquesCharges.filter(function(r){ return r.actif; });
+  }
+  function findRubriqueCharge(id){
+    var list = state.config.rubriquesCharges;
+    for(var i=0;i<list.length;i++) if(list[i].id === id) return list[i];
+    return null;
+  }
+
+  function renderDetailChargesJour(){
+    var today = todayStr();
+    var range = { start: today, end: today };
+    var hint = '<div class="hint tight" style="margin-bottom:14px;">Ces charges concernent l’activité dans son ensemble (loyer, publicité…), pas un achat ou une vente en particulier.</div>';
+    var autres = filterRange(state.autresCharges, range).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+    var autresHtml = '<div class="reglages-section"><div class="rs-title">Charges communes du jour</div>' +
+      (autres.length ? autres.map(function(c){
+        return (
+          '<button type="button" class="entry-card" data-action="voir-autre-charge" data-id="' + c.id + '" style="margin-bottom:8px;">' +
+            '<div class="entry-ico">' + esc(c.rubriqueEmoji||"📝") + '</div>' +
+            '<div class="entry-main"><div class="entry-title">' + esc(c.rubriqueNom) + '</div></div>' +
+            '<div class="entry-amount">' + formatFCFA(c.montant) + '</div>' +
+          '</button>'
+        );
+      }).join("") : '<div class="hint tight">Aucune charge commune ajoutée aujourd’hui.</div>') +
+      '<button type="button" class="btn btn-secondary" style="margin-top:8px;" data-action="add-autre-charge">+ Ajouter une charge</button>' +
+    '</div>';
+    return hint + autresHtml;
+  }
+
+  function renderFormAutreCharge(){
+    var d = ui.draft;
+    var rubSel = d["f-rubrique"] || "";
+    var rubs = rubriquesActives();
+    var tiles = rubs.map(function(r){
+      return (
+        '<button type="button" class="rub-tile' + (rubSel===r.id?" selected":"") + '" data-action="set-rubrique-charge" data-id="' + r.id + '">' +
+          '<div class="rub-icon">' + esc(r.emoji||"📝") + '</div>' +
+          '<div class="rub-nom">' + esc(r.nom) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+    return (
+      '<div>' +
+        '<div class="field"><div class="label">Rubrique <span class="req">*</span></div>' +
+          '<div class="rub-grid">' + tiles + '</div>' +
+          fieldErr("rubrique") +
+        '</div>' +
+        '<div class="field"><div class="label">Montant (FCFA) <span class="req">*</span></div>' +
+          '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-montantAutreCharge" value="' + esc(d["f-montantAutreCharge"]||"") + '" data-action-change="capture-autre-charge">' +
+          fieldErr("montant") +
+        '</div>' +
+        '<button type="button" class="btn btn-primary" data-action="enregistrer-autre-charge">Enregistrer</button>' +
+      '</div>'
+    );
+  }
+  function renderDetailAutreCharge(){
+    var c = state.autresCharges.filter(function(x){ return x.id === ui.modal.id; })[0];
+    if(!c) return "";
+    var rows = drow("Date", formatDateFr(c.date)) + drow("Rubrique", esc(c.rubriqueEmoji||"") + " " + esc(c.rubriqueNom)) + drow("Montant", formatFCFA(c.montant));
+    return detailShell(rows, "autre-charge", c.id);
+  }
+  function renderConfirmSuppressionRubrique(){
+    var r = findRubriqueCharge(ui.modal.id);
+    if(!r) return "";
+    return (
+      '<div><p style="font-size:13.5px; margin:0 0 14px;">Supprimer la rubrique « ' + esc(r.nom) + ' » ? Les charges déjà enregistrées avec cette rubrique restent dans l’historique.</p>' +
+        '<div class="btn-row">' +
+          '<button type="button" class="btn btn-secondary" data-action="fermer-modal">Annuler</button>' +
+          '<button type="button" class="btn btn-danger" data-action="confirmer-suppression-rubrique" data-id="' + r.id + '">Oui, supprimer</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+  function enregistrerAutreCharge(){
+    captureDraft(["f-montantAutreCharge"]);
+    var d = ui.draft;
+    var errors = {};
+    var rubriqueId = d["f-rubrique"];
+    var montant = toNum(d["f-montantAutreCharge"]);
+    var rubrique = rubriqueId ? findRubriqueCharge(rubriqueId) : null;
+    if(!rubrique) errors.rubrique = "Choisissez une rubrique.";
+    if(!(montant > 0) || d["f-montantAutreCharge"]==="") errors.montant = "Indiquez un montant supérieur à 0.";
+    if(Object.keys(errors).length){ ui.errors = errors; render(); return; }
+    state.autresCharges.push({
+      id: uid("acharge"), date: todayStr(),
+      rubriqueId: rubrique.id, rubriqueNom: rubrique.nom, rubriqueEmoji: rubrique.emoji,
+      montant: montant, ts: Date.now()
+    });
+    saveState();
+    closeModal();
+  }
+
+  /* ================= Modal : dispatcher ================= */
+
+  function drow(k,v){ return '<div class="detail-row"><div class="dk">' + esc(k) + '</div><div class="dv">' + v + '</div></div>'; }
+
+  function detailShell(rowsHtml, kind, id){
+    var confirming = ui.modal.confirmDelete;
+    return (
+      '<div>' + rowsHtml +
+      (confirming ?
+        '<div class="confirm-box"><p>Supprimer cet enregistrement ? Cette action est définitive.</p>' +
+          '<div class="btn-row">' +
+            '<button type="button" class="btn btn-secondary" data-action="annuler-suppression">Annuler</button>' +
+            '<button type="button" class="btn btn-danger" data-action="confirmer-suppression" data-kind="' + kind + '" data-id="' + id + '">Oui, supprimer</button>' +
+          '</div></div>'
+        :
+        '<button type="button" class="btn btn-danger" style="margin-top:14px;" data-action="demander-suppression">🗑️ Supprimer</button>'
+      ) +
+      '</div>'
+    );
+  }
+
+  function renderModal(){
+    var m = ui.modal;
+    var body = "";
+    var title = "";
+    switch(m.type){
+      case "add-achat": title = "Nouvel achat"; body = renderFormAchat(); break;
+      case "add-vente": title = "Nouvelle vente"; body = renderFormVente(); break;
+      case "detail-achat": title = "Détail de l’achat"; body = renderDetailAchat(); break;
+      case "detail-vente": title = "Détail de la vente"; body = renderDetailVente(); break;
+      case "jour-achats": title = "Achats d’aujourd’hui"; body = renderJourAchatsModal(); break;
+      case "jour-ventes": title = "Ventes d’aujourd’hui"; body = renderJourVentesModal(); break;
+      case "detail-charges-jour": title = "Charges communes"; body = renderDetailChargesJour(); break;
+      case "add-autre-charge": title = "Nouvelle charge"; body = renderFormAutreCharge(); break;
+      case "detail-autre-charge": title = "Détail de la charge"; body = renderDetailAutreCharge(); break;
+      case "confirmer-suppression-rubrique": title = "Supprimer la rubrique"; body = renderConfirmSuppressionRubrique(); break;
+      case "modifier-objectif": title = "Modifier l’objectif"; body = renderFormModifierObjectif(); break;
+      case "confirmer-suppression-objectif": title = "Supprimer l’objectif"; body = renderConfirmSuppressionObjectif(); break;
+      case "pin-setup": title = "Code PIN"; body = renderPinSetupModal(); break;
+      case "pin-oublie": title = "Code oublié ?"; body = renderPinOublieModal(); break;
+      default: body = "";
+    }
+    return (
+      '<div class="modal-overlay" data-action="fermer-modal-overlay">' +
+        '<div class="modal" data-stop-close="1">' +
+          '<div class="modal-head">' +
+            '<div class="modal-title">' + esc(title) + '</div>' +
+            '<button type="button" class="modal-close" data-action="fermer-modal">✕</button>' +
+          '</div>' +
+          body +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  /* ================= Mon état ================= */
+
+  function ensureEtatRefs(){
+    if(!ui.etatPeriode) ui.etatPeriode = "jour";
+    if(!ui.etatSemaineRef) ui.etatSemaineRef = todayStr();
+    if(!ui.etatMoisRef) ui.etatMoisRef = todayStr();
+  }
+  function shiftRef(refName, delta){
+    if(refName === "semaine"){
+      var d = dateFromStr(ui.etatSemaineRef);
+      d.setDate(d.getDate() + 7*delta);
+      var nouveau = dateKey(d);
+      var refAujourdhui = getWeekRange(new Date()).start;
+      if(nouveau > refAujourdhui) nouveau = refAujourdhui;
+      var refPlusAncienne = earliestActivityWeekStart();
+      if(nouveau < refPlusAncienne) nouveau = refPlusAncienne;
+      ui.etatSemaineRef = nouveau;
+    } else if(refName === "mois"){
+      var d2 = dateFromStr(ui.etatMoisRef);
+      d2.setDate(1);
+      d2.setMonth(d2.getMonth() + delta);
+      var nouveau2 = dateKey(d2);
+      var refAujourdhuiM = getMonthRange(new Date()).start;
+      if(nouveau2 > refAujourdhuiM) nouveau2 = refAujourdhuiM;
+      var refPlusAncienM = earliestActivityMonthStart();
+      if(nouveau2 < refPlusAncienM) nouveau2 = refPlusAncienM;
+      ui.etatMoisRef = nouveau2;
+    }
+  }
+
+  function renderEtatBack(){
+    return '<button type="button" class="btn btn-ghost" style="padding:8px 0; margin-bottom:6px;" data-action="etat-back">‹ Retour</button>';
+  }
+  function renderEtatSemaineNav(){
+    var range = getWeekRange(dateFromStr(ui.etatSemaineRef));
+    var label = formatDateFr(range.start) + " – " + formatDateFr(range.end);
+    var estActuelle = ui.etatSemaineRef >= getWeekRange(new Date()).start;
+    var estPlusAncienne = ui.etatSemaineRef <= earliestActivityWeekStart();
+    return (
+      '<div class="etat-nav">' +
+        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="-1" data-periode="semaine"' + (estPlusAncienne?" disabled":"") + '>‹</button>' +
+        '<div class="en-label">' + esc(label) + '</div>' +
+        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="1" data-periode="semaine"' + (estActuelle?" disabled":"") + '>›</button>' +
+      '</div>'
+    );
+  }
+  function renderEtatMoisNav(){
+    var ref = dateFromStr(ui.etatMoisRef);
+    var label = moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1);
+    var estActuelle = ui.etatMoisRef >= getMonthRange(new Date()).start;
+    var estPlusAncien = ui.etatMoisRef <= earliestActivityMonthStart();
+    return (
+      '<div class="etat-nav">' +
+        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="-1" data-periode="mois"' + (estPlusAncien?" disabled":"") + '>‹</button>' +
+        '<div class="en-label">' + esc(label) + '</div>' +
+        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="1" data-periode="mois"' + (estActuelle?" disabled":"") + '>›</button>' +
+      '</div>'
+    );
+  }
+
+  var JOURS_NOMS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+
+  function renderEtatListeJours(range, from){
+    var jours = [];
+    var d = dateFromStr(range.start);
+    var end = dateFromStr(range.end);
+    while(dateKey(d) <= dateKey(end)){
+      jours.push(dateKey(d));
+      d.setDate(d.getDate()+1);
+    }
+    var today = todayStr();
+    var rows = jours.map(function(ds){
+      var dd = dateFromStr(ds);
+      var label = JOURS_NOMS[dd.getDay()].charAt(0).toUpperCase() + JOURS_NOMS[dd.getDay()].slice(1) + " " + formatDateFr(ds);
+      if(ds > today){
+        return '<div class="etat-stat-row" style="opacity:.4;"><div class="er-label">' + esc(label) + '</div><div class="er-val">—</div></div>';
+      }
+      var solde = soldeNetPeriode({ start:ds, end:ds });
+      return (
+        '<button type="button" class="entry-card" style="width:100%; text-align:left;" data-action="etat-select-jour" data-date="' + ds + '" data-from="' + from + '">' +
+          '<div class="entry-main"><div class="entry-title">' + esc(label) + '</div></div>' +
+          '<div class="entry-amount' + (solde<0?" neg":"") + '">' + formatFCFA(solde) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+    return '<div class="entry-list">' + rows + '</div>';
+  }
+
+  function renderEtatListeSemaines(monthRange){
+    var firstWeekStart = getWeekRange(dateFromStr(monthRange.start)).start;
+    var lastWeekStart = getWeekRange(dateFromStr(monthRange.end)).start;
+    var semaines = [];
+    var cur = firstWeekStart;
+    while(cur <= lastWeekStart){
+      semaines.push(cur);
+      var d = dateFromStr(cur); d.setDate(d.getDate()+7);
+      cur = dateKey(d);
+    }
+    var today = todayStr();
+    var rows = semaines.map(function(ws){
+      var range = getWeekRange(dateFromStr(ws));
+      var label = formatDateFr(range.start) + " – " + formatDateFr(range.end);
+      if(range.start > today){
+        return '<div class="etat-stat-row" style="opacity:.4;"><div class="er-label">' + esc(label) + '</div><div class="er-val">—</div></div>';
+      }
+      var solde = soldeNetPeriode(range);
+      return (
+        '<button type="button" class="entry-card" style="width:100%; text-align:left;" data-action="etat-select-semaine" data-week-start="' + ws + '">' +
+          '<div class="entry-main"><div class="entry-title">' + esc(label) + '</div></div>' +
+          '<div class="entry-amount' + (solde<0?" neg":"") + '">' + formatFCFA(solde) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+    return '<div class="entry-list">' + rows + '</div>';
+  }
+
+  function renderMiniStatsRow(benefice, charges, eparg){
+    return (
+      '<div class="solde-mini-stats">' +
+        '<div class="sms-col"><div class="sms-label">Bénéfice</div><div class="sms-val">' + formatFCFA(benefice) + '</div></div>' +
+        '<div class="sms-col"><div class="sms-label">Charges</div><div class="sms-val">' + formatFCFA(charges) + '</div></div>' +
+        '<div class="sms-col"><div class="sms-label">Épargne</div><div class="sms-val">' + (state.objectifEpargne ? formatFCFA(eparg) : "Aucun") + '</div></div>' +
+      '</div>'
+    );
+  }
+
+  function renderListeAchatsVentesRange(range){
+    var achats = filterRange(state.achats, range).map(function(a){
+      return { date:a.date, type:"achat", ref:a };
+    });
+    var ventes = filterRange(state.ventes, range).map(function(v){
+      return { date:v.date, type:"vente", ref:v };
+    });
+    var items = achats.concat(ventes).sort(function(x,y){ return y.date < x.date ? -1 : (y.date > x.date ? 1 : 0); });
+    if(!items.length){
+      return emptyState("📦","Aucun mouvement","Les achats et ventes de cette période apparaîtront ici.");
+    }
+    var rows = items.map(function(it){
+      if(it.type === "achat"){
+        var a = it.ref;
+        return (
+          '<button type="button" class="entry-card" style="width:100%; text-align:left;" data-action="voir-achat" data-id="' + a.id + '">' +
+            '<div class="entry-ico">📦</div>' +
+            '<div class="entry-main"><div class="entry-title">' + esc(a.produitNom) + '</div>' +
+            '<div class="entry-sub">' + formatDateFr(a.date) + ' · achat · ' + a.quantite + ' u.</div></div>' +
+            '<div class="entry-amount">' + formatFCFA(a.quantite * a.prixAchatUnitaire + (a.charges||0)) + '</div>' +
+          '</button>'
+        );
+      }
+      var v = it.ref;
+      return (
+        '<button type="button" class="entry-card" style="width:100%; text-align:left;" data-action="voir-vente" data-id="' + v.id + '">' +
+          '<div class="entry-ico">🛍️</div>' +
+          '<div class="entry-main"><div class="entry-title">' + esc(v.produitNom) + '</div>' +
+          '<div class="entry-sub">' + formatDateFr(v.date) + ' · vente · ' + v.quantite + ' u.</div></div>' +
+          '<div class="entry-amount">' + formatFCFA(v.montantEncaisse) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+    return '<div class="entry-list">' + rows + '</div>';
+  }
+
+  function renderBlocEtatJour(dateStr){
+    var range = { start: dateStr, end: dateStr };
+    var benefice = beneficeReventePeriode(range);
+    var charges = chargesCommunesTotal(range);
+    var eparg = epargnePeriode(range);
+    var solde = benefice - eparg - charges;
+    var titre = '<div class="hint tight" style="margin-bottom:10px; font-weight:700; color:var(--text);">' + esc(formatDateFr(dateStr)) + '</div>';
+    var soldeCard = (
+      '<div class="dash-solde" style="margin-bottom:16px;">' +
+        '<div class="ds-label">Solde net</div>' +
+        '<div class="ds-amount' + (solde<0?" neg":"") + '">' + formatFCFA(solde) + '</div>' +
+        renderMiniStatsRow(benefice, charges, eparg) +
+      '</div>'
+    );
+    var listeHtml = '<div class="section-title" style="margin-top:2px;">Achats &amp; ventes de la journée</div>' +
+      renderListeAchatsVentesRange(range);
+    return titre + soldeCard + listeHtml;
+  }
+
+  function renderBlocEtatPeriode(range){
+    var benefice = beneficeReventePeriode(range);
+    var charges = chargesCommunesTotal(range);
+    var eparg = epargnePeriode(range);
+    var solde = benefice - eparg - charges;
+    var soldeCard = (
+      '<div class="dash-solde" style="margin-bottom:16px;">' +
+        '<div class="ds-label">Solde net</div>' +
+        '<div class="ds-amount' + (solde<0?" neg":"") + '">' + formatFCFA(solde) + '</div>' +
+        renderMiniStatsRow(benefice, charges, eparg) +
+      '</div>'
+    );
+    return { soldeCard: soldeCard, benefice: benefice, eparg: eparg };
+  }
+
+  function renderMonEtat(){
+    ensureEtatRefs();
+    var periode = ui.etatPeriode;
+    var tabs = ["jour","semaine","mois"].map(function(p){
+      var lbl = { jour:"Jour", semaine:"Semaine", mois:"Mois" }[p];
+      return '<button type="button" class="etat-tab' + (periode===p?" active":"") + '" data-action="etat-set-periode" data-val="' + p + '">' + lbl + '</button>';
+    }).join("");
+
+    var body = "";
+    if(periode === "jour"){
+      body = renderBlocEtatJour(todayStr());
+    } else if(periode === "semaine"){
+      if(ui.etatSelJour){
+        body = renderEtatBack() + renderBlocEtatJour(ui.etatSelJour);
+      } else {
+        var wr = getWeekRange(dateFromStr(ui.etatSemaineRef));
+        var b = renderBlocEtatPeriode(wr);
+        body = renderEtatSemaineNav() + b.soldeCard +
+          '<div class="section-title">Achats &amp; ventes de la semaine</div>' +
+          renderEtatListeJours(wr, "semaine");
+      }
+    } else {
+      if(ui.etatSelJour){
+        body = renderEtatBack() + renderBlocEtatJour(ui.etatSelJour);
+      } else if(ui.etatSelSemaine){
+        var wr2 = getWeekRange(dateFromStr(ui.etatSelSemaine));
+        var b2 = renderBlocEtatPeriode(wr2);
+        body = renderEtatBack() +
+          '<div class="hint tight" style="margin-bottom:10px; font-weight:700; color:var(--text);">' + esc(formatDateFr(wr2.start) + " – " + formatDateFr(wr2.end)) + '</div>' +
+          b2.soldeCard +
+          '<div class="section-title">Achats &amp; ventes de la semaine</div>' +
+          renderEtatListeJours(wr2, "mois");
+      } else {
+        var mr = getMonthRange(dateFromStr(ui.etatMoisRef));
+        var b3 = renderBlocEtatPeriode(mr);
+        body = renderEtatMoisNav() + b3.soldeCard +
+          '<div class="section-title">Semaines du mois</div>' +
+          renderEtatListeSemaines(mr);
+      }
+    }
+
+    return (
+      '<div class="section-title">Mon état</div>' +
+      '<div class="etat-tabs">' + tabs + '</div>' +
+      body
+    );
+  }
+
+  /* ================= « Mes habitudes » ================= */
+
+  function ensureHabitudesRefs(){
+    if(!ui.habitudesPeriode) ui.habitudesPeriode = "jour";
+    if(!ui.habitudesSemaineRef) ui.habitudesSemaineRef = todayStr();
+    if(!ui.habitudesMoisRef) ui.habitudesMoisRef = todayStr();
+  }
+  function shiftHabitudesRef(periode, delta){
+    if(periode === "semaine"){
+      var d = dateFromStr(ui.habitudesSemaineRef);
+      d.setDate(d.getDate() + 7*delta);
+      var nouveau = dateKey(d);
+      var refAujourdhui = getWeekRange(new Date()).start;
+      if(nouveau > refAujourdhui) nouveau = refAujourdhui;
+      var refPlusAncienne = earliestActivityWeekStart();
+      if(nouveau < refPlusAncienne) nouveau = refPlusAncienne;
+      ui.habitudesSemaineRef = nouveau;
+    } else if(periode === "mois"){
+      var d2 = dateFromStr(ui.habitudesMoisRef);
+      d2.setDate(1);
+      d2.setMonth(d2.getMonth() + delta);
+      var nouveau2 = dateKey(d2);
+      var refAujourdhuiM = getMonthRange(new Date()).start;
+      if(nouveau2 > refAujourdhuiM) nouveau2 = refAujourdhuiM;
+      var refPlusAncienM = earliestActivityMonthStart();
+      if(nouveau2 < refPlusAncienM) nouveau2 = refPlusAncienM;
+      ui.habitudesMoisRef = nouveau2;
+    }
+  }
+
+  function groupSum(arr, labelFn, valFn){
+    var map = {}, ordre = [];
+    arr.forEach(function(x){
+      var lbl = labelFn(x);
+      if(lbl === null || lbl === undefined || lbl === "") return;
+      if(!(lbl in map)){ map[lbl] = 0; ordre.push(lbl); }
+      map[lbl] += Number(valFn(x)) || 0;
+    });
+    return ordre.map(function(k){ return { label:k, montant:map[k] }; }).sort(function(a,b){ return b.montant - a.montant; });
+  }
+
+  function renderBreakdownRows(titre, rows){
+    if(!rows.length) return "";
+    var body = rows.map(function(r){
+      return '<div class="eb-row"><div class="eb-nom">' + esc(r.label) + '</div><div class="eb-val">' + formatFCFA(r.montant) + '</div></div>';
+    }).join("");
+    return '<div class="etat-breakdown"><div class="eb-title">' + esc(titre) + '</div>' + body + '</div>';
+  }
+
+  function produitsRangeStats(range){
+    var produits = state.config.produits;
+    var rows = produits.map(function(p){
+      var ventesP = filterRange(state.ventes.filter(function(v){ return v.produitId === p.id; }), range);
+      if(!ventesP.length) return null;
+      var qte = sumBy(ventesP, function(v){ return v.quantite; });
+      var ca = sumBy(ventesP, function(v){ return v.montantEncaisse; });
+      var coutMoyen = computeStockProduit(p).coutMoyen;
+      var benefice = sumBy(ventesP, function(v){
+        if(v.typeVente === "commande_speciale") return v.montantEncaisse - (v.prixPayeRevendeur||0);
+        return v.montantEncaisse - v.quantite * coutMoyen;
+      });
+      return { nom: p.nom, qte: qte, ca: ca, benefice: benefice };
+    }).filter(Boolean).sort(function(a,b){ return b.ca - a.ca; });
+    return rows;
+  }
+
+  function renderTopProduitCard(range){
+    var rows = produitsRangeStats(range);
+    if(!rows.length) return "";
+    var top = rows[0];
+    return (
+      '<div class="top-produit-card">' +
+        '<div class="tp-emoji">🏆</div>' +
+        '<div><div class="tp-nom">' + esc(top.nom) + '</div>' +
+        '<div class="tp-sub">Meilleur produit · ' + top.qte + ' vendu(s) · ' + formatFCFA(top.ca) + ' de CA (bénéf. ' + formatFCFA(top.benefice) + ')</div></div>' +
+      '</div>'
+    );
+  }
+
+  function renderBreakdownProduits(range){
+    var rows = produitsRangeStats(range);
+    if(!rows.length) return "";
+    var body = rows.map(function(r){
+      return '<div class="eb-row"><div class="eb-nom">' + esc(r.nom) + ' <span class="eb-sub">(' + r.qte + ' vendu(s))</span></div>' +
+        '<div class="eb-val">' + formatFCFA(r.ca) + ' <span class="eb-sub">(bénéf. ' + formatFCFA(r.benefice) + ')</span></div></div>';
+    }).join("");
+    return '<div class="etat-breakdown"><div class="eb-title">Par produit — quantités &amp; chiffre d’affaires</div>' + body + '</div>';
+  }
+
+  function renderBreakdownAutresCharges(range){
+    var items = filterRange(state.autresCharges, range);
+    if(!items.length) return "";
+    return renderBreakdownRows("Charges communes — par rubrique", groupSum(items, function(c){ return c.rubriqueNom + (c.rubriqueSupprimee ? " (rubrique supprimée)" : ""); }, function(c){ return c.montant; }));
+  }
+
+  function renderHabitudes(){
+    ensureHabitudesRefs();
+    var periode = ui.habitudesPeriode;
+    var ref = periode === "semaine" ? dateFromStr(ui.habitudesSemaineRef) : periode === "mois" ? dateFromStr(ui.habitudesMoisRef) : new Date();
+    var range = rangeForPeriode(periode, ref);
+
+    var tabs = ["jour","semaine","mois"].map(function(p){
+      var lbl = { jour:"Jour", semaine:"Semaine", mois:"Mois" }[p];
+      return '<button type="button" class="etat-tab' + (periode===p?" active":"") + '" data-action="habitudes-set-periode" data-val="' + p + '">' + lbl + '</button>';
+    }).join("");
+
+    var navHtml = "";
+    if(periode === "semaine" || periode === "mois"){
+      var label = periode === "semaine" ? (formatDateFr(range.start) + " – " + formatDateFr(range.end)) : (moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1));
+      var refAujourdhui = periode === "semaine" ? getWeekRange(new Date()).start : getMonthRange(new Date()).start;
+      var estPeriodeActuelle = (periode === "semaine" ? ui.habitudesSemaineRef : ui.habitudesMoisRef) >= refAujourdhui;
+      var refPlusAncienneH = periode === "semaine" ? earliestActivityWeekStart() : earliestActivityMonthStart();
+      var estPeriodePlusAncienne = (periode === "semaine" ? ui.habitudesSemaineRef : ui.habitudesMoisRef) <= refPlusAncienneH;
+      navHtml = (
+        '<div class="etat-nav">' +
+          '<button type="button" class="en-btn" data-action="habitudes-nav" data-sens="-1" data-periode="' + periode + '"' + (estPeriodePlusAncienne?" disabled":"") + '>‹</button>' +
+          '<div class="en-label">' + esc(label) + '</div>' +
+          '<button type="button" class="en-btn" data-action="habitudes-nav" data-sens="1" data-periode="' + periode + '"' + (estPeriodeActuelle?" disabled":"") + '>›</button>' +
+        '</div>'
+      );
+    } else {
+      navHtml = '<div class="etat-nav"><div class="en-label">' + esc(formatDateFr(todayStr())) + '</div></div>';
+    }
+
+    var topCard = renderTopProduitCard(range);
+    var breakdowns = renderBreakdownProduits(range) + renderBreakdownAutresCharges(range);
+    if(!topCard && !breakdowns){
+      breakdowns = emptyState("📈","Pas encore d’habitudes à montrer","Vos statistiques par produit ou par rubrique de charge apparaîtront ici au fil de vos saisies.");
+    }
+
+    return (
+      '<div class="section-title">Mes habitudes</div>' +
+      '<div class="etat-tabs">' + tabs + '</div>' +
+      navHtml +
+      topCard +
+      breakdowns
+    );
+  }
+
+  function renderHabitudesOverlay(){
+    return (
+      '<div class="overlay-back">' +
+        '<button type="button" class="btn btn-ghost" data-action="fermer-overlay">‹ Retour</button>' +
+      '</div>' +
+      '<div class="overlay-body">' + renderHabitudes() + '</div>'
+    );
+  }
+
+  /* ================= Objectif d'épargne ================= */
+
+  function renderObjectifOverlay(){
+    var body = state.objectifEpargne ? renderObjectifCarteActive() : renderObjectifCreation();
+    return (
+      '<div class="onb">' +
+        '<div class="onb-head" style="display:flex; align-items:center; justify-content:space-between;">' +
+          '<div class="onb-title" style="margin:0;">Objectif d’épargne</div>' +
+          '<button type="button" class="icon-btn" data-action="fermer-overlay">✕</button>' +
+        '</div>' +
+        '<div class="objectif-rappel">faut pas zahé, bloque chaque fois ton Djai sur mobile ou transfert sur ton compte bancaire</div>' +
+        body +
+        renderObjectifSlotsGrises() +
+      '</div>'
+    );
+  }
+
+  function renderObjectifSlotsGrises(){
+    var ghosts = OBJECTIF_MODELES.map(function(m){ return '<span>' + m.emoji + '</span>'; }).join("");
+    var tile = function(){
+      return (
+        '<div class="objectif-slot-vide">' +
+          '<div class="osv-ghost-icons">' + ghosts + '</div>' +
+          '<div class="osv-badge">Abonnez-vous pour plus de fonctionnalités</div>' +
+        '</div>'
+      );
+    };
+    return '<div style="margin-top:8px;">' + tile() + tile() + '</div>';
+  }
+
+  function renderObjectifCreation(){
+    var d = ui.objDraft = ui.objDraft || { step:"modele", modeleId:null, mode:"auto", pourcentage:"10", montant:"", nom:"" };
+
+    if(d.step !== "form"){
+      var tiles = OBJECTIF_MODELES.map(function(m){
+        var active = d.modeleId === m.id;
+        return (
+          '<button type="button" class="modele-tile' + (active?" active":"") + '" data-action="choisir-modele-objectif" data-val="' + m.id + '">' +
+            '<div class="mt-emoji">' + m.emoji + '</div>' +
+            '<div class="mt-nom">' + esc(m.nom) + '</div>' +
+            '<div class="mt-desc">' + esc(m.desc) + '</div>' +
+          '</button>'
+        );
+      }).join("");
+      return (
+        '<div class="hint" style="margin-bottom:4px;">Vous mettez de côté pour quoi ?</div>' +
+        '<div class="hint tight" style="margin-bottom:14px;">Choisissez ce qui vous ressemble le plus.</div>' +
+        '<div class="modele-grid">' + tiles + '</div>' +
+        '<button type="button" class="btn btn-primary" data-action="continuer-objectif-modele"' + (d.modeleId ? "" : " disabled") + '>Continuer</button>'
+      );
+    }
+
+    var scenarios = [
+      { val:"10", label:"Tranquille" },
+      { val:"20", label:"Équilibré" },
+      { val:"30", label:"Ambitieux" }
+    ];
+    var scenariosHtml = scenarios.map(function(s){
+      var active = String(d.pourcentage) === s.val;
+      return '<button type="button" class="radio-opt' + (active?" active":"") + '" data-action="choisir-pourcentage-objectif" data-val="' + s.val + '">' + s.val + ' %<br><span style="font-weight:600; font-size:11px;">' + esc(s.label) + '</span></button>';
+    }).join("");
+    return (
+      '<button type="button" class="btn btn-secondary" style="margin-bottom:14px;" data-action="revenir-objectif-modele">‹ Changer de modèle</button>' +
+      '<div class="hint" style="margin-bottom:10px;">Comment voulez-vous épargner ? Automatique : un pourcentage de votre bénéfice réalisé à chaque vente. Manuel : un montant fixe visé chaque jour où vous enregistrez un achat ou une vente.</div>' +
+      '<div class="radio-row" style="margin-bottom:14px;">' +
+        '<button type="button" class="radio-opt' + (d.mode==="auto"?" active":"") + '" data-action="choisir-mode-objectif" data-val="auto">Auto (%)</button>' +
+        '<button type="button" class="radio-opt' + (d.mode==="manuel"?" active":"") + '" data-action="choisir-mode-objectif" data-val="manuel">Manuel (montant)</button>' +
+      '</div>' +
+      (d.mode === "manuel" ?
+        '<div class="field"><div class="label">Montant souhaité par jour (FCFA) <span class="req">*</span></div>' +
+          '<input type="number" inputmode="numeric" min="1" step="1" class="input" id="f-objMontant" value="' + esc(d.montant||"") + '" data-action-change="capture-obj-montant">' +
+          '<div class="field-note">Mis de côté chaque jour où au moins un achat ou une vente est enregistré, quel que soit le montant.</div>' +
+          fieldErrObj("montant") +
+        '</div>'
+        :
+        '<div class="field"><div class="label">Pourcentage du bénéfice réalisé <span class="req">*</span></div>' +
+          '<div class="radio-row">' + scenariosHtml + '</div>' +
+        '</div>'
+      ) +
+      '<div class="field"><div class="label">Nom</div>' +
+        '<input type="text" class="input" id="f-objNom" value="' + esc(d.nom||"Épargne") + '" data-action-change="capture-obj-nom">' +
+      '</div>' +
+      '<button type="button" class="btn btn-primary" data-action="enregistrer-objectif">Créer mon objectif</button>'
+    );
+  }
+
+  function fieldErrObj(key){
+    return (ui.objDraft && ui.objDraft.erreurs && ui.objDraft.erreurs[key]) ? '<div class="field-error">' + esc(ui.objDraft.erreurs[key]) + '</div>' : "";
+  }
+
+  function enregistrerObjectif(){
+    var d = ui.objDraft;
+    if(!d) return;
+    d.erreurs = {};
+    var nom = (d.nom||"").trim() || "Épargne";
+    var modele = findObjectifModele(d.modeleId);
+    var emoji = modele ? modele.emoji : "💰";
+    if(d.mode === "manuel"){
+      var montant = toNum(d.montant);
+      if(!(montant > 0)){
+        d.erreurs.montant = "Indiquez un montant supérieur à 0.";
+        render();
+        return;
+      }
+      state.objectifEpargne = {
+        id: uid("obj"), nom: nom, type: "manuel", emoji: emoji,
+        montant: montant, dateCreation: todayStr()
+      };
+    } else {
+      var pourcentage = toNum(d.pourcentage) || 10;
+      state.objectifEpargne = {
+        id: uid("obj"), nom: nom, type: "auto", emoji: emoji,
+        pourcentage: pourcentage, dateCreation: todayStr()
+      };
+    }
+    saveState();
+    ui.objDraft = null;
+    render();
+  }
+
+  function renderObjectifCarteActive(){
+    var o = state.objectifEpargne;
+    var cumule = epargnePeriode({ start:o.dateCreation, end: todayStr() });
+    var duJour = epargneJour(todayStr());
+    var sousTexte = o.type === "manuel"
+      ? "Manuel · " + formatFCFA(o.montant||0) + " par jour d’activité"
+      : "Automatique · " + o.pourcentage + " % du bénéfice réalisé";
+    return (
+      '<div class="objectif-card">' +
+        '<div class="oc-head"><div class="oc-emoji">' + esc(epargneEmoji()) + '</div><div class="oc-nom">' + esc(o.nom) + '</div></div>' +
+        '<div class="oc-montant">' + formatFCFA(cumule) + '</div>' +
+        '<div class="oc-sub">Mis de côté depuis le ' + formatDateFr(o.dateCreation) + ' · ' + esc(sousTexte) + '</div>' +
+        '<div class="oc-sub">Aujourd’hui : ' + formatFCFA(duJour) + '</div>' +
+        '<div class="oc-actions">' +
+          '<button type="button" class="btn btn-secondary" data-action="ouvrir-modifier-objectif">Modifier</button>' +
+          '<button type="button" class="btn btn-danger" data-action="ouvrir-supprimer-objectif">Supprimer</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderFormModifierObjectif(){
+    var o = state.objectifEpargne;
+    if(!o) return "";
+    if(ui.draft.__objModif !== o.id){
+      ui.draft = { __objModif:o.id, nom:o.nom, mode:o.type, pourcentage:o.pourcentage||10, montant:o.montant||"" };
+    }
+    var d = ui.draft;
+    var scenarios = [
+      { val:"10", label:"Tranquille" },
+      { val:"20", label:"Équilibré" },
+      { val:"30", label:"Ambitieux" }
+    ];
+    var scenariosHtml = scenarios.map(function(s){
+      var active = String(d.pourcentage) === s.val;
+      return '<button type="button" class="radio-opt' + (active?" active":"") + '" data-action="modif-pourcentage-objectif" data-val="' + s.val + '">' + s.val + ' %<br><span style="font-weight:600; font-size:11px;">' + esc(s.label) + '</span></button>';
+    }).join("");
+    return (
+      '<div class="radio-row" style="margin-bottom:14px;">' +
+        '<button type="button" class="radio-opt' + (d.mode==="auto"?" active":"") + '" data-action="modif-mode-objectif" data-val="auto">Auto (%)</button>' +
+        '<button type="button" class="radio-opt' + (d.mode==="manuel"?" active":"") + '" data-action="modif-mode-objectif" data-val="manuel">Manuel (montant)</button>' +
+      '</div>' +
+      (d.mode === "manuel" ?
+        '<div class="field"><div class="label">Montant souhaité par jour (FCFA)</div>' +
+          '<input type="number" inputmode="numeric" min="1" step="1" class="input" id="f-modifMontant" value="' + esc(d.montant||"") + '" data-action-change="capture-modif-objectif">' +
+        '</div>'
+        :
+        '<div class="field"><div class="label">Pourcentage du bénéfice réalisé</div>' +
+          '<div class="radio-row">' + scenariosHtml + '</div>' +
+        '</div>'
+      ) +
+      '<div class="field"><div class="label">Nom</div>' +
+        '<input type="text" class="input" id="f-modifNom" value="' + esc(d.nom||"") + '" data-action-change="capture-modif-objectif">' +
+      '</div>' +
+      '<button type="button" class="btn btn-primary" data-action="enregistrer-modif-objectif">Enregistrer</button>'
+    );
+  }
+
+  function enregistrerModifObjectif(){
+    var o = state.objectifEpargne;
+    if(!o) return;
+    var d = ui.draft;
+    var nom = (d.nom||"").trim();
+    if(nom) o.nom = nom;
+    var mode = d.mode === "manuel" ? "manuel" : "auto";
+    o.type = mode;
+    if(mode === "manuel"){
+      var montant = toNum(d.montant);
+      if(montant > 0) o.montant = montant;
+    } else {
+      var pct = toNum(d.pourcentage);
+      o.pourcentage = (pct === 10 || pct === 20 || pct === 30) ? pct : 10;
+    }
+    saveState();
+    closeModal();
+  }
+
+  function renderConfirmSuppressionObjectif(){
+    var o = state.objectifEpargne;
+    if(!o) return "";
+    return (
+      '<div><p style="font-size:13.5px; margin:0 0 14px;">Supprimer l’objectif « ' + esc(o.nom) + ' » ? Ce qui a déjà été mis de côté reste acquis — seul le suivi de cet objectif disparaît.</p>' +
+        '<div class="btn-row">' +
+          '<button type="button" class="btn btn-secondary" data-action="fermer-modal">Annuler</button>' +
+          '<button type="button" class="btn btn-danger" data-action="confirmer-suppr-objectif">Oui, supprimer</button>' +
+        '</div></div>'
+    );
+  }
+
+  /* ================= Télécharger ================= */
+
+  function ensureTelechargerRefs(){
+    if(!ui.telechargerPeriode) ui.telechargerPeriode = "jour";
+    if(!ui.telechargerSemaineRef) ui.telechargerSemaineRef = todayStr();
+    if(!ui.telechargerMoisRef) ui.telechargerMoisRef = todayStr();
+  }
+  function shiftTelechargerRef(periode, delta){
+    if(periode === "semaine"){
+      var d = dateFromStr(ui.telechargerSemaineRef);
+      d.setDate(d.getDate() + 7*delta);
+      var nouveau = dateKey(d);
+      var refAujourdhui = getWeekRange(new Date()).start;
+      if(nouveau > refAujourdhui) nouveau = refAujourdhui;
+      var refPlusAncienne = earliestActivityWeekStart();
+      if(nouveau < refPlusAncienne) nouveau = refPlusAncienne;
+      ui.telechargerSemaineRef = nouveau;
+    } else if(periode === "mois"){
+      var d2 = dateFromStr(ui.telechargerMoisRef);
+      d2.setDate(1);
+      d2.setMonth(d2.getMonth() + delta);
+      var nouveau2 = dateKey(d2);
+      var refAujourdhuiM = getMonthRange(new Date()).start;
+      if(nouveau2 > refAujourdhuiM) nouveau2 = refAujourdhuiM;
+      var refPlusAncienM = earliestActivityMonthStart();
+      if(nouveau2 < refPlusAncienM) nouveau2 = refPlusAncienM;
+      ui.telechargerMoisRef = nouveau2;
+    }
+  }
+
+  function renderTelechargerOverlay(){
+    return (
+      '<div class="overlay-back">' +
+        '<button type="button" class="btn btn-ghost" data-action="fermer-overlay">‹ Retour</button>' +
+      '</div>' +
+      '<div class="overlay-body">' + renderTelecharger() + '</div>'
+    );
+  }
+
+  function renderTelecharger(){
+    ensureTelechargerRefs();
+    var periode = ui.telechargerPeriode;
+    var ref = periode === "semaine" ? dateFromStr(ui.telechargerSemaineRef) : periode === "mois" ? dateFromStr(ui.telechargerMoisRef) : new Date();
+    var range = rangeForPeriode(periode, ref);
+
+    var tabs = ["jour","semaine","mois"].map(function(p){
+      var lbl = { jour:"Jour", semaine:"Semaine", mois:"Mois" }[p];
+      return '<button type="button" class="etat-tab' + (periode===p?" active":"") + '" data-action="telecharger-set-periode" data-val="' + p + '">' + lbl + '</button>';
+    }).join("");
+
+    var navHtml = "";
+    if(periode === "semaine" || periode === "mois"){
+      var label = periode === "semaine" ? (formatDateFr(range.start) + " – " + formatDateFr(range.end)) : (moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1));
+      var refAujourdhui = periode === "semaine" ? getWeekRange(new Date()).start : getMonthRange(new Date()).start;
+      var estPeriodeActuelle = (periode === "semaine" ? ui.telechargerSemaineRef : ui.telechargerMoisRef) >= refAujourdhui;
+      var refPlusAncienneT = periode === "semaine" ? earliestActivityWeekStart() : earliestActivityMonthStart();
+      var estPeriodePlusAncienneT = (periode === "semaine" ? ui.telechargerSemaineRef : ui.telechargerMoisRef) <= refPlusAncienneT;
+      navHtml = (
+        '<div class="etat-nav">' +
+          '<button type="button" class="en-btn" data-action="telecharger-nav" data-sens="-1" data-periode="' + periode + '"' + (estPeriodePlusAncienneT?" disabled":"") + '>‹</button>' +
+          '<div class="en-label">' + esc(label) + '</div>' +
+          '<button type="button" class="en-btn" data-action="telecharger-nav" data-sens="1" data-periode="' + periode + '"' + (estPeriodeActuelle?" disabled":"") + '>›</button>' +
+        '</div>'
+      );
+    } else {
+      navHtml = '<div class="etat-nav"><div class="en-label">' + esc(formatDateFr(todayStr())) + '</div></div>';
+    }
+
+    return (
+      '<div class="section-title">Télécharger</div>' +
+      '<div class="etat-tabs">' + tabs + '</div>' +
+      navHtml +
+      '<div class="partager-canvas-wrap" style="position:relative;">' +
+        '<canvas id="telecharger-canvas" width="1080" height="1350"></canvas>' +
+        '<canvas id="telecharger-canvas-blur" width="1080" height="1350" class="tc-blur-layer"></canvas>' +
+        '<div class="partager-overlay-abo">Abonnez-vous pour plus de fonctionnalités</div>' +
+      '</div>' +
+      '<div class="btn-row">' +
+        '<button type="button" class="btn btn-secondary" data-action="telecharger-telecharger">⬇️ Télécharger l’image</button>' +
+        '<button type="button" class="btn btn-primary" data-action="telecharger-partager">Partager</button>' +
+      '</div>'
+    );
+  }
+
+  function dessinerCarteTelecharger(){
+    var canvas = byId("telecharger-canvas");
+    if(!canvas || !canvas.getContext) return;
+    ensureTelechargerRefs();
+    var periode = ui.telechargerPeriode;
+    var ref = periode === "semaine" ? dateFromStr(ui.telechargerSemaineRef) : periode === "mois" ? dateFromStr(ui.telechargerMoisRef) : new Date();
+    var range = rangeForPeriode(periode, ref);
+    var benefice = beneficeReventePeriode(range);
+    var charges = chargesCommunesTotal(range);
+    var epargne = epargnePeriode(range);
+    var soldeNet = benefice - epargne - charges;
+    var periodeLabel = periode === "jour" ? formatDateFr(todayStr()) :
+      periode === "semaine" ? (formatDateFr(range.start) + " – " + formatDateFr(range.end)) :
+      (moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1));
+
+    var ctx = canvas.getContext("2d");
+    var W = canvas.width, H = canvas.height;
+    var grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,"#1b2029"); grad.addColorStop(1,"#11141a");
+    ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#f5a623";
+    ctx.font = "700 40px -apple-system,Helvetica,Arial,sans-serif";
+    ctx.fillText("🛍️ MonDjai / Revente", W/2, 110);
+    ctx.fillStyle = "#9aa3b2";
+    ctx.font = "500 30px -apple-system,Helvetica,Arial,sans-serif";
+    ctx.fillText(periodeLabel, W/2, 160);
+
+    ctx.fillStyle = "#9aa3b2";
+    ctx.font = "700 26px -apple-system,Helvetica,Arial,sans-serif";
+    ctx.fillText(soldeNet < 0 ? "SOLDE NET (PÉRIODE À PERTE)" : "SOLDE NET", W/2, 260);
+    ctx.fillStyle = soldeNet < 0 ? "#ff6b5e" : "#eef1f6";
+    ctx.font = "800 96px -apple-system,Helvetica,Arial,sans-serif";
+    ctx.fillText(formatFCFA(soldeNet), W/2, 350);
+
+    var colW = W/3;
+    var cols = [
+      { label:"Bénéfice réalisé", val: formatFCFA(benefice), color:"#34b37e" },
+      { label:"Charges communes", val: formatFCFA(charges), color:"#ff6b5e" },
+      { label:"Épargne", val: formatFCFA(epargne), color:"#f5a623" }
+    ];
+    cols.forEach(function(c, i){
+      var cx = colW*i + colW/2;
+      ctx.fillStyle = "#9aa3b2";
+      ctx.font = "700 24px -apple-system,Helvetica,Arial,sans-serif";
+      ctx.fillText(c.label, cx, 460);
+      ctx.fillStyle = c.color;
+      ctx.font = "800 38px -apple-system,Helvetica,Arial,sans-serif";
+      ctx.fillText(c.val, cx, 510);
+    });
+
+    ctx.strokeStyle = "#2a303c"; ctx.beginPath(); ctx.moveTo(70,570); ctx.lineTo(W-70,570); ctx.stroke();
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "400 22px -apple-system,Helvetica,Arial,sans-serif";
+    ctx.fillText("Document informatif, non certifié.", W/2, H-60);
+
+    var blurCanvas = byId("telecharger-canvas-blur");
+    if(blurCanvas && blurCanvas.getContext){
+      blurCanvas.getContext("2d").drawImage(canvas, 0, 0);
+    }
+  }
+
+  function roundRectPath(ctx, x, y, w, h, r){
+    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+  }
+  function dessinerOverlayAbonnementExport(ctx, W, H){
+    var texte = "Abonnez-vous pour plus de fonctionnalités";
+    ctx.font = "800 30px -apple-system,Helvetica,Arial,sans-serif";
+    var maxWidth = W*0.8 - 68;
+    var mots = texte.split(" "), lignes = [], ligne = "";
+    mots.forEach(function(mot){
+      var essai = ligne ? ligne + " " + mot : mot;
+      if(ctx.measureText(essai).width > maxWidth && ligne){ lignes.push(ligne); ligne = mot; }
+      else { ligne = essai; }
+    });
+    if(ligne) lignes.push(ligne);
+
+    var lineHeight = 40, padX = 34, padY = 24;
+    var textWidth = 0;
+    lignes.forEach(function(l){ textWidth = Math.max(textWidth, ctx.measureText(l).width); });
+    var boxW = Math.min(W*0.8, textWidth + padX*2);
+    var boxH = lignes.length*lineHeight + padY*2;
+    var cx = W/2, cy = H*0.74;
+    var x0 = cx - boxW/2, y0 = cy - boxH/2;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(17,20,26,.85)";
+    ctx.strokeStyle = "rgba(245,166,35,.6)";
+    ctx.lineWidth = 2;
+    roundRectPath(ctx, x0, y0, boxW, boxH, 22);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = "#f5a623";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    lignes.forEach(function(l, i){
+      ctx.fillText(l, cx, y0 + padY + lineHeight*i + lineHeight/2);
+    });
+    ctx.restore();
+  }
+  function construireCanvasExport(){
+    var source = byId("telecharger-canvas");
+    if(!source || !source.getContext) return null;
+    var W = source.width, H = source.height;
+
+    var out = document.createElement("canvas");
+    out.width = W; out.height = H;
+    var octx = out.getContext("2d");
+    octx.drawImage(source, 0, 0);
+
+    var blurred = document.createElement("canvas");
+    blurred.width = W; blurred.height = H;
+    var bctx = blurred.getContext("2d");
+    if("filter" in bctx){
+      bctx.filter = "blur(16px)";
+      bctx.drawImage(source, 0, 0);
+      bctx.filter = "none";
+    } else {
+      var small = document.createElement("canvas");
+      var sw = Math.max(1, Math.round(W/12)), sh = Math.max(1, Math.round(H/12));
+      small.width = sw; small.height = sh;
+      small.getContext("2d").drawImage(source, 0, 0, sw, sh);
+      bctx.imageSmoothingEnabled = true;
+      bctx.drawImage(small, 0, 0, sw, sh, 0, 0, W, H);
+    }
+
+    var grad = bctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, "rgba(0,0,0,0)");
+    grad.addColorStop(0.28, "rgba(0,0,0,0)");
+    grad.addColorStop(0.36, "rgba(0,0,0,1)");
+    grad.addColorStop(1, "rgba(0,0,0,1)");
+    bctx.globalCompositeOperation = "destination-in";
+    bctx.fillStyle = grad;
+    bctx.fillRect(0, 0, W, H);
+    bctx.globalCompositeOperation = "source-over";
+
+    octx.drawImage(blurred, 0, 0);
+    dessinerOverlayAbonnementExport(octx, W, H);
+
+    return out;
+  }
+
+  function canvasVersBlob(callback){
+    var canvas = construireCanvasExport();
+    if(!canvas){ callback(null); return; }
+    if(canvas.toBlob){ canvas.toBlob(callback, "image/png"); return; }
+    try{
+      var dataUrl = canvas.toDataURL("image/png");
+      var bstr = atob(dataUrl.split(",")[1]), n = bstr.length, u8 = new Uint8Array(n);
+      while(n--) u8[n] = bstr.charCodeAt(n);
+      callback(new Blob([u8], { type:"image/png" }));
+    }catch(e){ callback(null); }
+  }
+  function nomFichierTelecharger(){
+    return "mondjai-revente-" + ui.telechargerPeriode + "-" + todayStr() + ".png";
+  }
+  function telechargerImage(){
+    canvasVersBlob(function(blob){
+      if(!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = nomFichierTelecharger();
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    });
+  }
+  function partagerImage(){
+    canvasVersBlob(function(blob){
+      if(!blob) return;
+      var fichier;
+      try{ fichier = new File([blob], nomFichierTelecharger(), { type:"image/png" }); }catch(e){ fichier = null; }
+      if(fichier && navigator.share && navigator.canShare && navigator.canShare({ files:[fichier] })){
+        navigator.share({ files:[fichier], title:"MonDjai/Revente" }).catch(function(){});
+      } else {
+        telechargerImage();
+      }
+    });
+  }
+
+  /* ================= Réglages ================= */
+
+  function renderReglages(){
+    var rubList = state.config.rubriquesCharges;
+    var rubRows = rubList.map(function(r){
+      return (
+        '<div class="rub-manage-row">' +
+          '<div class="rm-emoji">' + esc(r.emoji||"📝") + '</div>' +
+          '<div class="rm-nom">' + esc(r.nom) + '</div>' +
+          '<button type="button" class="switch' + (r.actif?" on":"") + '" data-action="toggle-rubrique-charge" data-id="' + r.id + '"><span class="knob"></span></button>' +
+          (r.perso ? '<button type="button" class="rm-del" data-action="demander-suppression-rubrique" data-id="' + r.id + '" aria-label="Supprimer">🗑️</button>' : '') +
+        '</div>'
+      );
+    }).join("");
+
+    var pinActif = state.config.pinActif;
+
+    var bientotHtml =
+      '<div class="reglages-section">' +
+        '<div class="rs-title">Disponible par abonnement premium</div>' +
+        '<div class="profil-row soon">' +
+          '<div class="pr-emoji">💇</div>' +
+          '<div class="pr-text"><div class="pr-title">Coiffure</div>' +
+            '<div class="pr-desc">Application indépendante, sur commande, fusion avec Revente et/ou Pédicure/Manicure.</div></div>' +
+          '<button type="button" class="switch' + (ui.abonnementToggles.coiffure?" on":"") + '" data-action="toggle-abonnement-premium" data-id="coiffure"><span class="knob"></span></button>' +
+        '</div>' +
+        '<div class="profil-row soon">' +
+          '<div class="pr-emoji">💅</div>' +
+          '<div class="pr-text"><div class="pr-title">Pédicure / Manicure</div>' +
+            '<div class="pr-desc">Application indépendante, sur commande, fusion avec Revente et/ou Coiffure.</div></div>' +
+          '<button type="button" class="switch' + (ui.abonnementToggles.pedicure?" on":"") + '" data-action="toggle-abonnement-premium" data-id="pedicure"><span class="knob"></span></button>' +
+        '</div>' +
+        (ui.reglagesMsg ? '<div class="hint tight" style="margin-top:8px;">' + esc(ui.reglagesMsg) + '</div>' : '') +
+      '</div>';
+
+    return (
+      '<div class="onb">' +
+        '<div class="onb-head" style="display:flex; align-items:center; justify-content:space-between;">' +
+          '<div class="onb-title" style="margin:0;">Réglages</div>' +
+          '<button type="button" class="icon-btn" data-action="fermer-overlay">✕</button>' +
+        '</div>' +
+        '<div class="reglages-section">' +
+          '<div class="rs-title">Charges communes</div>' +
+          rubRows +
+          '<div class="inline-new">' +
+            '<input type="text" class="input" id="f-nouvelleRubrique" placeholder="Nouvelle rubrique" value="' + esc(ui.draft["f-nouvelleRubrique"]||"") + '" data-autofocus data-action-change="capture-nouvelle-rubrique">' +
+            '<button type="button" class="btn btn-secondary" data-action="ajouter-rubrique-charge">Ajouter</button>' +
+          '</div>' +
+          '<div class="hint tight">Servent pour les charges communes ajoutées depuis la carte « Charges communes » (loyer/local de stockage, transport, publicité…). Supprimer une rubrique personnalisée ne touche pas aux charges déjà enregistrées.</div>' +
+        '</div>' +
+        bientotHtml +
+        '<div class="reglages-section">' +
+          '<div class="rs-title">Sécurité</div>' +
+          '<div class="profil-row">' +
+            '<div class="pr-emoji">🔒</div>' +
+            '<div class="pr-text"><div class="pr-title">Code PIN à l’ouverture</div><div class="pr-desc">Un verrou simple contre un regard indiscret — pas un chiffrement.</div></div>' +
+            '<button type="button" class="switch' + (pinActif?" on":"") + '" data-action="toggle-pin-reglages"><span class="knob"></span></button>' +
+          '</div>' +
+          (pinActif ? '<button type="button" class="btn btn-secondary" data-action="changer-pin">Changer le code PIN</button>' : '') +
+        '</div>' +
+        '<div class="reglages-section">' +
+          '<div class="rs-title">Sauvegarde et restauration</div>' +
+          '<button type="button" class="btn btn-secondary" data-action="exporter-json">💾 Sauvegarder mes données (JSON)</button>' +
+          '<div style="height:10px;"></div>' +
+          '<label class="btn btn-secondary" style="display:flex; cursor:pointer;">📂 Restaurer une sauvegarde' +
+            '<input type="file" accept="application/json" style="display:none;" data-action-change="importer-json"></label>' +
+          (ui.backupMsg ? '<div class="hint tight">' + esc(ui.backupMsg) + '</div>' : '') +
+          (state.meta.derniereSauvegarde ? '<div class="hint tight">Dernière sauvegarde : ' + esc(formatDateFr(state.meta.derniereSauvegarde)) + '</div>' : '') +
+        '</div>' +
+        '<div class="reglages-section">' +
+          '<button type="button" class="btn btn-secondary" data-action="ouvrir-apropos">À propos</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderApropos(){
+    return (
+      '<div class="onb">' +
+        '<div class="onb-head" style="display:flex; align-items:center; justify-content:space-between;">' +
+          '<div class="onb-title" style="margin:0;">À propos</div>' +
+          '<button type="button" class="icon-btn" data-action="fermer-apropos">✕</button>' +
+        '</div>' +
+        '<div class="mission">Chaque geste compte : on note, on avance.</div>' +
+        '<div class="about-line">MonDjai/Revente vous aide à suivre vos achats, vos ventes et votre stock, sans jugement et sans calcul compliqué.</div>' +
+        '<div class="about-line">Vos données restent uniquement sur ce téléphone — rien n’est envoyé sur internet.</div>' +
+        '<div class="about-line">Le bénéfice réalisé est calculé produit par produit, à partir du coût moyen d’achat — c’est lui qui sert de base à votre épargne automatique, pas le montant total encaissé.</div>' +
+        '<div class="about-line">Troisième application de la famille, après Coiffure : Pédicure/Manicure arrivera plus tard en application indépendante, avec une fusion prévue par la suite.</div>' +
+        '<div class="about-line">Le code PIN est un verrou de confort, pas un chiffrement fort — à ne jamais présenter comme une sécurité absolue.</div>' +
+        '<div class="about-line">Votre accès est valable jusqu’à la fin du mois en cours ; le renouvellement se fait localement, sans connexion, à l’aide d’un code que l’on vous communique.</div>' +
+        '<div class="about-line">Version : Sprint Revente-B — accès mensuel calendaire et choix du dossier de sauvegarde.</div>' +
+      '</div>'
+    );
+  }
+
+  /* ================= Actions ================= */
+
+  function openModal(type, extra){
+    ui.modal = merge({ type:type }, extra || {});
+    ui.draft = {};
+    ui.errors = {};
+    render();
+  }
+  function closeModal(){
+    if(ui.modalReturnTo){
+      var back = ui.modalReturnTo;
+      ui.modalReturnTo = null;
+      openModal(back.type, back.extra);
+      return;
+    }
+    ui.modal = null;
+    ui.draft = {};
+    ui.errors = {};
+    render();
+  }
+
+  function handleClick(e){
+    var el = e.target.closest("[data-action]");
+    if(!el) return;
+    var action = el.getAttribute("data-action");
+
+    if(action === "fermer-modal-overlay"){
+      if(e.target.closest("[data-stop-close]")) return;
+      closeModal();
+      return;
+    }
+    if(action === "fermer-modal"){ closeModal(); return; }
+
+    switch(action){
+      case "ouvrir-reglages": ui.overlay = "reglages"; ui.reglagesMsg = ""; render(); return;
+      case "fermer-overlay": ui.overlay = null; ui.objDraft = null; render(); return;
+      case "ouvrir-apropos": ui.overlay = "apropos"; render(); return;
+      case "fermer-apropos": ui.overlay = "reglages"; render(); return;
+      case "ouvrir-habitudes": ui.overlay = "habitudes"; render(); return;
+      case "ouvrir-telecharger": ui.overlay = "telecharger"; render(); return;
+
+      case "ouvrir-objectif": ui.overlay = "objectif"; render(); return;
+
+      case "choisir-modele-objectif": {
+        ui.objDraft = ui.objDraft || { step:"modele", modeleId:null, mode:"auto", pourcentage:"10", montant:"", nom:"" };
+        ui.objDraft.modeleId = el.getAttribute("data-val");
+        render();
+        return;
+      }
+      case "continuer-objectif-modele": {
+        var d0 = ui.objDraft;
+        if(!d0 || !d0.modeleId) return;
+        var m0 = findObjectifModele(d0.modeleId);
+        d0.step = "form";
+        if(m0 && !d0.nom) d0.nom = m0.nom;
+        render();
+        return;
+      }
+      case "revenir-objectif-modele": {
+        if(ui.objDraft) ui.objDraft.step = "modele";
+        render();
+        return;
+      }
+
+      case "choisir-mode-objectif": {
+        ui.objDraft = ui.objDraft || { mode:"auto", pourcentage:"10", montant:"", nom:"Épargne" };
+        ui.objDraft.mode = el.getAttribute("data-val");
+        ui.objDraft.erreurs = {};
+        render();
+        return;
+      }
+      case "choisir-pourcentage-objectif": {
+        ui.objDraft = ui.objDraft || { mode:"auto", pourcentage:"10", montant:"", nom:"Épargne" };
+        ui.objDraft.pourcentage = el.getAttribute("data-val");
+        render();
+        return;
+      }
+      case "enregistrer-objectif": enregistrerObjectif(); return;
+      case "ouvrir-modifier-objectif": ui.draft = {}; openModal("modifier-objectif"); return;
+      case "ouvrir-supprimer-objectif": openModal("confirmer-suppression-objectif"); return;
+      case "confirmer-suppr-objectif": {
+        state.objectifEpargne = null;
+        saveState();
+        closeModal();
+        return;
+      }
+      case "modif-mode-objectif": {
+        ui.draft.mode = el.getAttribute("data-val");
+        render();
+        return;
+      }
+      case "modif-pourcentage-objectif": {
+        ui.draft.pourcentage = el.getAttribute("data-val");
+        render();
+        return;
+      }
+      case "enregistrer-modif-objectif": enregistrerModifObjectif(); return;
+
+      case "telecharger-set-periode": ensureTelechargerRefs(); ui.telechargerPeriode = el.getAttribute("data-val"); render(); return;
+      case "telecharger-nav": {
+        var tsens = parseInt(el.getAttribute("data-sens"),10);
+        var tper = el.getAttribute("data-periode");
+        shiftTelechargerRef(tper, tsens);
+        render();
+        return;
+      }
+      case "telecharger-telecharger": telechargerImage(); return;
+      case "telecharger-partager": partagerImage(); return;
+
+      case "valider-code-acces": {
+        var champCode = byId("f-codeAcces");
+        if(champCode) ui.codeAccesInput = champCode.value;
+        var saisieNorm = normaliserCode(ui.codeAccesInput);
+        if(!state.config.codeAccesOk){
+          if(saisieNorm === CODE_ACCES_ATTENDU){
+            state.config.codeAccesOk = true;
+            state.config.derniereValidationAcces = Date.now();
+            // Mois d'essai : calculé à partir de la date d'installation réelle
+            // (meta.creation, fixée dès le tout premier lancement), pas de la
+            // date de saisie du code — les deux coïncident en pratique sauf si
+            // l'utilisatrice a attendu avant de saisir le code initial.
+            state.config.moisAccesValide = finEssaiPourInstallation(parseDateStr(state.meta.creation) || new Date());
+            saveState();
+            ui.codeAccesInput = "";
+            ui.codeAccesErreur = "";
+          } else {
+            ui.codeAccesErreur = "Code incorrect, réessayez.";
+          }
+        } else {
+          if(saisieNorm === codeAccesDuMoisAttenduAujourdhui()){
+            state.config.derniereValidationAcces = Date.now();
+            var dValid = new Date();
+            state.config.moisAccesValide = { mois: dValid.getMonth()+1, annee: dValid.getFullYear() };
+            saveState();
+            ui.codeAccesInput = "";
+            ui.codeAccesErreur = "";
+          } else {
+            ui.codeAccesErreur = "Code incorrect, réessayez.";
+          }
+        }
+        render();
+        return;
+      }
+
+      case "toggle-pin-reglages": {
+        if(state.config.pinActif){
+          state.config.pinActif = false;
+          state.config.pinCode = null;
+          saveState();
+          render();
+        } else {
+          ui.pinSetupStep = "premier"; ui.pinSetupPremier = ""; ui.pinSetupInput = ""; ui.pinSetupErreur = false;
+          openModal("pin-setup");
+        }
+        return;
+      }
+      case "toggle-abonnement-premium": {
+        var idAbo = el.getAttribute("data-id");
+        ui.abonnementToggles[idAbo] = !ui.abonnementToggles[idAbo];
+        ui.reglagesMsg = "Disponible par abonnement premium — activation à venir.";
+        render();
+        return;
+      }
+      case "changer-pin": {
+        ui.pinSetupStep = "premier"; ui.pinSetupPremier = ""; ui.pinSetupInput = ""; ui.pinSetupErreur = false;
+        openModal("pin-setup");
+        return;
+      }
+      case "pin-key": handlePinKey(el.getAttribute("data-id"), el.getAttribute("data-val")); return;
+      case "pin-oublie": openModal("pin-oublie"); return;
+      case "demander-erase": ui.modal.confirmErase = true; render(); return;
+      case "annuler-erase": ui.modal.confirmErase = false; render(); return;
+      case "confirmer-erase": {
+        try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+        state = defaultState();
+        ui.locked = false;
+        ui.modal = null;
+        render();
+        return;
+      }
+
+      case "exporter-json": exporterJson(); return;
+
+      case "toggle-rubrique-charge": {
+        var rid = el.getAttribute("data-id");
+        var rub = findRubriqueCharge(rid);
+        if(rub){ rub.actif = !rub.actif; saveState(); render(); }
+        return;
+      }
+      case "demander-suppression-rubrique": openModal("confirmer-suppression-rubrique", {id: el.getAttribute("data-id")}); return;
+      case "confirmer-suppression-rubrique": {
+        var ridSup = el.getAttribute("data-id");
+        state.config.rubriquesCharges = state.config.rubriquesCharges.filter(function(r){ return r.id !== ridSup; });
+        state.autresCharges.forEach(function(c){ if(c.rubriqueId === ridSup) c.rubriqueSupprimee = true; });
+        saveState();
+        ui.overlay = "reglages";
+        closeModal();
+        return;
+      }
+      case "ajouter-rubrique-charge": {
+        var nomRub = (ui.draft["f-nouvelleRubrique"]||"").trim();
+        if(nomRub){
+          state.config.rubriquesCharges.push({ id: uid("rub"), nom: nomRub, emoji:"📝", actif:true, perso:true });
+          saveState();
+          ui.draft["f-nouvelleRubrique"] = "";
+        }
+        render();
+        return;
+      }
+
+      case "go-tab": ui.tab = el.getAttribute("data-tab"); render(); return;
+
+      case "etat-set-periode": {
+        ensureEtatRefs();
+        ui.etatPeriode = el.getAttribute("data-val");
+        ui.etatSelSemaine = null; ui.etatSelJour = null;
+        render();
+        return;
+      }
+      case "etat-nav": {
+        var sens = parseInt(el.getAttribute("data-sens"), 10);
+        var per = el.getAttribute("data-periode");
+        shiftRef(per, sens);
+        ui.etatSelSemaine = null; ui.etatSelJour = null;
+        render();
+        return;
+      }
+      case "etat-select-jour": {
+        ui.etatSelJour = el.getAttribute("data-date");
+        ui.etatSelJourFrom = el.getAttribute("data-from");
+        render();
+        return;
+      }
+      case "etat-select-semaine": {
+        ui.etatSelSemaine = el.getAttribute("data-week-start");
+        render();
+        return;
+      }
+      case "etat-back": {
+        if(ui.etatSelJour){ ui.etatSelJour = null; ui.etatSelJourFrom = null; render(); return; }
+        if(ui.etatSelSemaine){ ui.etatSelSemaine = null; render(); return; }
+        return;
+      }
+
+      case "habitudes-set-periode": ensureHabitudesRefs(); ui.habitudesPeriode = el.getAttribute("data-val"); render(); return;
+      case "habitudes-nav": {
+        var hsens = parseInt(el.getAttribute("data-sens"), 10);
+        var hper = el.getAttribute("data-periode");
+        shiftHabitudesRef(hper, hsens);
+        render();
+        return;
+      }
+
+      case "add-achat": openModal("add-achat"); return;
+      case "voir-achat": openModal("detail-achat", {id: el.getAttribute("data-id")}); return;
+      case "voir-achat-du-jour": {
+        ui.modalReturnTo = { type: "jour-achats" };
+        openModal("detail-achat", {id: el.getAttribute("data-id")});
+        return;
+      }
+      case "add-vente": openModal("add-vente"); return;
+      case "voir-vente": openModal("detail-vente", {id: el.getAttribute("data-id")}); return;
+      case "voir-vente-du-jour": {
+        ui.modalReturnTo = { type: "jour-ventes" };
+        openModal("detail-vente", {id: el.getAttribute("data-id")});
+        return;
+      }
+      case "voir-jour-achats": openModal("jour-achats"); return;
+      case "voir-jour-ventes": openModal("jour-ventes"); return;
+
+      case "voir-charges-jour": openModal("detail-charges-jour"); return;
+      case "add-autre-charge": {
+        ui.modalReturnTo = { type: "detail-charges-jour" };
+        openModal("add-autre-charge");
+        return;
+      }
+      case "voir-autre-charge": {
+        ui.modalReturnTo = { type: "detail-charges-jour" };
+        openModal("detail-autre-charge", {id: el.getAttribute("data-id")});
+        return;
+      }
+      case "set-rubrique-charge": {
+        captureDraft(["f-montantAutreCharge"]);
+        ui.draft["f-rubrique"] = el.getAttribute("data-id");
+        render();
+        return;
+      }
+
+      case "demander-suppression": ui.modal.confirmDelete = true; render(); return;
+      case "annuler-suppression": ui.modal.confirmDelete = false; render(); return;
+      case "confirmer-suppression": {
+        var kind = el.getAttribute("data-kind");
+        var id = el.getAttribute("data-id");
+        var map = { achat:"achats", vente:"ventes", "autre-charge":"autresCharges" };
+        var arrName = map[kind];
+        if(arrName){
+          state[arrName] = state[arrName].filter(function(x){ return x.id !== id; });
+          saveState();
+        }
+        closeModal();
+        return;
+      }
+
+      case "produit-achat-change": captureDraft(ACHAT_FIELDS); render(); return;
+      case "produit-vente-change": captureDraft(VENTE_FIELDS); render(); return;
+      case "set-type-vente": {
+        captureDraft(VENTE_FIELDS);
+        ui.draft["f-typeVente"] = el.getAttribute("data-val");
+        render();
+        return;
+      }
+
+      case "capture-achat": captureDraft(ACHAT_FIELDS); return;
+      case "capture-vente": captureDraft(VENTE_FIELDS); return;
+      case "capture-autre-charge": captureDraft(["f-montantAutreCharge"]); return;
+      case "enregistrer-achat": enregistrerAchat(); return;
+      case "enregistrer-vente": enregistrerVente(); return;
+      case "enregistrer-autre-charge": enregistrerAutreCharge(); return;
+    }
+  }
+
+  function handleChange(e){
+    var el = e.target;
+    var action = el.getAttribute && el.getAttribute("data-action-change");
+    if(!action) return;
+    switch(action){
+      case "capture-achat": {
+        captureDraft(ACHAT_FIELDS);
+        if(el.id === "f-produitSel"){ onProduitAchatChange(); }
+        render();
+        return;
+      }
+      case "capture-vente": {
+        captureDraft(VENTE_FIELDS);
+        if(el.id === "f-produitSel"){ render(); }
+        return;
+      }
+      case "produit-achat-change": {
+        captureDraft(ACHAT_FIELDS);
+        onProduitAchatChange();
+        if(ui.draft["f-produitSel"] === "__new__") ui.pendingAutofocus = true;
+        render();
+        return;
+      }
+      case "produit-vente-change": {
+        captureDraft(VENTE_FIELDS);
+        if(ui.draft["f-produitSel"] === "__new__") ui.pendingAutofocus = true;
+        render();
+        return;
+      }
+      case "set-seuil-reassort": {
+        var pid = el.getAttribute("data-id");
+        var produit = findProduitById(pid);
+        if(produit){
+          var n = toNum(el.value);
+          produit.seuilReassort = n >= 0 ? Math.round(n) : SEUIL_REASSORT_DEFAUT;
+          saveState();
+          render();
+        }
+        return;
+      }
+      case "capture-code-acces": ui.codeAccesInput = el.value; ui.codeAccesErreur = ""; return;
+      case "capture-obj-montant": ui.objDraft.montant = el.value; return;
+      case "capture-obj-nom": ui.objDraft.nom = el.value; return;
+      case "capture-modif-objectif": {
+        if(el.id === "f-modifNom") ui.draft.nom = el.value;
+        if(el.id === "f-modifPourcentage") ui.draft.pourcentage = el.value;
+        if(el.id === "f-modifMontant") ui.draft.montant = el.value;
+        return;
+      }
+      case "capture-autre-charge": captureDraft(["f-montantAutreCharge"]); return;
+      case "capture-nouvelle-rubrique": ui.draft["f-nouvelleRubrique"] = el.value; return;
+      case "importer-json": case "importer-json-lock": {
+        var file = el.files && el.files[0];
+        importerJsonDepuisFichier(file, function(ok){
+          ui.backupMsg = ok ? "Sauvegarde restaurée." : "Ce fichier ne peut pas être lu comme une sauvegarde MonDjai/Revente.";
+          if(ok){
+            ui.locked = !!(state.config.pinActif && state.config.pinCode);
+            if(!ui.locked){ ui.modal = null; ui.overlay = null; }
+          }
+          render();
+        });
+        return;
+      }
+    }
+  }
+
+  /* ================= Démarrage ================= */
+
+  document.addEventListener("click", handleClick);
+  document.addEventListener("change", handleChange);
+
+  state = loadState();
+  ui.locked = !!(state.config.pinActif && state.config.pinCode);
+  render();
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(){});
+    });
+  }
+
+  window.__mondjaiRevente = {
+    getState: function(){ return state; },
+    setState: function(s){ state = s; saveState(); render(); },
+    render: render,
+    STORAGE_KEY: STORAGE_KEY,
+    normaliserEtatImporte: normaliserEtatImporte,
+    defaultState: defaultState,
+    codeAccesDuMois: codeAccesDuMois,
+    codeAccesDuMoisAttenduAujourdhui: codeAccesDuMoisAttenduAujourdhui,
+    accesMensuelExpire: accesMensuelExpire,
+    finEssaiPourInstallation: finEssaiPourInstallation
+  };
+})();
+</script>
+</body>
+</html>
