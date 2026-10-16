@@ -26,34 +26,63 @@
     --pink:#e8788c;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
+    /* Sprint Revente-E : finitions visuelles (« chic, sobre ») — bordures
+       fines et discrètes, léger dégradé + ombre douce, rayons harmonisés. */
+    --line:rgba(255,255,255,.075);
+    --card-grad:linear-gradient(180deg,#1f252f 0%,#1a1f28 100%);
+    --shadow:inset 0 1px 0 rgba(255,255,255,.035), 0 8px 18px -10px rgba(0,0,0,.65);
+    --shadow-sm:inset 0 1px 0 rgba(255,255,255,.03), 0 3px 8px -4px rgba(0,0,0,.5);
+    --r-lg:18px;
+    --r-md:14px;
+    --r-sm:11px;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     height:100%; overscroll-behavior-y:none; color-scheme:dark;}
-  #app{min-height:100%; display:flex; flex-direction:column;}
+  /* Sprint Revente-E : chiffres à chasse fixe sur tous les montants (ils
+     s'alignent et ne « dansent » pas). Pas sur le texte courant : dans la
+     police système Android, l'option élargit aussi les traits d'union
+     (« mois - ci »). */
+  .db-amount, .mt-val, .cb-amount, .entry-amount, .entry-sub, .ds-amount, .sms-val, .er-val, .eb-val, .cr-amount,
+  .cd-v, .sv, .mvt-n, .dv, .oc-montant, .oc-sub, .es-val, .en-label, .periode-titre, .tp-sub, input[type=number], input[type=date],
+  .modifie-le, .zone-titre, .about-line b{font-variant-numeric:tabular-nums;}
+  #app{min-height:100%; display:flex; flex-direction:column;
+    /* Sprint Revente-E : le léger glissement des transitions d'écran ne doit
+       jamais créer de défilement passager (clip ≠ hidden : l'en-tête reste
+       collant et la page défile normalement). */
+    overflow:clip;}
   a{color:inherit;}
   button{font-family:inherit; color:inherit;}
 
   /* ---------- Header ---------- */
   .header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:calc(14px + var(--safe-top)) 16px 12px;
-    background:linear-gradient(180deg,#161b23,#11141a);
-    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:calc(15px + var(--safe-top)) 16px 13px;
+    background:linear-gradient(180deg,#181d26,#12161d);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 10px 18px -16px rgba(0,0,0,.9);
     position:sticky; top:0; z-index:5;
   }
-  .brand{display:flex; align-items:center; gap:8px; min-width:0;}
+  .brand{display:flex; align-items:center; gap:9px; min-width:0;}
   .brand-emoji{font-size:22px; flex:none;}
-  .brand-text{display:flex; flex-direction:column; line-height:1.15; min-width:0;}
-  .brand-title{font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .brand-sub{font-size:10.5px; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .brand-text{display:flex; flex-direction:column; line-height:1.18; min-width:0;}
+  .brand-title{font-size:15px; font-weight:800; letter-spacing:.005em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .brand-sub{font-size:10.5px; color:var(--text-dim); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .icon-btn{
-    background:var(--card); border:1px solid var(--border); color:var(--text);
-    width:38px; height:38px; border-radius:12px; font-size:17px;
+    background:var(--card-grad); border:1px solid var(--line); color:var(--text);
+    width:38px; height:38px; border-radius:12px; font-size:17px; box-shadow:var(--shadow-sm);
     display:flex; align-items:center; justify-content:center; flex:none;
   }
   .icon-btn:active{background:var(--card-2);}
+  /* Petits écrans (360 px) : le nom de l'application reste entier. */
+  @media (max-width:380px){
+    .header{padding-left:14px; padding-right:14px; gap:6px;}
+    .brand{gap:7px;}
+    .brand-emoji{font-size:20px;}
+    .brand-title{font-size:14px;}
+    .header-icons{gap:5px;}
+  }
   .icon-btn.epargne-shortcut{
     width:auto; padding:0 10px; gap:5px; flex-direction:row; font-size:15px; font-weight:800;
   }
@@ -64,8 +93,11 @@
   .main{flex:1; padding:14px 16px calc(24px + var(--safe-bottom)); display:flex; flex-direction:column;}
   .main.with-tabbar{padding-bottom: calc(96px + var(--safe-bottom));}
 
-  .section-title{font-size:13px; font-weight:700; color:var(--text-dim); text-transform:uppercase;
-    letter-spacing:.04em; margin:4px 0 10px;}
+  /* Sprint Revente-E : titres de section suivis d'un fin filet */
+  .section-title{display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase;
+    letter-spacing:.06em; margin:4px 0 10px;}
+  .section-title::after{content:""; flex:1 1 auto; min-width:16px; height:1px;
+    background:linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,0));}
   .hint{font-size:12.5px; color:var(--text-dim); line-height:1.5;}
   .hint.tight{margin-top:4px;}
 
@@ -102,11 +134,12 @@
     border:none; border-radius:14px; padding:14px 16px; font-size:15px; font-weight:700;
     width:100%;
   }
-  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark)); color:#1b1200;}
-  .btn-secondary{background:var(--card); color:var(--text); border:1px solid var(--border);}
+  .btn-primary{background:linear-gradient(135deg,#f7b443,var(--accent-dark)); color:#1b1200;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 10px 20px -12px rgba(245,166,35,.75);}
+  .btn-secondary{background:var(--card-grad); color:var(--text); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow-sm);}
   .btn-ghost{background:transparent; color:var(--accent); border:none; padding:10px;}
-  .btn-danger{background:rgba(255,107,94,.12); color:var(--red); border:1px solid rgba(255,107,94,.4);}
-  .btn:active{opacity:.85;}
+  .btn-danger{background:rgba(255,107,94,.1); color:var(--red); border:1px solid rgba(255,107,94,.38);}
+  .btn:active{opacity:.88;}
   .btn:disabled{opacity:.4; pointer-events:none;}
   .btn-row{display:flex; gap:10px; margin-top:14px;}
   .btn-row .btn{width:auto; flex:1;}
@@ -114,35 +147,48 @@
   /* ---------- Tab bar ---------- */
   .tabbar{
     position:fixed; left:0; right:0; bottom:0; z-index:6;
-    display:flex; background:#161b23; border-top:1px solid var(--border);
-    padding:8px 6px calc(8px + var(--safe-bottom));
+    display:flex; background:linear-gradient(180deg,#171c24,#13171e); border-top:1px solid var(--line);
+    box-shadow:0 -10px 22px -16px rgba(0,0,0,.9);
+    padding:7px 4px calc(8px + var(--safe-bottom));
   }
   .tab{
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-    background:transparent; border:none; color:var(--text-dim); padding:6px 2px; border-radius:12px;
+    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:transparent; border:none; color:var(--text-dim); padding:2px 1px; border-radius:12px;
   }
-  .tab .tab-emoji{font-size:20px;}
-  .tab .tab-label{font-size:10.5px; font-weight:600;}
+  /* Sprint Revente-E : l'onglet actif est marqué par une pastille ambre. */
+  .tab .tab-emoji{font-size:19px; line-height:1; width:54px; max-width:100%; height:30px; border-radius:999px;
+    display:flex; align-items:center; justify-content:center;}
+  .tab .tab-label{font-size:10.5px; font-weight:600; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;}
+  /* Sprint Revente-C : 5 onglets — libellés un peu plus serrés sur les petits écrans */
+  @media (max-width:380px){ .tab .tab-label{font-size:9.8px; letter-spacing:-.01em;} }
   .tab.active{color:var(--accent);}
-  .tab.active .tab-emoji{transform:translateY(-1px);}
+  .tab.active .tab-emoji{background:rgba(245,166,35,.17); box-shadow:inset 0 0 0 1px rgba(245,166,35,.42);}
+  .tab.active .tab-label{font-weight:800;}
 
   /* ---------- List cards ---------- */
   .entry-list{display:flex; flex-direction:column; gap:10px; margin-top:4px;}
   .entry-card{
-    background:var(--card); border:1px solid var(--border); border-radius:14px;
-    padding:13px 14px; display:flex; align-items:center; gap:12px; text-align:left;
+    background:var(--card-grad); border:1px solid var(--line); border-radius:var(--r-md); box-shadow:var(--shadow);
+    padding:13px 14px; display:flex; align-items:center; gap:12px; text-align:left; color:var(--text);
   }
   .entry-card:active{background:var(--card-2);}
   .entry-ico{
-    width:38px; height:38px; border-radius:11px; flex:none;
+    width:38px; height:38px; border-radius:12px; flex:none;
     display:flex; align-items:center; justify-content:center; font-size:18px;
-    background:rgba(245,166,35,.12); color:var(--accent);
+    background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.26), rgba(245,166,35,.08));
+    box-shadow:inset 0 0 0 1px rgba(245,166,35,.2); color:var(--accent);
   }
+  .entry-ico.ico-vente{background:radial-gradient(circle at 30% 25%, rgba(52,179,126,.28), rgba(52,179,126,.08)); box-shadow:inset 0 0 0 1px rgba(52,179,126,.24);}
   .entry-main{flex:1; min-width:0;}
   .entry-title{font-size:14.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  /* Sprint Revente-E : un nom de produit long est coupé, jamais le badge qui le suit. */
+  .entry-title.et-flex{display:flex; align-items:center; min-width:0;}
+  .entry-title .et-nom{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .entry-title .badge{flex:none;}
   .entry-sub{font-size:12px; color:var(--text-dim); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .entry-amount{font-size:14px; font-weight:700; color:var(--accent); flex:none; white-space:nowrap;}
+  .entry-amount{font-size:14.5px; font-weight:800; color:var(--accent); flex:none; white-space:nowrap;}
   .entry-amount.neg{color:var(--red);}
+  .entry-amount.pos{color:var(--green);}
 
   /* ---------- Cartes agrandies Achats / Ventes ---------- */
   .entry-list-lg{flex:1;}
@@ -153,28 +199,35 @@
   .entry-card-lg .entry-ico{width:50px; height:50px; font-size:23px;}
   .entry-card-lg .entry-main{width:100%;}
   .entry-card-lg .entry-title{white-space:normal; font-size:16px;}
+  .entry-card-lg .entry-title.et-flex{justify-content:center; flex-wrap:wrap; row-gap:4px;}
+  .entry-card-lg .entry-title .et-nom{white-space:normal;}
   .entry-card-lg .entry-sub{white-space:normal; margin-top:3px;}
   .entry-card-lg .entry-amount{font-size:21px; margin-top:2px;}
   .badge{
-    display:inline-block; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px;
+    display:inline-block; vertical-align:1px; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px;
     background:rgba(91,141,239,.15); color:var(--blue); margin-left:6px;
   }
 
+  /* Sprint Revente-E : états vides plus soignés (pastille, cadre en pointillés discret) */
   .empty-state{
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:30px 10px; color:var(--text-dim); gap:8px;
+    text-align:center; padding:28px 16px; color:var(--text-dim); gap:8px;
+    border:1px dashed rgba(255,255,255,.1); border-radius:var(--r-lg); background:rgba(255,255,255,.012);
   }
-  .empty-state .es-emoji{font-size:38px; opacity:.7;}
-  .empty-state .es-title{font-size:14.5px; font-weight:700; color:var(--text);}
+  .empty-state .es-emoji{width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:29px; margin-bottom:4px;
+    background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.24), rgba(245,166,35,.05));
+    box-shadow:inset 0 0 0 1px rgba(245,166,35,.22);}
+  .empty-state .es-title{font-size:14.5px; font-weight:800; color:var(--text);}
   .empty-state .es-desc{font-size:12.5px; max-width:260px; line-height:1.5;}
 
   .fab{
     position:fixed; right:18px; bottom:calc(92px + var(--safe-bottom)); z-index:7;
     width:56px; height:56px; border-radius:18px; border:none;
-    background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+    background:linear-gradient(135deg,#f7b443,var(--accent-dark));
     color:#1b1200; font-size:26px; font-weight:800;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 8px 20px rgba(245,166,35,.35);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 10px 22px -6px rgba(245,166,35,.5);
   }
   .fab:active{transform:scale(.96);}
 
@@ -198,10 +251,11 @@
 
   .radio-row{display:flex; gap:10px;}
   .radio-opt{
-    flex:1; text-align:center; background:var(--card-2); border:1.5px solid var(--border); color:var(--text-dim);
+    flex:1; text-align:center; background:var(--card-2); border:1px solid var(--border); color:var(--text-dim);
     border-radius:12px; padding:12px 8px; font-size:13px; font-weight:700;
   }
-  .radio-opt.active{border-color:var(--accent); color:var(--accent); background:rgba(245,166,35,.1);}
+  .radio-opt.active{border-color:rgba(245,166,35,.85); color:var(--accent); background:rgba(245,166,35,.12);
+    box-shadow:inset 0 0 0 1px rgba(245,166,35,.35);}
 
   .chip-wrap{display:flex; flex-wrap:wrap; gap:8px;}
   .chip{
@@ -213,20 +267,23 @@
 
   /* ---------- Modal ---------- */
   .modal-overlay{
-    position:fixed; inset:0; background:rgba(6,8,12,.6); z-index:20;
+    position:fixed; inset:0; background:rgba(5,7,10,.62); z-index:20;
     display:flex; align-items:flex-end;
   }
+  /* Sprint Revente-E : feuille du bas avec une poignée grise */
   .modal{
-    width:100%; max-height:88vh; overflow-y:auto; background:var(--bg);
-    border-radius:20px 20px 0 0; border-top:1px solid var(--border);
-    padding:18px 18px calc(20px + var(--safe-bottom));
+    width:100%; max-height:88vh; overflow-y:auto; background:linear-gradient(180deg,#171c24 0px,#11141a 160px);
+    border-radius:22px 22px 0 0; border-top:1px solid rgba(255,255,255,.1);
+    box-shadow:0 -14px 34px rgba(0,0,0,.5);
+    padding:10px 18px calc(20px + var(--safe-bottom));
   }
-  .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
-  .modal-title{font-size:17px; font-weight:800;}
-  .modal-close{background:var(--card); border:1px solid var(--border); color:var(--text-dim);
+  .modal::before{content:""; display:block; width:40px; height:4px; border-radius:999px; background:#3c4352; margin:0 auto 12px;}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px;}
+  .modal-title{font-size:17px; font-weight:800; min-width:0;}
+  .modal-close{background:var(--card-grad); border:1px solid var(--line); color:var(--text-dim); flex:none;
     width:32px; height:32px; border-radius:10px; font-size:15px; display:flex; align-items:center; justify-content:center;}
 
-  .detail-row{display:flex; justify-content:space-between; gap:14px; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px;}
+  .detail-row{display:flex; justify-content:space-between; gap:14px; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px;}
   .detail-row:last-of-type{border-bottom:none;}
   .detail-row .dk{color:var(--text-dim);}
   .detail-row .dv{font-weight:700; text-align:right;}
@@ -236,10 +293,12 @@
 
   /* ---------- Réglages / À propos ---------- */
   .reglages-section{margin-bottom:22px;}
-  .reglages-section .rs-title{font-size:13px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; margin-bottom:10px;}
+  .reglages-section .rs-title{display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
+  .reglages-section .rs-title::after{content:""; flex:1 1 auto; min-width:16px; height:1px;
+    background:linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,0));}
   .profil-row{
-    display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border);
-    border-radius:14px; padding:13px 14px; margin-bottom:10px;
+    display:flex; align-items:center; gap:12px; background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow);
+    border-radius:var(--r-md); padding:13px 14px; margin-bottom:10px;
   }
   .profil-row.soon{opacity:1;}
   .profil-row .pr-emoji{font-size:22px; width:30px; text-align:center; flex:none;}
@@ -263,89 +322,205 @@
 
   /* ---------- Aujourd'hui ---------- */
   .dash-solde{
-    background:linear-gradient(135deg,var(--card),var(--card-2)); border:1px solid var(--border);
-    border-radius:18px; padding:20px 18px; text-align:center; margin-bottom:14px;
+    background:radial-gradient(120% 90% at 50% 0%, rgba(245,166,35,.07), rgba(245,166,35,0) 60%), var(--card-grad);
+    border:1px solid var(--line); box-shadow:var(--shadow);
+    border-radius:var(--r-lg); padding:18px 18px; text-align:center; margin-bottom:14px;
   }
-  .dash-solde .ds-label{font-size:12px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em;}
-  .dash-solde .ds-amount{font-size:32px; font-weight:800; margin-top:6px;}
+  .dash-solde .ds-label{font-size:11.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em;}
+  .dash-solde .ds-amount{font-size:31px; font-weight:800; margin-top:6px; letter-spacing:-.01em;}
   .dash-solde .ds-amount.neg{color:var(--red);}
   .dash-perte{
     margin-top:12px; background:rgba(255,107,94,.12); border:1px solid rgba(255,107,94,.35);
     border-radius:12px; padding:9px 12px; font-size:12.5px; color:var(--red); font-weight:600; line-height:1.4;
   }
-  .solde-mini-stats{display:flex; margin-top:16px; padding-top:14px; border-top:1px solid var(--border);}
+  .solde-mini-stats{display:flex; margin-top:14px; padding-top:13px; border-top:1px solid var(--line);}
   .solde-mini-stats .sms-col{flex:1; text-align:center;}
+  .solde-mini-stats .sms-col + .sms-col{border-left:1px solid var(--line);}
   .solde-mini-stats .sms-label{font-size:11.5px; color:var(--text-dim);}
   .solde-mini-stats .sms-val{font-size:15px; font-weight:800; margin-top:4px;}
   .solde-mini-stats .sms-val.neg{color:var(--red);}
   .dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;}
-  .dash-block{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:26px 12px; text-align:center; appearance:none; -webkit-appearance:none; font:inherit;}
-  .dash-block .db-emoji{font-size:34px;}
-  .dash-block .db-label{font-size:12px; color:var(--text-dim); margin-top:6px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;}
-  .dash-block .db-amount{font-size:24px; font-weight:800; margin-top:10px;}
+  .dash-block{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg);
+    padding:22px 12px; text-align:center; color:var(--text); appearance:none; -webkit-appearance:none; font:inherit;}
+  .dash-block .db-emoji{font-size:30px;}
+  .dash-block .db-label{font-size:11px; color:var(--text-dim); margin-top:6px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;}
+  .dash-block .db-amount{font-size:24px; font-weight:800; margin-top:10px; letter-spacing:-.01em;}
+  .dash-block .db-amount.pos{color:var(--green);}
   .dash-block.charges .db-amount{color:var(--red);}
-  .dash-block.info{border-style:dashed;}
-  .dash-block.info .db-amount{color:var(--text-dim);}
+  .dash-block.info{border-style:dashed; border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.018); box-shadow:none;}
   .charges-card-wrap{margin-top:26px;}
+  /* Sprint Revente-E : icônes dans des pastilles teintées (ambre = achats,
+     vert = ventes, turquoise = bénéfice, bleu = épargne, rouge = sorties). */
+  .db-ico{width:52px; height:52px; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; line-height:1;}
+  .t-ambre{background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.32), rgba(245,166,35,.08)); box-shadow:inset 0 0 0 1px rgba(245,166,35,.26);}
+  .t-vert{background:radial-gradient(circle at 30% 25%, rgba(52,179,126,.32), rgba(52,179,126,.08)); box-shadow:inset 0 0 0 1px rgba(52,179,126,.28);}
+  .t-turq{background:radial-gradient(circle at 30% 25%, rgba(79,209,197,.28), rgba(79,209,197,.07)); box-shadow:inset 0 0 0 1px rgba(79,209,197,.24);}
+  .t-bleu{background:radial-gradient(circle at 30% 25%, rgba(91,141,239,.32), rgba(91,141,239,.08)); box-shadow:inset 0 0 0 1px rgba(91,141,239,.28);}
+  .t-rouge{background:radial-gradient(circle at 30% 25%, rgba(255,107,94,.3), rgba(255,107,94,.08)); box-shadow:inset 0 0 0 1px rgba(255,107,94,.26);}
+  /* Sprint Revente-C : écran Aujourd'hui plein écran — la grille s'étire entre
+     l'en-tête et la barre du bas (--tabbar-h, mesurée après chaque rendu), sans
+     espace vide en dessous. Pas de bouton flottant « + » sur cet écran. */
+  /* Sprint Revente-E : la zone « Ce mois-ci » n'est plus affichée en
+     permanence — un bouton en bas l'ouvre dans une feuille du bas. Les 4 blocs
+     du jour reprennent la hauteur libérée ; le bas du bouton « Ce mois-ci »
+     touche la barre du bas. Tailles indexées sur la hauteur d'écran pour tenir
+     aussi en 360×640 sans défilement. */
+  .main.ecran-aujourdhui{padding-top:12px; padding-bottom:var(--tabbar-h, 74px); gap:10px;}
+  .main.ecran-aujourdhui .zone-titre{margin:0;}
+  .main.ecran-aujourdhui .dash-grid{flex:1 1 auto; grid-template-rows:1fr 1fr; gap:10px; margin-bottom:0; min-height:0;}
+  .main.ecran-aujourdhui .dash-block{display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:8px; min-height:80px;}
+  .main.ecran-aujourdhui .dash-block .db-ico{width:clamp(40px, 7.2vh, 62px); height:clamp(40px, 7.2vh, 62px); font-size:clamp(20px, 3.5vh, 30px);}
+  .main.ecran-aujourdhui .dash-block .db-amount{font-size:clamp(18px, 3.5vh, 30px); margin-top:clamp(6px, 1.4vh, 14px); line-height:1.15;}
+  .main.ecran-aujourdhui .dash-block .db-label{font-size:10.5px; margin-top:clamp(2px, .5vh, 5px);}
+  .main.ecran-aujourdhui .charges-card-wrap{margin-top:0;}
+  .main.ecran-aujourdhui .charges-row{padding:9px 14px;}
+  .main.ecran-aujourdhui .caisse-zone, .main.ecran-aujourdhui .caisse-zone:last-child{margin-bottom:0;}
+
+  /* ---------- Sprint Revente-E : bouton « Ce mois-ci » (accent ambre, plus haut que Charges communes) ---------- */
+  .mois-btn{position:relative; flex:none; width:100%; display:flex; align-items:center; gap:12px; text-align:left;
+    padding:12px 14px 12px 12px; border-radius:var(--r-lg); color:var(--text); font:inherit; appearance:none; -webkit-appearance:none;
+    background:linear-gradient(120deg, rgba(245,166,35,.22) 0%, rgba(245,166,35,.08) 48%, rgba(245,166,35,.03) 100%), #1b2029;
+    border:1px solid rgba(245,166,35,.6);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 10px 22px -12px rgba(245,166,35,.55);}
+  .mois-btn .cm-ico{position:relative; flex:none; width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    font-size:22px; line-height:1; background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.42), rgba(245,166,35,.14));
+    box-shadow:inset 0 0 0 1px rgba(245,166,35,.45);}
+  .mois-btn .cm-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px;}
+  .mois-btn .cm-titre{font-size:clamp(14px, 4.1vw, 16px); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mois-btn .cm-titre .mb-mois{color:var(--accent);}
+  .mois-btn .cm-sous{font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mois-btn .cm-chev{flex:none; font-size:26px; line-height:1; color:var(--accent); margin-top:-2px;}
+  /* Caisse à date négative : petite pastille rouge (le message doux reste dans le contenu). */
+  .mois-btn .cm-pastille{position:absolute; top:-4px; right:-4px; width:13px; height:13px; border-radius:50%;
+    background:var(--red); box-shadow:0 0 0 2.5px #1d1f22;}
+
+  /* ---------- Contenu de « Ce mois-ci » (feuille du bas) ---------- */
+  .mois-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .mois-tile{position:relative; background:rgba(255,255,255,.018); border:1px dashed rgba(255,255,255,.12); border-radius:var(--r-md); padding:12px 13px;
+    display:flex; flex-direction:column; justify-content:center; align-items:flex-start; min-height:78px; min-width:0;
+    text-align:left; color:var(--text); font:inherit; appearance:none; -webkit-appearance:none;}
+  .mois-tile.mois-tile-btn{border-style:solid; border-color:var(--line); background:var(--card-grad); box-shadow:var(--shadow);}
+  .mois-tile.mois-tile-btn:active{background:var(--card-2);}
+  .mois-tile .mt-chev{position:absolute; top:9px; right:11px; font-size:17px; line-height:1; color:var(--text-dim);}
+  .mois-tile .mt-label{font-size:10.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  .mois-tile .mt-val{font-size:21px; font-weight:800; margin-top:5px; white-space:nowrap; line-height:1.15; letter-spacing:-.01em;}
+  .mois-tile .mt-val.pos{color:var(--green);}
+  .mois-tile .mt-val.neg{color:var(--red);}
+  .mois-tile .mt-note{font-size:10.5px; color:var(--text-dim); margin-top:3px; white-space:nowrap;}
+  .caisse-bloc{margin-top:12px; width:100%; display:flex; align-items:center; gap:14px; text-align:left;
+    background:radial-gradient(120% 120% at 0% 0%, rgba(245,166,35,.2), rgba(245,166,35,0) 60%), linear-gradient(135deg,#221c12,#1b2029);
+    border:1px solid rgba(245,166,35,.6); border-radius:var(--r-lg); box-shadow:var(--shadow);
+    padding:14px 16px; color:var(--text); font:inherit; appearance:none; -webkit-appearance:none; flex:none;}
+  .caisse-bloc:active{opacity:.92;}
+  .caisse-bloc.caisse-neg{border-color:rgba(255,107,94,.6);
+    background:radial-gradient(120% 120% at 0% 0%, rgba(255,107,94,.18), rgba(255,107,94,0) 60%), linear-gradient(135deg,#271716,#1b2029);}
+  .caisse-bloc .cb-emoji{flex:none; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:25px; line-height:1;}
+  .caisse-bloc .cb-main{flex:1; min-width:0;}
+  .caisse-bloc .cb-label{font-size:11.5px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.06em;}
+  .caisse-bloc.caisse-neg .cb-label{color:var(--red);}
+  .caisse-bloc .cb-amount{font-size:32px; font-weight:800; line-height:1.12; white-space:nowrap; letter-spacing:-.01em; margin-top:2px;}
+  .caisse-bloc .cb-amount.neg{color:var(--red);}
+  .caisse-bloc .cb-chev{font-size:24px; color:var(--accent); flex:none;}
+  .caisse-negative{font-size:12px; font-weight:600; color:var(--red); margin-top:4px; line-height:1.35;}
+  .mois-aide{font-size:12px; color:var(--text-dim); text-align:center; margin-top:12px;}
+  /* Petits écrans (ex. 360×640) : marges resserrées pour que l'écran
+     Aujourd'hui tienne sans défilement. */
+  @media (max-height:700px){
+    .main.ecran-aujourdhui{padding-top:9px; gap:8px;}
+    .main.ecran-aujourdhui .dash-grid{gap:8px;}
+    .main.ecran-aujourdhui .dash-block{padding:4px 8px;}
+    .main.ecran-aujourdhui .charges-row{padding:8px 14px;}
+    .mois-btn{padding:9px 12px 9px 10px; gap:10px;}
+    .mois-btn .cm-ico{width:38px; height:38px; font-size:19px; border-radius:12px;}
+    .mois-btn .cm-sous{font-size:11.5px;}
+    .mois-tile{min-height:70px; padding:10px 12px;}
+    .caisse-bloc{padding:12px 14px;}
+  }
+  .caisse-detail{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md); padding:4px 14px;}
+  .cd-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  .cd-row:last-child{border-bottom:none;}
+  .cd-row .cd-k{color:var(--text-dim);}
+  .cd-row .cd-v{font-weight:700; text-align:right; white-space:nowrap;}
+  .cd-row.cd-pos .cd-v{color:var(--green);}
+  .cd-row.cd-neg .cd-v{color:var(--red);}
+  .cd-row.cd-sub{padding:6px 0 6px 14px; font-size:12.5px; border-bottom-style:dashed;}
+  .cd-row.cd-sub .cd-k::before{content:"· ";}
+  .cd-row.cd-sub .cd-v{font-weight:600; color:var(--text-dim);}
+  .cd-row.cd-total{padding:13px 0 11px; border-top:1.5px solid var(--accent); border-bottom:none;}
+  .cd-row.cd-total .cd-k{color:var(--text); font-weight:800; text-transform:uppercase; font-size:12.5px; letter-spacing:.04em;}
+  .cd-row.cd-total .cd-v{font-size:22px; font-weight:800; color:var(--accent);}
+  .cd-row.cd-total.cd-total-neg .cd-v{color:var(--red);}
+  /* Onglets Achats et Ventes : la fin de la page s'arrête au-dessus du bouton
+     « + », qui ne masque jamais un montant ni un champ. */
+  .main.ecran-achats, .main.ecran-ventes{padding-bottom:calc(164px + var(--safe-bottom));}
   .charges-row{
-    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
-    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md);
     padding:12px 14px; appearance:none; -webkit-appearance:none; font:inherit; color:var(--text);
   }
-  .charges-row .cr-emoji{font-size:19px; flex:none; line-height:1;}
-  .charges-row .cr-label{flex:1; min-width:0; font-size:12px; font-weight:700; color:var(--text-dim);
-    text-transform:uppercase; letter-spacing:.03em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .charges-row .cr-emoji{flex:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; line-height:1;}
+  .charges-row .cr-label{flex:1; min-width:0; font-size:11.5px; font-weight:700; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:.05em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .charges-row .cr-amount{font-size:16px; font-weight:800; color:var(--red); flex:none; white-space:nowrap;}
-  .charges-row.charges-row-vide{border-style:dashed;}
+  .charges-row .cr-chev{flex:none; font-size:18px; line-height:1; color:var(--text-dim);}
+  .charges-row.charges-row-vide{border-style:dashed; border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.018); box-shadow:none;}
   .charges-row.charges-row-vide .cr-label{color:var(--text-dim);}
 
   .caisse-zone{margin-bottom:22px;}
   .caisse-zone:last-child{margin-bottom:6px;}
 
   /* ---------- F4 : Suivi de stock ---------- */
-  .stock-card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 14px; margin-bottom:10px;}
-  .stock-card .sc-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
-  .stock-card .sc-nom{font-size:14.5px; font-weight:700;}
-  .stock-card .sc-alerte{font-size:10.5px; font-weight:700; color:var(--accent); background:rgba(245,166,35,.14); padding:3px 8px; border-radius:999px;}
+  .stock-card{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md); padding:13px 14px; margin-bottom:10px;}
+  .stock-card .sc-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;}
+  .stock-card .sc-nom{font-size:14.5px; font-weight:800; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .stock-card .sc-alerte{flex:none; font-size:10.5px; font-weight:800; color:var(--accent); background:rgba(245,166,35,.14);
+    box-shadow:inset 0 0 0 1px rgba(245,166,35,.3); padding:3px 9px; border-radius:999px;}
   .stock-card .sc-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:12.5px;}
   .stock-card .sc-grid .sk{color:var(--text-dim);}
   .stock-card .sc-grid .sv{font-weight:700; text-align:right;}
-  .stock-card .sc-seuil{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);}
-  .stock-card .sc-seuil label{font-size:11.5px; color:var(--text-dim);}
-  .stock-card .sc-seuil input{width:60px; background:var(--card-2); border:1px solid var(--border); color:var(--text);
-    border-radius:8px; padding:6px 8px; font-size:13px; text-align:center;}
+  /* Sprint Revente-E : « Me prévenir quand il reste [ 3 ] paquet(s) » */
+  .stock-card .sc-seuil{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+  .stock-card .sc-seuil-txt{font-size:12px; color:var(--text-dim); min-width:0;}
+  .stock-card .sc-seuil-val{display:flex; align-items:center; gap:7px; flex:none; font-size:12px; color:var(--text-dim);}
+  .stock-card .sc-seuil input{width:56px; background:var(--card-2); border:1px solid var(--border); color:var(--text);
+    border-radius:9px; padding:6px 6px; font-size:14px; font-weight:700; text-align:center; font-variant-numeric:tabular-nums;}
 
   /* ---------- Mon état ---------- */
-  .etat-tabs{display:flex; gap:8px; margin-bottom:14px;}
-  .etat-tab{flex:1; text-align:center; background:var(--card); border:1.5px solid var(--border); color:var(--text-dim);
-    border-radius:12px; padding:10px 6px; font-size:13px; font-weight:700;}
-  .etat-tab.active{border-color:var(--accent); color:var(--accent); background:rgba(245,166,35,.1);}
-  .etat-nav{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
-  .etat-nav .en-btn{background:var(--card); border:1px solid var(--border); color:var(--text); width:36px; height:36px;
-    border-radius:10px; font-size:16px; display:flex; align-items:center; justify-content:center;}
-  .etat-nav .en-btn:disabled{opacity:.35;}
-  .etat-nav .en-label{font-size:13.5px; font-weight:700; text-align:center; flex:1;}
+  /* Sprint Revente-E : Jour / Semaine / Mois en contrôle segmenté (pastille ambre teintée) */
+  .etat-tabs{display:flex; gap:4px; margin-bottom:14px; padding:4px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-md);}
+  .etat-tab{flex:1; text-align:center; background:transparent; border:none; color:var(--text-dim);
+    border-radius:10px; padding:9px 6px; font-size:13px; font-weight:700;}
+  .etat-tab.active{color:var(--accent); background:rgba(245,166,35,.15); box-shadow:inset 0 0 0 1px rgba(245,166,35,.5);}
+  .etat-nav{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px;}
+  .etat-nav .en-btn{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow-sm); color:var(--text); width:38px; height:38px;
+    border-radius:12px; font-size:18px; display:flex; align-items:center; justify-content:center; flex:none;}
+  .etat-nav .en-btn:disabled{opacity:.3; box-shadow:none;}
+  .etat-nav .en-label{font-size:14px; font-weight:800; text-align:center; flex:1;}
   .etat-stats{display:flex; flex-direction:column; gap:8px; margin-bottom:16px;}
-  .etat-stat-row{display:flex; justify-content:space-between; align-items:center; background:var(--card); border:1px solid var(--border);
+  .etat-stat-row{display:flex; justify-content:space-between; align-items:center; background:var(--card-grad); border:1px solid var(--line);
     border-radius:12px; padding:11px 14px;}
   .etat-stat-row .er-label{font-size:13px; color:var(--text-dim);}
   .etat-stat-row .er-val{font-size:15px; font-weight:800;}
   .etat-stat-row .er-val.neg{color:var(--red);}
   .etat-breakdown{margin-top:6px; margin-bottom:18px;}
   .etat-breakdown .eb-title{font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;}
-  .eb-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px;}
+  .eb-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;}
   .eb-row:last-child{border-bottom:none;}
   .eb-row .eb-nom{color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .eb-row .eb-val{font-weight:700; white-space:nowrap;}
   .eb-row .eb-sub{color:var(--text-dim); font-weight:600; font-size:11.5px;}
-  .top-produit-card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:16px;
+  .top-produit-card{background:radial-gradient(120% 120% at 0% 0%, rgba(245,166,35,.1), rgba(245,166,35,0) 55%), var(--card-grad);
+    border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg); padding:16px; margin-bottom:16px;
     display:flex; align-items:center; gap:12px;}
-  .top-produit-card .tp-emoji{font-size:28px; flex:none;}
+  .top-produit-card .tp-emoji{font-size:24px; flex:none; width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.32), rgba(245,166,35,.08)); box-shadow:inset 0 0 0 1px rgba(245,166,35,.26);}
   .top-produit-card .tp-nom{font-size:15px; font-weight:800;}
   .top-produit-card .tp-sub{font-size:12px; color:var(--text-dim); margin-top:2px;}
 
   /* ---------- Header : plusieurs icônes ---------- */
-  .header-icons{display:flex; align-items:center; gap:6px;}
+  .header-icons{display:flex; align-items:center; gap:6px; flex:none;}
 
   /* ---------- Code d'accès / PIN ---------- */
   .code-acces-onb .onb-body{align-items:center; text-align:center;}
@@ -378,7 +553,7 @@
     background:rgba(91,141,239,.1); border:1px solid rgba(91,141,239,.3); border-radius:14px;
     padding:12px 14px; font-size:12.5px; color:var(--text); line-height:1.5; margin-bottom:16px;
   }
-  .objectif-card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px;}
+  .objectif-card{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg); padding:16px; margin-bottom:12px;}
   .objectif-card .oc-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
   .objectif-card .oc-emoji{font-size:22px;}
   .objectif-card .oc-nom{font-size:15px; font-weight:800; flex:1;}
@@ -399,16 +574,16 @@
   /* ---------- étape « Vous mettez de côté pour quoi ? » (modèles) ---------- */
   .modele-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
   .modele-tile{
-    background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:18px 10px;
+    background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg); padding:18px 10px;
     text-align:center; appearance:none; -webkit-appearance:none; font:inherit; color:var(--text);
   }
-  .modele-tile.active{border-color:var(--accent); background:rgba(245,166,35,.1);}
+  .modele-tile.active{border-color:rgba(245,166,35,.85); background:rgba(245,166,35,.1); box-shadow:inset 0 0 0 1px rgba(245,166,35,.35);}
   .modele-tile .mt-emoji{font-size:30px; margin-bottom:8px;}
   .modele-tile .mt-nom{font-size:14px; font-weight:800;}
   .modele-tile .mt-desc{font-size:11px; color:var(--text-dim); margin-top:4px; line-height:1.3;}
 
   /* ---------- Télécharger ---------- */
-  .partager-canvas-wrap{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:10px; margin-bottom:16px; overflow:hidden;}
+  .partager-canvas-wrap{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg); padding:10px; margin-bottom:16px; overflow:hidden;}
   .partager-canvas-wrap canvas{width:100%; height:auto; display:block; border-radius:10px;}
   .tc-blur-layer{
     position:absolute; left:0; top:0; right:0;
@@ -433,12 +608,108 @@
   .rub-tile .rub-icon{font-size:20px;}
   .rub-tile .rub-nom{font-size:11px; font-weight:600; line-height:1.25;}
   .rub-manage-row{
-    display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border);
-    border-radius:14px; padding:11px 14px; margin-bottom:8px;
+    display:flex; align-items:center; gap:12px; background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow-sm);
+    border-radius:var(--r-md); padding:11px 14px; margin-bottom:8px;
   }
   .rub-manage-row .rm-emoji{font-size:18px; width:26px; text-align:center; flex:none;}
   .rub-manage-row .rm-nom{flex:1; font-size:13.5px; font-weight:600;}
   .rub-manage-row .rm-del{background:none; border:none; color:var(--text-dim); font-size:15px; padding:4px;}
+
+  /* ---------- Écrans secondaires (Télécharger) : marges ---------- */
+  .overlay-back{padding:calc(8px + var(--safe-top)) 8px 0;}
+  .overlay-back .btn-ghost{width:auto; padding:10px 8px;}
+  .overlay-body{padding:4px 16px calc(28px + var(--safe-bottom));}
+
+  /* ---------- Sprint Revente-C : onglet Achats (sous-vues) ---------- */
+  .seg{display:flex; gap:4px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-md); padding:4px; margin-bottom:14px;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.35);}
+  .seg-btn{flex:1; background:transparent; border:none; color:var(--text-dim); border-radius:11px; padding:10px 6px; font-size:13px; font-weight:700;}
+  .seg-btn.active{background:linear-gradient(135deg,#f7b443,var(--accent-dark)); color:#1b1200; font-weight:800;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 4px 12px -6px rgba(245,166,35,.8);}
+  /* Sprint Revente-E : sous-vue de l'onglet Achats (garde la chaîne flex pour les cartes agrandies) */
+  .sous-vue{display:flex; flex-direction:column; flex:1 1 auto; min-height:0;}
+  .periode-titre{font-size:13px; font-weight:700; color:var(--text); margin:0 0 10px;}
+  .stock-alerte-bandeau{background:linear-gradient(135deg, rgba(245,166,35,.14), rgba(245,166,35,.05)); border:1px solid rgba(245,166,35,.38); color:var(--text);
+    border-radius:var(--r-md); padding:11px 14px; font-size:12.5px; line-height:1.45; margin-bottom:14px;}
+  .stock-alerte-bandeau b{color:var(--accent);}
+  .mvt-table{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md); padding:2px 14px 0; margin-bottom:16px; overflow:hidden;}
+  .mvt-row{display:grid; grid-template-columns:minmax(0,1fr) 58px 58px 62px; gap:6px; padding:10px 0;
+    border-bottom:1px solid var(--line); font-size:13px; align-items:center;}
+  .mvt-row:last-child{border-bottom:none;}
+  .mvt-row.mvt-head{font-size:10px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; padding:11px 0 9px;}
+  .mvt-row .mvt-nom{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;}
+  .mvt-row .mvt-n{text-align:right; font-weight:700; white-space:nowrap;}
+  .mvt-row .mvt-n.in{color:var(--green);}
+  .mvt-row .mvt-n.out{color:var(--red);}
+  /* Sprint Revente-E : ligne TOTAL bien lisible (filet ambre, fond teinté) */
+  .mvt-row.mvt-total{font-weight:800; margin:0 -14px; padding:12px 14px 13px; border-top:1.5px solid rgba(245,166,35,.6);
+    background:linear-gradient(180deg, rgba(245,166,35,.11), rgba(245,166,35,.04)); font-size:14.5px;}
+  .mvt-row.mvt-total .mvt-nom{font-weight:800; font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.07em;}
+  .mvt-row.mvt-total .mvt-n{font-weight:800;}
+  .mvt-row.mvt-total .mvt-n.fin{color:var(--text);}
+  .entry-amount.mvt{font-size:12.5px; color:var(--text);}
+  .entry-amount.mvt .in{color:var(--green);}
+  .entry-amount.mvt .out{color:var(--red);}
+
+  /* ---------- Sprint Revente-C : bannière « nouvelle version » (non bloquante) ---------- */
+  #maj-banner{
+    position:fixed; left:12px; right:12px; bottom:calc(12px + var(--safe-bottom)); z-index:40;
+    display:flex; align-items:center; gap:10px; background:#1f2632; border:1px solid rgba(245,166,35,.45);
+    border-radius:14px; padding:10px 10px 10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.45);
+    font-size:13px; color:var(--text);
+  }
+  body.avec-tabbar #maj-banner{bottom:calc(var(--tabbar-h, 74px) + 8px);}
+  body.modale-ouverte #maj-banner{bottom:calc(12px + var(--safe-bottom));}
+  #maj-banner .mb-text{flex:1; line-height:1.35;}
+  #maj-banner .mb-btn{flex:none; border:none; border-radius:10px; padding:9px 12px; font-size:13px; font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark)); color:#1b1200;}
+  body.maj-visible .fab{bottom:calc(92px + 62px + var(--safe-bottom));}
+  body.maj-visible .modal{padding-bottom:calc(20px + 72px + var(--safe-bottom));}
+  body.maj-visible .main.with-tabbar{padding-bottom:calc(96px + 62px + var(--safe-bottom));}
+  body.maj-visible .main.ecran-aujourdhui{padding-bottom:calc(var(--tabbar-h, 74px) + 62px);}
+  .badge.badge-autre{background:rgba(232,120,140,.15); color:var(--pink);}
+  body.maj-visible .main.ecran-achats, body.maj-visible .main.ecran-ventes{padding-bottom:calc(164px + 62px + var(--safe-bottom));}
+  body.maj-visible .onb, body.maj-visible .overlay-body{padding-bottom:calc(28px + 72px + var(--safe-bottom));}
+
+  /* ---------- Sprint Revente-E : modifier un achat / une vente ---------- */
+  .detail-actions{margin-top:16px;}
+  .detail-actions .btn{padding:13px 10px;}
+  .modifie-le{display:flex; align-items:center; gap:6px; margin-top:12px; font-size:12px; color:var(--text-dim);}
+  .note-douce{background:rgba(91,141,239,.1); border:1px solid rgba(91,141,239,.32); color:var(--text);
+    border-radius:12px; padding:10px 12px; font-size:12.5px; line-height:1.45; margin:0 0 14px;}
+  .note-douce[hidden]{display:none;}
+
+  /* ---------- Sprint Revente-E : retour visuel au toucher (léger enfoncement) ---------- */
+  .btn, .entry-card, .dash-block, .charges-row, .mois-btn, .mois-tile-btn, .caisse-bloc, .seg-btn, .etat-tab, .en-btn,
+  .icon-btn, .radio-opt, .chip, .rub-tile, .modele-tile, .choice-card, .pin-key, .modal-close, .tab .tab-emoji, .fab{
+    transition:transform .12s ease, background-color .15s ease, opacity .15s ease;
+  }
+  .btn:active, .entry-card:active, button.dash-block:active, .charges-row:active, .mois-btn:active, .mois-tile-btn:active,
+  .caisse-bloc:active, .seg-btn:active, .etat-tab:active, .en-btn:active, .icon-btn:active, .radio-opt:active, .chip:active,
+  .rub-tile:active, .modele-tile:active, .choice-card:active, .pin-key:active, .modal-close:active{transform:scale(.97);}
+  .tab:active .tab-emoji{transform:scale(.92);}
+
+  /* ---------- Sprint Revente-E : transitions courtes ---------- */
+  /* Ajoutées par le script UNIQUEMENT lors d'un vrai changement d'écran,
+     d'onglet, d'écran secondaire ou de feuille du bas (jamais à chaque
+     redessin : toucher un bouton dans un formulaire ne rejoue rien). */
+  @keyframes mdjEcranIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  @keyframes mdjFondIn{from{opacity:0;} to{opacity:1;}}
+  @keyframes mdjFeuilleIn{from{opacity:.5; transform:translateY(56px);} to{opacity:1; transform:none;}}
+  @keyframes mdjContenuIn{from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:none;}}
+  .anim-ecran{animation:mdjEcranIn .18s ease-out;}
+  .modal-overlay.anim-in{animation:mdjFondIn .18s ease-out;}
+  .modal-overlay.anim-in .modal{animation:mdjFeuilleIn .2s cubic-bezier(.2,.8,.25,1);}
+  .modal.anim-swap{animation:mdjContenuIn .16s ease-out;}
+
+  /* Mouvement réduit demandé par le téléphone : aucune animation ni transition. */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{animation:none !important; transition:none !important;}
+    .btn:active, .entry-card:active, button.dash-block:active, .charges-row:active, .mois-btn:active, .mois-tile-btn:active,
+    .caisse-bloc:active, .seg-btn:active, .etat-tab:active, .en-btn:active, .icon-btn:active, .radio-opt:active, .chip:active,
+    .rub-tile:active, .modele-tile:active, .choice-card:active, .pin-key:active, .modal-close:active, .fab:active,
+    .tab:active .tab-emoji{transform:none !important; opacity:.8;}
+  }
 </style>
 </head>
 <body>
@@ -485,8 +756,73 @@
   //    Safari/iPhone) — aucune perte de fonctionnalité ni de donnée.
   //  - Aucun appel réseau n'est introduit par ces changements ; tout le calcul
   //    (code du mois, bornes calendaires) reste entièrement local.
+  //
+  // Sprint Revente-C (remarques terrain du 15/10/2026) :
+  //  - Correctif : MOIS_NOMS / moisLabelFor manquaient (omis au fork depuis
+  //    Coiffure) → ReferenceError sur tous les onglets « Mois ». Les bornes de
+  //    navigation précédent/suivant sont désormais comparées sur le début de
+  //    période (plus de bouton « précédent » actif qui ne mène nulle part).
+  //  - Mes habitudes devient le 5e onglet de la barre du bas (l'icône 📈 de
+  //    l'en-tête et l'écran superposé « habitudes » sont supprimés).
+  //  - Onglet Achats : deux sous-vues « Détails achats » et « Stock & réappro »,
+  //    chacune en Jour / Semaine / Mois sur le modèle de Mon état.
+  //  - Écran Aujourd'hui : les blocs occupent toute la hauteur disponible.
+  //  - Bouton retour du téléphone : history.pushState + popstate, la navigation
+  //    reste dans l'application jusqu'à l'écran Aujourd'hui.
+  //  - Mise à jour automatique : vérification à chaque ouverture et à chaque
+  //    retour au premier plan, rechargement unique et sans risque quand une
+  //    nouvelle version prend le contrôle (sinon bannière douce).
+  //  - Données : clé mondjai_revente_state_v1 inchangée, aucun champ ajouté ni
+  //    supprimé — un état Sprint B se charge tel quel.
+  //
+  // Sprint Revente-D (caisse physique, zone « Ce mois-ci », commande spéciale) :
+  //  - Fonction unique montantComptabiliseVente() : vente depuis le stock =
+  //    montant encaissé ; commande spéciale = montant encaissé − prix payé au
+  //    revendeur (seule la marge entre dans la comptabilité, le prix payé au
+  //    revendeur est de l'argent « en transit »). Elle remplace le montant
+  //    encaissé brut partout où des ventes sont additionnées ou affichées en
+  //    liste (Aujourd'hui, Ce mois-ci, caisse, Mon état, Mes habitudes,
+  //    Télécharger). Les données enregistrées ne changent pas.
+  //  - « Ventes du mois » est un chiffre d'activité, jamais diminué par les
+  //    achats ; l'argent physique est une autre grandeur : « Caisse à date » =
+  //    fonds de départ + ventes comptabilisées − sorties de caisse, cumulés
+  //    depuis le début (report d'un mois à l'autre automatique).
+  //  - Sorties de caisse = achats payés avec la caisse + charges communes +
+  //    épargne mise de côté (sur le bénéfice réalisé, depuis la création de
+  //    l'objectif — comme la carte de l'objectif).
+  //  - Données : deux champs ajoutés, migration non destructive dans
+  //    normaliserEtatImporte — achats[].sourcePaiement ("caisse" | "autre",
+  //    "caisse" par défaut) et config.fondsDepartCaisse (0 par défaut). Un état
+  //    ou une sauvegarde Sprint C se charge sans perte.
+  //
+  // Sprint Revente-E (remarques d'Hamadou du 16/10/2026, après test du D) :
+  //  - Aujourd'hui : la zone « Ce mois-ci » n'est plus affichée en permanence.
+  //    Un bouton ambre « 📅 Ce mois-ci · <Mois année> » (pastille rouge si la
+  //    caisse est négative) l'ouvre dans une feuille du bas, contenu inchangé ;
+  //    les 4 blocs du jour reprennent la hauteur libérée. Calculs du Sprint D
+  //    inchangés (montantComptabiliseVente, caisse à date, sorties de caisse).
+  //  - Achats › Détails achats : plus de listes de semaines ni de jours (le
+  //    drill-down d'Achats disparaît) ; Jour / Semaine / Mois + ‹ › conservés.
+  //  - Achats › Stock & réappro : tableau Produit / Entrées / Sorties / Stock du
+  //    mois civil (‹ › pour revoir un mois passé), avec une ligne TOTAL.
+  //  - Vocabulaire : « Me prévenir quand il reste … paquet(s) », « Bientôt
+  //    fini », « pensez à racheter » (le champ de données reste seuilReassort).
+  //  - Modifier un achat ou une vente (piste d'audit adaptée à un carnet
+  //    personnel) : on corrige l'enregistrement au lieu de le supprimer puis le
+  //    ressaisir, en gardant la trace — champs ajoutés à l'enregistrement
+  //    modifié : modifieLe (horodatage) et versionsPrecedentes (anciennes
+  //    valeurs, la plus récente en dernier). id, ts et date de saisie
+  //    conservés. Aucune migration nécessaire : champ absent = jamais modifié.
+  //  - Finitions visuelles (cartes, pastilles, chiffres à chasse fixe,
+  //    transitions courtes seulement lors d'un vrai changement d'écran, de
+  //    feuille ou d'onglet ; rien si « mouvement réduit » est demandé).
 
   var STORAGE_KEY = "mondjai_revente_state_v1";
+
+  // Version affichée dans Réglages → À propos, pour vérifier d'un coup d'œil
+  // quelle version tourne sur un téléphone. Le numéro de cache doit être le
+  // même que VERSION_CACHE dans sw.js.
+  var VERSION_APP = "Revente-E · cache 5";
 
   /* ================= Helpers ================= */
 
@@ -509,7 +845,9 @@
     var neg = num < 0;
     num = Math.abs(num);
     var s = String(num).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    return (neg ? "-" : "") + s + " F";
+    // Sprint Revente-E : vrai signe moins (U+2212) — avec les chiffres à chasse
+    // fixe, le trait d'union « - » s'élargit et se détache du nombre.
+    return (neg ? "−" : "") + s + " F";
   }
   function toNum(v){
     var n = parseFloat(String(v === undefined || v === null ? "" : v).replace(",", "."));
@@ -548,9 +886,10 @@
         derniereValidationAcces: null,
         moisAccesValide: null,        // { mois, annee } — dernier mois civil couvert par l'accès (essai ou code mensuel)
         pinActif: false,
-        pinCode: null
+        pinCode: null,
+        fondsDepartCaisse: 0          // Sprint Revente-D : argent déjà en caisse au départ (facultatif)
       },
-      achats: [],
+      achats: [],                     // { …, sourcePaiement:"caisse"|"autre" } (Sprint Revente-D)
       ventes: [],
       autresCharges: [],
       objectifEpargne: null,          // { id, nom, emoji, type:'auto'|'manuel', pourcentage/montant, dateCreation }
@@ -588,7 +927,23 @@
     out.meta = merge(base.meta, parsed.meta || {});
     migrerValidationAcces(out);
     migrerAccesCalendaire(out);
+    migrerCaisse(out);
     return out;
+  }
+
+  // Sprint Revente-D — migration non destructive (rien n'est supprimé ni
+  // réécrit, seuls des champs manquants sont ajoutés) :
+  //  - un achat sans `sourcePaiement` (enregistré avant le Sprint D) devient
+  //    « payé avec la caisse », le cas de loin le plus courant ;
+  //  - `config.fondsDepartCaisse` absent ou illisible → 0.
+  function migrerCaisse(out){
+    out.achats = out.achats.map(function(a){
+      if(!a || typeof a !== "object") return a;
+      if(a.sourcePaiement === "caisse" || a.sourcePaiement === "autre") return a;
+      return merge(a, { sourcePaiement: "caisse" });
+    });
+    var f = Number(out.config.fondsDepartCaisse);
+    out.config.fondsDepartCaisse = (isFinite(f) && f > 0) ? f : 0;
   }
 
   // Amendement Sprint Revente-B (repris tel quel de Coiffure Sprint 4C/5B) : un
@@ -715,7 +1070,7 @@
 
   var ui = {
     tab: "aujourdhui",
-    overlay: null,       // null | 'reglages' | 'apropos' | 'objectif' | 'habitudes' | 'telecharger'
+    overlay: null,       // null | 'reglages' | 'apropos' | 'objectif' | 'telecharger'
     modal: null,
     draft: {},
     errors: {},
@@ -735,6 +1090,15 @@
     telechargerPeriode: "jour",
     telechargerSemaineRef: null,
     telechargerMoisRef: null,
+    // Sprint Revente-C : onglet Achats — sous-vues « Détails achats » et
+    // « Stock & réappro ». Sprint Revente-E : Jour / Semaine / Mois seulement
+    // dans « Détails achats » (plus de drill-down) ; « Stock & réappro » a son
+    // propre mois affiché (mois civil en cours par défaut), indépendant.
+    achatsVue: "details",  // 'details' | 'stock'
+    achatsPeriode: "jour",
+    achatsSemaineRef: null,
+    achatsMoisRef: null,
+    stockMoisRef: null,
     reglagesMsg: "",
     backupMsg: "",
     modalReturnTo: null,
@@ -745,7 +1109,8 @@
     { key:"aujourdhui", label:"Aujourd’hui", emoji:"🏠" },
     { key:"achats", label:"Achats", emoji:"📦" },
     { key:"ventes", label:"Ventes", emoji:"🛍️" },
-    { key:"etat", label:"Mon état", emoji:"📊" }
+    { key:"etat", label:"Mon état", emoji:"📊" },
+    { key:"habitudes", label:"Habitudes", emoji:"📈" }
   ];
 
   /* ================= Produits ================= */
@@ -800,8 +1165,6 @@
       html = renderApropos();
     } else if(ui.overlay === "objectif"){
       html = renderObjectifOverlay();
-    } else if(ui.overlay === "habitudes"){
-      html = renderHabitudesOverlay();
     } else if(ui.overlay === "telecharger"){
       html = renderTelechargerOverlay();
     } else {
@@ -815,6 +1178,7 @@
   }
 
   function afterRender(){
+    animerSiChangementDeScene();
     if(ui.pendingAutofocus){
       var autoFocus = document.querySelector("[data-autofocus]");
       if(autoFocus){
@@ -824,6 +1188,76 @@
     }
     if(ui.overlay === "telecharger" && !ui.modal){
       dessinerCarteTelecharger();
+    }
+    if(ui.overlay === "apropos"){
+      afficherCacheActifApropos();
+    }
+    mesurerBarreDuBas();
+    // Sprint Revente-C : bouton retour du téléphone (historique synchronisé
+    // avec la profondeur de navigation) puis mise à jour en attente éventuelle.
+    synchroniserHistorique();
+    verifierMajEnAttente();
+  }
+
+  // Sprint Revente-E — transitions courtes. L'application redessine tout
+  // l'écran à chaque toucher : une animation posée sur les éléments eux-mêmes
+  // se rejouerait donc à chaque redessin (ex. toucher « Une autre source »
+  // dans un formulaire). On compare plutôt la « scène » affichée à celle du
+  // rendu précédent, et on n'ajoute une classe d'animation (CSS, 150–200 ms)
+  // que lors d'un VRAI changement : écran / onglet / écran secondaire (fondu +
+  // léger glissement), sous-vue de l'onglet Achats, ouverture d'une feuille
+  // du bas (la feuille monte, le fond s'assombrit en fondu) ou passage d'une
+  // feuille à une autre (fondu du contenu). Rien au tout premier affichage,
+  // et rien du tout si le téléphone demande un mouvement réduit.
+  var derniereScene = null;
+  function sceneCourante(){
+    if(estEcranPorte()){
+      return { ecran: ui.locked && state.config.codeAccesOk && !accesMensuelExpire() ? "porte-pin" : "porte-code", vue: "",
+        modale: ui.modal ? ui.modal.type + ":" + (ui.modal.id || "") : null };
+    }
+    var ecran = ui.overlay ? "overlay:" + ui.overlay : "onglet:" + ui.tab;
+    var vue = (!ui.overlay && ui.tab === "achats") ? (ui.achatsVue === "stock" ? "stock" : "details") : "";
+    return { ecran: ecran, vue: vue, modale: ui.modal ? ui.modal.type + ":" + (ui.modal.id || "") : null };
+  }
+  function mouvementReduit(){
+    try{ return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }catch(e){ return false; }
+  }
+  function ajouterClasse(liste, classe){
+    Array.prototype.forEach.call(liste, function(el){ if(el) el.classList.add(classe); });
+  }
+  function animerSiChangementDeScene(){
+    var s = sceneCourante();
+    var avant = derniereScene;
+    derniereScene = s;
+    if(!avant || mouvementReduit()) return;
+    if(s.ecran !== avant.ecran){
+      ajouterClasse(document.querySelectorAll("#app > .main, #app > .onb, #app > .overlay-back, #app > .overlay-body"), "anim-ecran");
+    } else if(s.vue !== avant.vue){
+      ajouterClasse(document.querySelectorAll("#app .sous-vue"), "anim-ecran");
+    }
+    if(s.modale && s.modale !== avant.modale){
+      var fond = document.querySelector("#app > .modal-overlay");
+      if(!fond) return;
+      if(!avant.modale) fond.classList.add("anim-in");
+      else ajouterClasse([fond.querySelector(".modal")], "anim-swap");
+    }
+  }
+
+  // Hauteur réelle de la barre du bas (dépend de la police des emoji et de la
+  // zone de sécurité du téléphone) : sert à étirer l'écran Aujourd'hui pile
+  // jusqu'à la barre, et à placer la bannière de mise à jour juste au-dessus.
+  var derniereHauteurTabbar = -1;
+  function mesurerBarreDuBas(){
+    var tb = document.querySelector(".tabbar");
+    try{
+      document.body.classList.toggle("avec-tabbar", !!tb);
+      document.body.classList.toggle("modale-ouverte", !!document.querySelector(".modal-overlay"));
+    }catch(e){}
+    if(!tb) return;
+    var h = tb.offsetHeight;
+    if(h > 0 && h !== derniereHauteurTabbar){
+      derniereHauteurTabbar = h;
+      document.documentElement.style.setProperty("--tabbar-h", h + "px");
     }
   }
 
@@ -1077,7 +1511,6 @@
           '</div>' +
         '</div>' +
         '<div class="header-icons">' +
-          '<button type="button" class="icon-btn" data-action="ouvrir-habitudes" aria-label="Mes habitudes">📈</button>' +
           '<button type="button" class="icon-btn" data-action="ouvrir-telecharger" aria-label="Télécharger">⬇️</button>' +
           renderEpargneShortcut() +
           '<button type="button" class="icon-btn" data-action="ouvrir-reglages" aria-label="Réglages">⚙️</button>' +
@@ -1112,13 +1545,15 @@
     var body = "";
     switch(ui.tab){
       case "aujourdhui": body = renderAujourdhui(); break;
-      case "achats": body = renderListeAchats(); break;
+      case "achats": body = renderAchats(); break;
       case "ventes": body = renderListeVentes(); break;
       case "etat": body = renderMonEtat(); break;
+      case "habitudes": body = renderHabitudes(); break;
       default: body = "";
     }
     var fab = renderFab();
-    return '<div class="main with-tabbar">' + body + '</div>' + fab;
+    var classe = "main with-tabbar" + (ui.tab === "aujourdhui" ? " ecran-aujourdhui" : "") + (ui.tab === "achats" ? " ecran-achats" : "") + (ui.tab === "ventes" ? " ecran-ventes" : "");
+    return '<div class="' + classe + '">' + body + '</div>' + fab;
   }
 
   function renderFab(){
@@ -1140,6 +1575,11 @@
     return new Date(+p[0], +p[1]-1, +p[2]);
   }
   function dateKey(d){ return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate()); }
+  // Sprint Revente-C — correctif : ces deux définitions avaient été omises au
+  // fork depuis Coiffure (ReferenceError sur tous les onglets « Mois »).
+  var MOIS_NOMS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  function moisLabelFor(d){ return MOIS_NOMS[d.getMonth()] + " " + d.getFullYear(); }
+  function moisLabelMaj(d){ var s = moisLabelFor(d); return s.charAt(0).toUpperCase() + s.slice(1); }
 
   function getDayRange(d){ var k = dateKey(d); return { start:k, end:k }; }
   function getWeekRange(d){
@@ -1180,6 +1620,58 @@
     if(!dates.length) return getMonthRange(new Date()).start;
     return getMonthRange(dateFromStr(dates[0])).start;
   }
+
+  // ----- Navigation précédent / suivant, commune à tous les écrans à période -----
+  // Sprint Revente-C : les références (ex. ui.etatMoisRef) peuvent être n'importe
+  // quel jour de la période (au départ : aujourd'hui). Les bornes sont donc
+  // toujours comparées sur le DÉBUT de la période — sinon le bouton « précédent »
+  // restait actif sur la toute première période avec données et ne menait nulle
+  // part. Bornes : la période de la toute première donnée enregistrée, et la
+  // période en cours (jamais de navigation dans le futur).
+  function debutPeriode(periode, refStr){
+    var d = dateFromStr(refStr);
+    return periode === "semaine" ? getWeekRange(d).start : getMonthRange(d).start;
+  }
+  function bornesPeriode(periode, refStr){
+    var debut = debutPeriode(periode, refStr);
+    var actuelle = periode === "semaine" ? getWeekRange(new Date()).start : getMonthRange(new Date()).start;
+    var premiere = periode === "semaine" ? earliestActivityWeekStart() : earliestActivityMonthStart();
+    return { estPremiere: debut <= premiere, estActuelle: debut >= actuelle };
+  }
+  function decalerPeriode(periode, refStr, delta){
+    var d = dateFromStr(debutPeriode(periode, refStr));
+    if(periode === "semaine") d.setDate(d.getDate() + 7*delta);
+    else d.setMonth(d.getMonth() + delta);
+    var nouveau = dateKey(d);
+    var actuelle = periode === "semaine" ? getWeekRange(new Date()).start : getMonthRange(new Date()).start;
+    var premiere = periode === "semaine" ? earliestActivityWeekStart() : earliestActivityMonthStart();
+    if(nouveau > actuelle) nouveau = actuelle;
+    if(nouveau < premiere) nouveau = premiere;
+    return nouveau;
+  }
+  function libellePeriode(periode, refStr){
+    if(periode === "semaine"){
+      var r = getWeekRange(dateFromStr(refStr));
+      return formatDateFr(r.start) + " – " + formatDateFr(r.end);
+    }
+    if(periode === "mois") return moisLabelMaj(dateFromStr(refStr));
+    return formatDateFr(refStr);
+  }
+  // Barre ‹ libellé › — `action` reçoit data-sens (-1/1) et data-periode.
+  function renderNavPeriode(action, periode, refStr){
+    var b = bornesPeriode(periode, refStr);
+    return (
+      '<div class="etat-nav">' +
+        '<button type="button" class="en-btn" data-action="' + action + '" data-sens="-1" data-periode="' + periode + '"' + (b.estPremiere?" disabled":"") + ' aria-label="Période précédente">‹</button>' +
+        '<div class="en-label">' + esc(libellePeriode(periode, refStr)) + '</div>' +
+        '<button type="button" class="en-btn" data-action="' + action + '" data-sens="1" data-periode="' + periode + '"' + (b.estActuelle?" disabled":"") + ' aria-label="Période suivante">›</button>' +
+      '</div>'
+    );
+  }
+  function formatQte(n){
+    var r = Math.round((Number(n)||0) * 100) / 100;
+    return String(r).replace(".", ",");
+  }
   // Un jour est "actif" (pour le mode Manuel de l'épargne) dès qu'un achat ou
   // une vente y a été enregistré.
   function joursActifsDansPeriode(range){
@@ -1193,9 +1685,33 @@
     return sumBy(filterRange(state.autresCharges, range), function(c){ return c.montant; });
   }
 
-  /* ================= F4 : Suivi de stock & réassort (repris de Salon F) ================= */
+  /* ================= F4 : Suivi de stock (repris de Salon F) ================= */
 
   var SEUIL_REASSORT_DEFAUT = 3;
+
+  /* ---------- Sprint Revente-D : montant comptabilisé d'une vente ---------- */
+  // FONCTION UNIQUE, utilisée partout où des ventes sont additionnées (et dans
+  // les listes, pour que chaque liste corresponde au total affiché au-dessus) :
+  //  - vente « depuis le stock » → le montant encaissé ;
+  //  - commande spéciale → montant encaissé − prix payé au revendeur : seule la
+  //    marge entre dans la comptabilité. Le prix payé au revendeur est de
+  //    l'argent « en transit » : il vient de la cliente et repart aussitôt chez
+  //    le revendeur (ex. encaissé 10 000, revendeur 7 000 → 3 000 comptabilisés).
+  // Les données enregistrées (montantEncaisse, prixPayeRevendeur) ne changent
+  // pas : seul le calcul change.
+  function estCommandeSpeciale(v){ return v.typeVente === "commande_speciale"; }
+  function montantComptabiliseVente(v){
+    var encaisse = Number(v.montantEncaisse) || 0;
+    if(estCommandeSpeciale(v)) return encaisse - (Number(v.prixPayeRevendeur) || 0);
+    return encaisse;
+  }
+  // Bénéfice réalisé d'une vente = montant comptabilisé − coût des paquets
+  // sortis du stock (quantité × coût moyen d'achat). Une commande spéciale ne
+  // sort rien du stock : son bénéfice est sa marge, déjà comptabilisée.
+  function beneficeVente(v, coutMoyen){
+    if(estCommandeSpeciale(v)) return montantComptabiliseVente(v);
+    return montantComptabiliseVente(v) - (Number(v.quantite) || 0) * (coutMoyen || 0);
+  }
 
   function computeStockProduit(p){
     var achatsP = state.achats.filter(function(a){ return a.produitId === p.id; });
@@ -1212,10 +1728,12 @@
 
     var prixVenteRef = (p.dernierPrixVenteEstime === null || p.dernierPrixVenteEstime === undefined) ? 0 : p.dernierPrixVenteEstime;
 
-    var caStock = sumBy(ventesStock, function(v){ return v.montantEncaisse; });
+    // Sprint Revente-D : via la fonction de comptabilisation (une commande
+    // spéciale ne compte que pour sa marge).
+    var caStock = sumBy(ventesStock, montantComptabiliseVente);
     var beneficeStock = caStock - qteVendueStock * coutMoyen;
-    var caCommande = sumBy(ventesCommande, function(v){ return v.montantEncaisse; });
-    var beneficeCommande = sumBy(ventesCommande, function(v){ return v.montantEncaisse - (v.prixPayeRevendeur||0); });
+    var caCommande = sumBy(ventesCommande, montantComptabiliseVente);
+    var beneficeCommande = sumBy(ventesCommande, function(v){ return beneficeVente(v, coutMoyen); });
 
     var beneficeAttendu = sumBy(achatsP, function(a){ return a.quantite * ((a.prixVenteUnitaireEstime||0) - (a.prixAchatUnitaire||0)); });
 
@@ -1229,42 +1747,50 @@
     };
   }
 
-  function renderStockSection(){
+  function renderStockSection(titre){
     var produits = state.config.produits.slice().sort(function(a,b){ return a.nom.localeCompare(b.nom); });
     if(!produits.length) return "";
     var cards = produits.map(function(p){
       var s = computeStockProduit(p);
       return (
-        '<div class="stock-card">' +
+        '<div class="stock-card" data-stock-produit="' + esc(p.nom) + '">' +
           '<div class="sc-head">' +
             '<div class="sc-nom">' + esc(p.nom) + '</div>' +
-            (s.alerte ? '<div class="sc-alerte">Stock bas</div>' : '') +
+            (s.alerte ? '<div class="sc-alerte" data-test="badge-bientot-fini">Bientôt fini</div>' : '') +
           '</div>' +
           '<div class="sc-grid">' +
-            '<div class="sk">Stock restant</div><div class="sv">' + s.stockRestant + ' paquet(s)</div>' +
+            '<div class="sk">Stock restant</div><div class="sv" data-col="stock-restant">' + formatQte(s.stockRestant) + ' paquet(s)</div>' +
             '<div class="sk">Coût moyen</div><div class="sv">' + formatFCFA(s.coutMoyen) + '</div>' +
             '<div class="sk">Valeur (coût)</div><div class="sv">' + formatFCFA(s.valeurStockCout) + '</div>' +
             '<div class="sk">Valeur (vente est.)</div><div class="sv">' + formatFCFA(s.valeurStockVente) + '</div>' +
             '<div class="sk">Bénéfice réalisé</div><div class="sv">' + formatFCFA(s.beneficeRealise) + '</div>' +
             '<div class="sk">Bénéfice attendu</div><div class="sv">' + formatFCFA(s.beneficeAttendu) + '</div>' +
           '</div>' +
-          '<div class="sc-seuil">' +
-            '<label>Seuil de réassort</label>' +
-            '<input type="number" min="0" step="1" value="' + s.seuil + '" data-action-change="set-seuil-reassort" data-id="' + p.id + '">' +
-          '</div>' +
+          // Sprint Revente-E : vocabulaire simple (le champ reste seuilReassort).
+          '<label class="sc-seuil">' +
+            '<span class="sc-seuil-txt">🔔 Me prévenir quand il reste</span>' +
+            '<span class="sc-seuil-val"><input type="number" inputmode="numeric" min="0" step="1" value="' + s.seuil + '" data-action-change="set-seuil-reassort" data-id="' + p.id + '" aria-label="Me prévenir quand il reste ce nombre de paquets">paquet(s)</span>' +
+          '</label>' +
         '</div>'
       );
     }).join("");
-    return '<div class="reglages-section"><div class="rs-title">Suivi de stock &amp; réassort</div>' + cards + '</div>';
+    return '<div class="reglages-section"><div class="rs-title">' + esc(titre || "Suivi de stock") + '</div>' + cards + '</div>';
   }
 
-  // Bénéfice réalisé (marge réelle) — même méthode que le Suivi de stock F4.
+  // Bénéfice réalisé (marge réelle) — même méthode que le Suivi de stock F4,
+  // via la fonction de comptabilisation (Sprint Revente-D). Le coût moyen de
+  // chaque produit n'est calculé qu'une fois par appel (mêmes chiffres, mais
+  // la caisse additionne tout l'historique à chaque affichage d'Aujourd'hui).
   function beneficeReventePeriode(range){
+    var coutsMoyens = {};
     return sumBy(filterRange(state.ventes, range), function(v){
-      if(v.typeVente === "commande_speciale") return v.montantEncaisse - (v.prixPayeRevendeur||0);
-      var p = findProduitById(v.produitId);
-      var coutMoyen = p ? computeStockProduit(p).coutMoyen : 0;
-      return v.montantEncaisse - v.quantite * coutMoyen;
+      if(estCommandeSpeciale(v)) return beneficeVente(v, 0);
+      var cle = "p:" + v.produitId;
+      if(!(cle in coutsMoyens)){
+        var p = findProduitById(v.produitId);
+        coutsMoyens[cle] = p ? computeStockProduit(p).coutMoyen : 0;
+      }
+      return beneficeVente(v, coutsMoyens[cle]);
     });
   }
   function beneficeReventeTotal(){
@@ -1316,38 +1842,234 @@
   }
   function soldeNetJour(dateStr){ return soldeNetPeriode({ start:dateStr, end:dateStr }); }
 
+  /* ================= Sprint Revente-D : caisse physique ================= */
+  // Deux grandeurs distinctes :
+  //  - « Ventes du mois » : un chiffre d'activité (somme des montants
+  //    comptabilisés), jamais diminué par les achats ;
+  //  - « Caisse à date » : l'argent physique =
+  //      fonds de départ + Σ ventes comptabilisées − Σ sorties de caisse,
+  //    tout cumulé DEPUIS LE DÉBUT jusqu'à aujourd'hui, en un seul calcul. Le
+  //    report d'un mois à l'autre est donc automatique ; on ne calcule jamais
+  //    « solde antérieur + solde du mois » à part (risque de double comptage).
+  // Sorties de caisse (période) = achats payés avec la caisse (quantité × prix
+  // d'achat unitaire + charges de l'achat) + charges communes + épargne mise de
+  // côté. L'épargne est celle de l'objectif (sur le bénéfice réalisé, comme
+  // partout), comptée à partir de la date de création de l'objectif : avant,
+  // rien n'a été mis de côté, l'argent est resté dans la caisse (même borne
+  // que « Mis de côté depuis le … » sur la carte de l'objectif).
+
+  var DEBUT_HISTORIQUE = "0000-01-01";
+
+  function achatPayeParCaisse(a){ return a.sourcePaiement !== "autre"; }
+  function ventesComptabiliseesPeriode(range){
+    return sumBy(filterRange(state.ventes, range), montantComptabiliseVente);
+  }
+  function achatsPeriodeTotal(range){
+    return sumBy(filterRange(state.achats, range), coutAchat);
+  }
+  function achatsCaissePeriode(range){
+    return sumBy(filterRange(state.achats, range).filter(achatPayeParCaisse), coutAchat);
+  }
+  function epargneMiseDeCotePeriode(range){
+    var o = state.objectifEpargne;
+    if(!o) return 0;
+    var debut = (o.dateCreation && o.dateCreation > range.start) ? o.dateCreation : range.start;
+    if(debut > range.end) return 0;
+    return epargnePeriode({ start: debut, end: range.end });
+  }
+  function sortiesCaissePeriode(range){
+    var achats = achatsCaissePeriode(range);
+    var charges = chargesCommunesTotal(range);
+    var epargne = epargneMiseDeCotePeriode(range);
+    return { achatsCaisse: achats, charges: charges, epargne: epargne, total: achats + charges + epargne };
+  }
+  function fondsDepartCaisse(){
+    var f = Number(state.config.fondsDepartCaisse);
+    return (isFinite(f) && f > 0) ? f : 0;
+  }
+  // Caisse à date : un seul calcul, du tout début jusqu'à aujourd'hui.
+  function caisseADate(){
+    var depuisLeDebut = { start: DEBUT_HISTORIQUE, end: todayStr() };
+    return fondsDepartCaisse() + ventesComptabiliseesPeriode(depuisLeDebut) - sortiesCaissePeriode(depuisLeDebut).total;
+  }
+
+  // Synthèse du mois civil en cours (zone « Ce mois-ci » et détail de la
+  // caisse), en francs entiers. Les sorties affichées sont la somme de leurs
+  // trois parts affichées, et le report des mois précédents est la différence
+  // entre la caisse à date (calculée d'un seul tenant, ci-dessus) et les
+  // chiffres du mois : le détail tombe donc toujours juste au franc près.
+  function syntheseCaisseMois(){
+    var aujourdHui = new Date();
+    var today = todayStr();
+    var moisRange = getMonthRange(aujourdHui);
+    var moisADate = { start: moisRange.start, end: today };
+    var sorties = sortiesCaissePeriode(moisADate);
+    var r = Math.round;
+    var achatsCaisse = r(sorties.achatsCaisse), charges = r(sorties.charges), epargne = r(sorties.epargne);
+    var sortiesMois = achatsCaisse + charges + epargne;
+    var ventesMois = r(ventesComptabiliseesPeriode(moisADate));
+    var achatsMois = r(achatsPeriodeTotal(moisADate));
+    var fonds = r(fondsDepartCaisse());
+    var caisse = r(caisseADate());
+    var commandesMois = filterRange(state.ventes, moisADate).filter(estCommandeSpeciale);
+    return {
+      moisLabel: moisLabelMaj(aujourdHui),
+      achatsMois: achatsMois,
+      achatsAutreSourceMois: achatsMois - r(achatsCaissePeriode(moisADate)),
+      ventesMois: ventesMois,
+      sortiesMois: sortiesMois,
+      sortiesAchatsCaisse: achatsCaisse,
+      sortiesCharges: charges,
+      sortiesEpargne: epargne,
+      chargesMois: charges,
+      fonds: fonds,
+      report: caisse - fonds - ventesMois + sortiesMois,
+      caisse: caisse,
+      nbCommandesSpecialesMois: commandesMois.length,
+      transitCommandesMois: r(sumBy(commandesMois, function(v){ return Number(v.prixPayeRevendeur) || 0; }))
+    };
+  }
+
   /* ================= Écran « Aujourd’hui » ================= */
   // Cahier des charges v1, section 5.1 (point tranché, option B) : blocs
   // cliquables Achats/Ventes/Épargne, chaque bloc ouvre le détail du jour
   // correspondant ; le bloc Bénéfice reste informatif (non cliquable).
 
+  // Sprint Revente-D : deux zones « Aujourd'hui » / « Ce mois-ci ».
+  // Sprint Revente-E : la zone « Ce mois-ci » n'est plus affichée en
+  // permanence. À sa place, en bas, un bouton bien visible (accent ambre, plus
+  // haut que la carte Charges communes) l'ouvre dans une feuille du bas, avec
+  // exactement le même contenu. Les 4 blocs du jour reprennent la hauteur
+  // libérée : le bas du bouton touche la barre du bas, sans défilement.
   function renderAujourdhui(){
+    return renderZoneJour() + renderBoutonCeMois();
+  }
+
+  function renderZoneJour(){
     var today = todayStr();
     var range = { start: today, end: today };
-    var achatsJour = sumBy(filterRange(state.achats, range), function(a){ return (a.quantite||0)*(a.prixAchatUnitaire||0) + (a.charges||0); });
-    var ventesJour = sumBy(filterRange(state.ventes, range), function(v){ return v.montantEncaisse; });
+    var achatsJour = sumBy(filterRange(state.achats, range), coutAchat);
+    var ventesJour = ventesComptabiliseesPeriode(range);
     var beneficeTotal = beneficeReventeTotal();
     var epargne = state.objectifEpargne ? epargneJour(today) : 0;
 
     var blocks =
-      '<button type="button" class="dash-block" style="color:var(--text);" data-action="voir-jour-achats">' +
-        '<div class="db-emoji">📦</div><div class="db-amount">' + formatFCFA(achatsJour) + '</div><div class="db-label">Achats du jour</div>' +
+      '<button type="button" class="dash-block" data-action="voir-jour-achats">' +
+        '<div class="db-emoji db-ico t-ambre">📦</div><div class="db-amount" data-test="achats-jour">' + formatFCFA(achatsJour) + '</div><div class="db-label">Achats du jour</div>' +
       '</button>' +
-      '<button type="button" class="dash-block" style="color:var(--text);" data-action="voir-jour-ventes">' +
-        '<div class="db-emoji">🛍️</div><div class="db-amount">' + formatFCFA(ventesJour) + '</div><div class="db-label">Ventes du jour</div>' +
+      '<button type="button" class="dash-block" data-action="voir-jour-ventes">' +
+        '<div class="db-emoji db-ico t-vert">🛍️</div><div class="db-amount pos" data-test="ventes-jour">' + formatFCFA(ventesJour) + '</div><div class="db-label">Ventes du jour</div>' +
       '</button>' +
       '<div class="dash-block info">' +
-        '<div class="db-emoji">💹</div><div class="db-amount">' + formatFCFA(beneficeTotal) + '</div><div class="db-label">Bénéfice (à date)</div>' +
+        '<div class="db-emoji db-ico t-turq">💹</div><div class="db-amount" data-test="benefice-date">' + formatFCFA(beneficeTotal) + '</div><div class="db-label">Bénéfice (à date)</div>' +
       '</div>' +
-      '<button type="button" class="dash-block" style="color:var(--text);" data-action="ouvrir-objectif">' +
-        '<div class="db-emoji">' + esc(epargneEmoji()) + '</div><div class="db-amount">' + (state.objectifEpargne ? formatFCFA(epargne) : "Aucun") + '</div><div class="db-label">Épargne</div>' +
+      '<button type="button" class="dash-block" data-action="ouvrir-objectif">' +
+        '<div class="db-emoji db-ico t-bleu">' + esc(epargneEmoji()) + '</div><div class="db-amount" data-test="epargne-jour">' + (state.objectifEpargne ? formatFCFA(epargne) : "Aucun") + '</div><div class="db-label">Épargne</div>' +
       '</button>';
 
     return (
-      '<div class="section-title">Aujourd’hui · ' + formatDateFr(today) + '</div>' +
+      '<div class="section-title zone-titre">Aujourd’hui · ' + formatDateFr(today) + '</div>' +
       '<div class="dash-grid">' + blocks + '</div>' +
       '<div class="charges-card-wrap">' + renderChargesCommunesCard() + '</div>'
     );
+  }
+
+  // Bouton « 📅 Ce mois-ci · <mois civil en cours> » (libellé dynamique).
+  // Pastille rouge si la caisse à date est négative (même arrondi que la
+  // synthèse) : l'alerte n'est pas cachée derrière le bouton ; le message doux
+  // reste dans le contenu.
+  function renderBoutonCeMois(){
+    var negative = Math.round(caisseADate()) < 0;
+    return (
+      '<button type="button" class="mois-btn" data-action="voir-ce-mois" data-test="bouton-ce-mois">' +
+        '<span class="cm-ico">📅' +
+          (negative ? '<span class="cm-pastille" data-test="pastille-caisse-negative" aria-label="Caisse négative"></span>' : '') +
+        '</span>' +
+        '<span class="cm-main">' +
+          '<span class="cm-titre">Ce mois-ci · <span class="cm-mois">' + esc(moisLabelMaj(new Date())) + '</span></span>' +
+          '<span class="cm-sous">Achats, ventes, caisse</span>' +
+        '</span>' +
+        '<span class="cm-chev" aria-hidden="true">›</span>' +
+      '</button>'
+    );
+  }
+
+  // Contenu de « Ce mois-ci » (feuille du bas) : celui de la zone du Sprint D,
+  // sans changement — Achats du mois, Ventes du mois, Sorties de caisse
+  // (→ détail), Charges communes (incluses dans les sorties), Caisse à date en
+  // grand (→ détail), message de caisse négative.
+  function renderCeMois(){
+    var s = syntheseCaisseMois();
+    var negative = s.caisse < 0;
+    var tuiles =
+      '<div class="mois-tile">' +
+        '<div class="mt-label">Achats du mois</div>' +
+        '<div class="mt-val" data-test="achats-mois">' + formatFCFA(s.achatsMois) + '</div>' +
+      '</div>' +
+      '<div class="mois-tile">' +
+        '<div class="mt-label">Ventes du mois</div>' +
+        '<div class="mt-val pos" data-test="ventes-mois">' + formatFCFA(s.ventesMois) + '</div>' +
+      '</div>' +
+      '<button type="button" class="mois-tile mois-tile-btn" data-action="voir-detail-caisse" data-test="tuile-sorties">' +
+        '<span class="mt-chev" aria-hidden="true">›</span>' +
+        '<div class="mt-label">Sorties de caisse</div>' +
+        '<div class="mt-val neg" data-test="sorties-mois">' + formatFCFA(s.sortiesMois) + '</div>' +
+      '</button>' +
+      '<div class="mois-tile">' +
+        '<div class="mt-label">Charges communes</div>' +
+        '<div class="mt-val" data-test="charges-mois">' + formatFCFA(s.chargesMois) + '</div>' +
+        '<div class="mt-note">incluses dans les sorties</div>' +
+      '</div>';
+    var caisse =
+      '<button type="button" class="caisse-bloc' + (negative ? " caisse-neg" : "") + '" data-action="voir-detail-caisse" data-test="bloc-caisse">' +
+        '<div class="cb-emoji ' + (negative ? "t-rouge" : "t-ambre") + '">💵</div>' +
+        '<div class="cb-main">' +
+          '<div class="cb-label">Caisse à date</div>' +
+          '<div class="cb-amount' + (negative ? " neg" : "") + '" data-test="caisse-date">' + formatFCFA(s.caisse) + '</div>' +
+          (negative ? '<div class="caisse-negative" data-test="caisse-negative">' + esc(MESSAGE_CAISSE_NEGATIVE) + '</div>' : '') +
+        '</div>' +
+        '<div class="cb-chev">›</div>' +
+      '</button>';
+    return (
+      '<div class="mois-grid">' + tuiles + '</div>' +
+      caisse +
+      '<div class="mois-aide">Touchez la caisse ou les sorties pour le détail.</div>'
+    );
+  }
+
+  var MESSAGE_CAISSE_NEGATIVE = "Votre caisse est négative : un achat a peut-être été payé avec une autre source.";
+
+  // Détail de la caisse (au toucher du bloc « Caisse à date » ou des sorties).
+  function renderDetailCaisse(){
+    var s = syntheseCaisseMois();
+    var negative = s.caisse < 0;
+    var signe = function(n){ return n === 0 ? formatFCFA(0) : (n < 0 ? "− " : "+ ") + formatFCFA(Math.abs(n)); };
+    var ligne = function(label, valeur, classe, test){
+      return '<div class="cd-row' + (classe ? " " + classe : "") + '"><div class="cd-k">' + label + '</div>' +
+        '<div class="cd-v"' + (test ? ' data-test="' + test + '"' : '') + '>' + valeur + '</div></div>';
+    };
+    var html =
+      '<div class="caisse-detail">' +
+        ligne("Fonds de départ", formatFCFA(s.fonds), "", "cd-fonds") +
+        ligne("Report des mois précédents", signe(s.report), "", "cd-report") +
+        ligne("Ventes du mois", signe(s.ventesMois), "cd-pos", "cd-ventes") +
+        ligne("Sorties de caisse du mois", "− " + formatFCFA(s.sortiesMois), "cd-neg", "cd-sorties") +
+        ligne("Achats payés avec la caisse", formatFCFA(s.sortiesAchatsCaisse), "cd-sub", "cd-sorties-achats") +
+        ligne("Charges communes", formatFCFA(s.sortiesCharges), "cd-sub", "cd-sorties-charges") +
+        ligne("Épargne mise de côté", formatFCFA(s.sortiesEpargne), "cd-sub", "cd-sorties-epargne") +
+        ligne("Caisse à date", formatFCFA(s.caisse), "cd-total" + (negative ? " cd-total-neg" : ""), "cd-caisse") +
+      '</div>';
+    var notes = "";
+    if(negative) notes += '<div class="dash-perte" style="margin-top:12px;">' + esc(MESSAGE_CAISSE_NEGATIVE) + '</div>';
+    if(s.achatsAutreSourceMois > 0){
+      notes += '<div class="hint" style="margin-top:12px;" data-test="cd-autre-source">Achats payés avec une autre source ce mois-ci : <b style="color:var(--text);">' + formatFCFA(s.achatsAutreSourceMois) + '</b> — comptés dans les achats du mois, pas dans la caisse.</div>';
+    }
+    if(s.nbCommandesSpecialesMois > 0){
+      notes += '<div class="hint" style="margin-top:10px;">Commandes spéciales : seule la marge est comptée. Les ' + formatFCFA(s.transitCommandesMois) + ' payés au revendeur ce mois-ci sont de l’argent en transit (de la cliente au revendeur).</div>';
+    }
+    notes += '<div class="hint" style="margin-top:10px;">La caisse se reporte toute seule d’un mois à l’autre. Épargne comptée depuis la création de votre objectif.</div>';
+    notes += '<button type="button" class="btn btn-secondary" style="margin-top:14px;" data-action="modifier-fonds-depuis-caisse">Fonds de départ : ' + (s.fonds > 0 ? 'modifier' : 'indiquer') + ' dans Réglages</button>';
+    return html + notes;
   }
 
   function renderChargesCommunesCard(){
@@ -1357,7 +2079,7 @@
       return (
         '<div class="caisse-zone">' +
           '<button type="button" class="charges-row charges-row-vide" data-action="voir-charges-jour">' +
-            '<span class="cr-emoji">🧾</span><span class="cr-label">Charges communes</span>' +
+            '<span class="cr-emoji t-rouge">🧾</span><span class="cr-label">Charges communes</span><span class="cr-chev" aria-hidden="true">›</span>' +
           '</button>' +
         '</div>'
       );
@@ -1365,7 +2087,7 @@
     return (
       '<div class="caisse-zone">' +
         '<button type="button" class="charges-row" data-action="voir-charges-jour">' +
-          '<span class="cr-emoji">💸</span><span class="cr-label">Charges communes</span><span class="cr-amount">' + formatFCFA(total) + '</span>' +
+          '<span class="cr-emoji t-rouge">💸</span><span class="cr-label">Charges communes</span><span class="cr-amount" data-test="charges-jour">' + formatFCFA(total) + '</span>' +
         '</button>' +
       '</div>'
     );
@@ -1384,7 +2106,7 @@
         '<button type="button" class="entry-card" data-action="voir-achat-du-jour" data-id="' + a.id + '">' +
           '<div class="entry-ico">📦</div>' +
           '<div class="entry-main">' +
-            '<div class="entry-title">' + esc(a.produitNom) + '</div>' +
+            '<div class="entry-title et-flex"><span class="et-nom">' + esc(a.produitNom) + '</span>' + badgeAutreSource(a) + '</div>' +
             '<div class="entry-sub">' + a.quantite + ' paquet(s) · ' + formatFCFA(a.prixAchatUnitaire) + '/u</div>' +
           '</div>' +
           '<div class="entry-amount">' + formatFCFA(a.quantite*a.prixAchatUnitaire + (a.charges||0)) + '</div>' +
@@ -1392,6 +2114,19 @@
       );
     }).join("") + '</div>';
   }
+  // Sprint Revente-D : repère visuel des achats qui ne sont pas sortis de la caisse.
+  function badgeAutreSource(a){
+    return achatPayeParCaisse(a) ? "" : ' <span class="badge badge-autre">Autre source</span>';
+  }
+  // Sprint Revente-D : dans les listes, une commande spéciale affiche son
+  // montant comptabilisé (la marge) — pour que la liste corresponde au total —
+  // et rappelle le montant encaissé et la part du revendeur.
+  function sousTitreTransit(v){
+    if(!estCommandeSpeciale(v)) return "";
+    return " · encaissé " + montantInsecable(v.montantEncaisse) + ", dont " + montantInsecable(v.prixPayeRevendeur || 0) + " au revendeur";
+  }
+  // Sprint Revente-E : un montant ne se coupe jamais en fin de ligne (« 7 / 000 F »).
+  function montantInsecable(n){ return formatFCFA(n).replace(/ /g, "\u00a0"); }
   function renderJourVentesModal(){
     var today = todayStr();
     var items = sortByDateDesc(state.ventes.filter(function(v){ return v.date === today; }));
@@ -1402,12 +2137,12 @@
       var badge = v.typeVente === "commande_speciale" ? ' <span class="badge">Commande spéciale</span>' : "";
       return (
         '<button type="button" class="entry-card" data-action="voir-vente-du-jour" data-id="' + v.id + '">' +
-          '<div class="entry-ico">🛍️</div>' +
+          '<div class="entry-ico ico-vente">🛍️</div>' +
           '<div class="entry-main">' +
-            '<div class="entry-title">' + esc(v.produitNom) + badge + '</div>' +
-            '<div class="entry-sub">' + v.quantite + ' vendu(s)</div>' +
+            '<div class="entry-title et-flex"><span class="et-nom">' + esc(v.produitNom) + '</span>' + badge + '</div>' +
+            '<div class="entry-sub">' + v.quantite + ' vendu(s)' + sousTitreTransit(v) + '</div>' +
           '</div>' +
-          '<div class="entry-amount">' + formatFCFA(v.montantEncaisse) + '</div>' +
+          '<div class="entry-amount pos">' + formatFCFA(montantComptabiliseVente(v)) + '</div>' +
         '</button>'
       );
     }).join("") + '</div>';
@@ -1438,10 +2173,14 @@
 
   var ACHAT_FIELDS = ["f-date","f-produitSel","f-produitNouveauNom","f-quantite","f-prixAchat","f-prixVente","f-charges"];
 
-  function renderFormAchat(){
+  // Sprint Revente-E : le même formulaire sert à la saisie et à la
+  // modification (pré-rempli, mêmes contrôles, bouton « Enregistrer les
+  // modifications » et message doux si un mois passé est concerné).
+  function renderFormAchat(modif){
     var d = ui.draft;
     var produitSel = d["f-produitSel"] || "";
     var isNew = produitSel === "__new__";
+    var sourcePaiement = d["f-sourcePaiement"] === "autre" ? "autre" : "caisse";
     return (
       '<div>' +
         '<div class="field"><div class="label">Date d’acquisition <span class="req">*</span></div>' +
@@ -1469,13 +2208,29 @@
         '<div class="field"><div class="label">Charges (transport, livraison…) (FCFA)</div>' +
           '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-charges" placeholder="0" value="' + esc(d["f-charges"]||"") + '" data-action-change="capture-achat">' +
         '</div>' +
-        '<button type="button" class="btn btn-primary" data-action="enregistrer-achat">Enregistrer</button>' +
+        // Sprint Revente-D : d'où vient l'argent de cet achat (« la caisse » par défaut).
+        '<div class="field"><div class="label">Payé avec</div>' +
+          '<div class="radio-row">' +
+            '<button type="button" class="radio-opt' + (sourcePaiement==="caisse"?" active":"") + '" data-action="set-source-paiement" data-val="caisse">La caisse</button>' +
+            '<button type="button" class="radio-opt' + (sourcePaiement==="autre"?" active":"") + '" data-action="set-source-paiement" data-val="autre">Une autre source</button>' +
+          '</div>' +
+          '<div class="field-note">' + (sourcePaiement==="autre"
+            ? "Argent personnel, mobile money, prêt… : l’achat compte dans vos achats du mois, mais ne sort pas de la caisse."
+            : "Le montant de l’achat sort de la caisse.") + '</div>' +
+        '</div>' +
+        (modif ? renderNoteMoisPasse() : '') +
+        (modif
+          ? '<button type="button" class="btn btn-primary" data-action="enregistrer-modif-achat">Enregistrer les modifications</button>'
+          : '<button type="button" class="btn btn-primary" data-action="enregistrer-achat">Enregistrer</button>') +
       '</div>'
     );
   }
 
   function onProduitAchatChange(){
     captureDraft(ACHAT_FIELDS);
+    // Sprint Revente-E : dans une modification, changer de produit garde les
+    // prix déjà indiqués (ce sont ceux de l'achat que l'on corrige).
+    if(estFormulaireModification()) return;
     var sel = ui.draft["f-produitSel"];
     if(sel && sel !== "__new__"){
       var p = findProduitById(sel);
@@ -1486,7 +2241,9 @@
     }
   }
 
-  function enregistrerAchat(){
+  // Lecture + contrôles du formulaire d'achat — Sprint Revente-E : partagés
+  // par la saisie et la modification (mêmes contrôles, mêmes messages).
+  function lireFormulaireAchat(){
     captureDraft(ACHAT_FIELDS);
     var d = ui.draft;
     var errors = {};
@@ -1504,42 +2261,217 @@
     if(!(prixAchat >= 0) || d["f-prixAchat"]==="") errors.prixAchat = "Indiquez le prix d’achat unitaire.";
     if(!(prixVente >= 0) || d["f-prixVente"]==="") errors.prixVente = "Indiquez le prix de vente estimé.";
 
-    if(Object.keys(errors).length){ ui.errors = errors; render(); return; }
+    return {
+      errors: errors, date: date, produitSel: produitSel, produitNom: produitNom,
+      quantite: quantite, prixAchat: prixAchat, prixVente: prixVente, charges: charges,
+      sourcePaiement: d["f-sourcePaiement"] === "autre" ? "autre" : "caisse"
+    };
+  }
 
-    var produit = produitSel === "__new__" ? findOrCreateProduit(produitNom, prixAchat, prixVente) : findProduitById(produitSel);
-    if(produit){ produit.dernierPrixAchat = prixAchat; produit.dernierPrixVenteEstime = prixVente; }
+  function enregistrerAchat(){
+    var f = lireFormulaireAchat();
+    if(Object.keys(f.errors).length){ ui.errors = f.errors; render(); return; }
+
+    var produit = f.produitSel === "__new__" ? findOrCreateProduit(f.produitNom, f.prixAchat, f.prixVente) : findProduitById(f.produitSel);
+    if(produit){ produit.dernierPrixAchat = f.prixAchat; produit.dernierPrixVenteEstime = f.prixVente; }
 
     state.achats.push({
-      id: uid("achat"), date: date,
+      id: uid("achat"), date: f.date,
       produitId: produit ? produit.id : null,
-      produitNom: produit ? produit.nom : produitNom,
-      quantite: quantite, prixAchatUnitaire: prixAchat, prixVenteUnitaireEstime: prixVente,
-      charges: charges, ts: Date.now()
+      produitNom: produit ? produit.nom : f.produitNom,
+      quantite: f.quantite, prixAchatUnitaire: f.prixAchat, prixVenteUnitaireEstime: f.prixVente,
+      charges: f.charges, ts: Date.now(),
+      sourcePaiement: f.sourcePaiement
     });
     saveState();
     closeModal();
   }
 
-  function renderListeAchats(){
-    var stockHtml = renderStockSection();
-    var items = sortByDateDesc(state.achats);
-    var head = '<div class="section-title">Achats</div>';
-    if(!items.length){
-      return stockHtml + head + emptyState("📦","Aucun achat enregistré","Touchez le bouton + pour enregistrer votre premier réapprovisionnement.");
+  /* ================= Sprint Revente-C : onglet Achats ================= */
+  // Deux sous-vues, « Détails achats » et « Stock & réappro ».
+  // Sprint Revente-E (simplification demandée par Hamadou) :
+  //  - « Détails achats » : Jour / Semaine / Mois avec navigation ‹ › bornée,
+  //    carte du total de la période et liste « Achats de la période » — les
+  //    listes « Semaines du mois » / « Jours de la semaine » et le drill-down
+  //    (avec son « ‹ Retour ») sont supprimés ;
+  //  - « Stock & réappro » : plus de sélecteur Jour / Semaine / Mois ; un
+  //    tableau mensuel (mois civil en cours par défaut, ‹ › pour revoir un
+  //    mois passé) avec une ligne TOTAL, indépendant de la période de
+  //    « Détails achats ».
+
+  function coutAchat(a){ return (a.quantite||0)*(a.prixAchatUnitaire||0) + (a.charges||0); }
+  function libelleJourLong(ds){
+    var dd = dateFromStr(ds);
+    var j = JOURS_NOMS[dd.getDay()];
+    return j.charAt(0).toUpperCase() + j.slice(1) + " " + formatDateFr(ds);
+  }
+  function ensureAchatsRefs(){
+    if(!ui.achatsPeriode) ui.achatsPeriode = "jour";
+    if(!ui.achatsSemaineRef) ui.achatsSemaineRef = todayStr();
+    if(!ui.achatsMoisRef) ui.achatsMoisRef = todayStr();
+  }
+  // Période affichée dans « Détails achats ».
+  function niveauAchats(){
+    ensureAchatsRefs();
+    var p = ui.achatsPeriode;
+    if(p === "semaine") return { type:"semaine", ref: ui.achatsSemaineRef, range: getWeekRange(dateFromStr(ui.achatsSemaineRef)) };
+    if(p === "mois") return { type:"mois", ref: ui.achatsMoisRef, range: getMonthRange(dateFromStr(ui.achatsMoisRef)) };
+    return { type:"jour", date: todayStr(), range: getDayRange(new Date()) };
+  }
+
+  function renderAchats(){
+    var vue = ui.achatsVue === "stock" ? "stock" : "details";
+    var seg =
+      '<div class="seg">' +
+        '<button type="button" class="seg-btn' + (vue==="details"?" active":"") + '" data-action="achats-vue" data-val="details">Détails achats</button>' +
+        '<button type="button" class="seg-btn' + (vue==="stock"?" active":"") + '" data-action="achats-vue" data-val="stock">Stock &amp; réappro</button>' +
+      '</div>';
+    var head = '<div class="section-title">Achats</div>' + seg;
+    return head + '<div class="sous-vue">' + (vue === "stock" ? renderAchatsStock() : renderAchatsDetails()) + '</div>';
+  }
+
+  function renderAchatsEntete(niv){
+    var periode = ui.achatsPeriode;
+    var tabs = ["jour","semaine","mois"].map(function(p){
+      var lbl = { jour:"Jour", semaine:"Semaine", mois:"Mois" }[p];
+      return '<button type="button" class="etat-tab' + (periode===p?" active":"") + '" data-action="achats-set-periode" data-val="' + p + '">' + lbl + '</button>';
+    }).join("");
+    var html = '<div class="etat-tabs">' + tabs + '</div>';
+    if(niv.type === "jour") html += '<div class="periode-titre">' + esc(libelleJourLong(niv.date)) + '</div>';
+    else html += renderNavPeriode("achats-nav", niv.type, niv.ref);
+    return html;
+  }
+
+  /* ---------- Sous-vue « Détails achats » ---------- */
+
+  function renderAchatsDetails(){
+    var niv = niveauAchats();
+    var range = niv.range;
+    var achats = sortByDateDesc(filterRange(state.achats, range));
+    var total = sumBy(achats, coutAchat);
+    var qte = sumBy(achats, function(a){ return a.quantite; });
+    var charges = sumBy(achats, function(a){ return a.charges; });
+    var carte =
+      '<div class="dash-solde" style="margin-bottom:16px;">' +
+        '<div class="ds-label">Total des achats de la période</div>' +
+        '<div class="ds-amount" data-test="total-achats-periode">' + formatFCFA(total) + '</div>' +
+        '<div class="solde-mini-stats">' +
+          '<div class="sms-col"><div class="sms-label">Achats</div><div class="sms-val" data-test="nb-achats-periode">' + achats.length + '</div></div>' +
+          '<div class="sms-col"><div class="sms-label">Paquets</div><div class="sms-val" data-test="paquets-periode">' + formatQte(qte) + '</div></div>' +
+          '<div class="sms-col"><div class="sms-label">Dont charges</div><div class="sms-val">' + formatFCFA(charges) + '</div></div>' +
+        '</div>' +
+      '</div>';
+
+    var titreListe = '<div class="section-title">' + (niv.type === "jour" ? "Achats de la journée" : "Achats de la période") + '</div>';
+    if(!achats.length){
+      var vide = niv.type === "jour"
+        ? emptyState("📦","Aucun achat aujourd’hui","Touchez le bouton + pour enregistrer un réapprovisionnement.")
+        : emptyState("📦","Aucun achat sur cette période","Les achats enregistrés sur cette période apparaîtront ici.");
+      return renderAchatsEntete(niv) + carte + titreListe + vide;
     }
-    var rows = items.map(function(a){
+    var lg = niv.type === "jour";
+    var rows = achats.map(function(a){
       return (
-        '<button type="button" class="entry-card entry-card-lg" data-action="voir-achat" data-id="' + a.id + '">' +
+        '<button type="button" class="entry-card' + (lg ? " entry-card-lg" : "") + '" style="width:100%;' + (lg ? "" : " text-align:left;") + '" data-action="voir-achat" data-id="' + a.id + '">' +
           '<div class="entry-ico">📦</div>' +
           '<div class="entry-main">' +
-            '<div class="entry-title">' + esc(a.produitNom) + '</div>' +
-            '<div class="entry-sub">' + formatDateFr(a.date) + ' · ' + a.quantite + ' paquet(s) · ' + formatFCFA(a.prixAchatUnitaire) + '/u</div>' +
+            '<div class="entry-title et-flex"><span class="et-nom">' + esc(a.produitNom) + '</span>' + badgeAutreSource(a) + '</div>' +
+            '<div class="entry-sub">' + formatDateFr(a.date) + ' · ' + formatQte(a.quantite) + ' paquet(s) · ' + formatFCFA(a.prixAchatUnitaire) + '/u</div>' +
           '</div>' +
-          '<div class="entry-amount">' + formatFCFA(a.quantite * a.prixAchatUnitaire + (a.charges||0)) + '</div>' +
+          '<div class="entry-amount">' + formatFCFA(coutAchat(a)) + '</div>' +
         '</button>'
       );
     }).join("");
-    return stockHtml + head + '<div class="entry-list entry-list-lg">' + rows + '</div>';
+    return renderAchatsEntete(niv) + carte + titreListe +
+      '<div class="entry-list' + (lg ? " entry-list-lg" : "") + '" data-test="liste-achats-periode">' + rows + '</div>';
+  }
+
+  /* ---------- Sous-vue « Stock & réappro » ---------- */
+  // Le stock est un état, pas un flux : le stock actuel par produit et les
+  // alertes « Bientôt fini » restent toujours visibles. Pour le mois affiché
+  // (mois civil en cours par défaut), le tableau donne par produit les entrées
+  // (achats), les sorties (ventes « depuis le stock ») et le stock en fin de
+  // mois = achats cumulés jusqu'à la fin du mois − ventes « depuis le stock »
+  // cumulées jusqu'à la fin du mois (jamais négatif, comme le stock restant),
+  // puis une ligne TOTAL de chaque colonne. Les commandes spéciales ne
+  // décrémentent pas le stock (inchangé).
+
+  function mouvementsStockProduit(p, range){
+    var achatsP = state.achats.filter(function(a){ return a.produitId === p.id; });
+    var ventesS = state.ventes.filter(function(v){ return v.produitId === p.id && v.typeVente !== "commande_speciale"; });
+    var qte = function(x){ return x.quantite; };
+    var entrees = sumBy(filterRange(achatsP, range), qte);
+    var sorties = sumBy(filterRange(ventesS, range), qte);
+    var cumulAchats = sumBy(achatsP.filter(function(a){ return !!a.date && a.date <= range.end; }), qte);
+    var cumulVentes = sumBy(ventesS.filter(function(v){ return !!v.date && v.date <= range.end; }), qte);
+    return {
+      produit: p, entrees: entrees, sorties: sorties,
+      stockFin: Math.max(0, cumulAchats - cumulVentes),
+      valeurEntrees: sumBy(filterRange(achatsP, range), coutAchat)
+    };
+  }
+  function mouvementsStock(range){
+    var produits = state.config.produits.slice().sort(function(a,b){ return a.nom.localeCompare(b.nom); });
+    return produits.map(function(p){ return mouvementsStockProduit(p, range); })
+      .filter(function(m){ return m.entrees > 0 || m.sorties > 0 || m.stockFin > 0; });
+  }
+  function ensureStockMoisRef(){
+    if(!ui.stockMoisRef) ui.stockMoisRef = todayStr();
+  }
+
+  function renderAchatsStock(){
+    var produits = state.config.produits.slice().sort(function(a,b){ return a.nom.localeCompare(b.nom); });
+    if(!produits.length){
+      return emptyState("📦","Aucun produit en stock","Enregistrez un premier achat avec le bouton + : le stock de chaque produit apparaîtra ici.");
+    }
+    var stats = produits.map(computeStockProduit);
+    var alertes = stats.filter(function(s){ return s.alerte; });
+    var bandeau = alertes.length
+      ? '<div class="stock-alerte-bandeau" data-test="bandeau-bientot-fini">⚠️ <b>Bientôt fini</b> — ' + alertes.map(function(s){
+          return esc(s.produit.nom) + ' (' + formatQte(s.stockRestant) + ')';
+        }).join(", ") + '&nbsp;: pensez à racheter.</div>'
+      : '';
+
+    ensureStockMoisRef();
+    var range = getMonthRange(dateFromStr(ui.stockMoisRef));
+    var moisEnCours = range.start === getMonthRange(new Date()).start;
+    var mvts = mouvementsStock(range);
+    var totEntrees = sumBy(mvts, function(m){ return m.entrees; });
+    var totSorties = sumBy(mvts, function(m){ return m.sorties; });
+    var totFin = sumBy(mvts, function(m){ return m.stockFin; });
+    var entrees = function(n){ return n ? "+" + formatQte(n) : "0"; };
+    var sorties = function(n){ return n ? "−" + formatQte(n) : "0"; };
+
+    var table = "";
+    if(mvts.length){
+      table =
+        '<div class="mvt-table" data-test="mvt-table">' +
+          '<div class="mvt-row mvt-head"><div>Produit</div><div class="mvt-n">Entrées</div><div class="mvt-n">Sorties</div><div class="mvt-n" data-test="col-stock">' + (moisEnCours ? "Stock" : "Stock fin") + '</div></div>' +
+          mvts.map(function(m){
+            return '<div class="mvt-row" data-produit="' + esc(m.produit.nom) + '">' +
+              '<div class="mvt-nom">' + esc(m.produit.nom) + '</div>' +
+              '<div class="mvt-n in" data-col="entrees">' + entrees(m.entrees) + '</div>' +
+              '<div class="mvt-n out" data-col="sorties">' + sorties(m.sorties) + '</div>' +
+              '<div class="mvt-n" data-col="fin">' + formatQte(m.stockFin) + '</div>' +
+            '</div>';
+          }).join("") +
+          '<div class="mvt-row mvt-total" data-test="mvt-total">' +
+            '<div class="mvt-nom">Total</div>' +
+            '<div class="mvt-n in" data-col="entrees">' + entrees(totEntrees) + '</div>' +
+            '<div class="mvt-n out" data-col="sorties">' + sorties(totSorties) + '</div>' +
+            '<div class="mvt-n fin" data-col="fin">' + formatQte(totFin) + '</div>' +
+          '</div>' +
+        '</div>';
+    } else {
+      table = '<div class="hint" style="margin-bottom:16px;" data-test="mvt-vide">Aucun mouvement de stock en ' + esc(moisLabelFor(dateFromStr(range.start))) + '.</div>';
+    }
+    table += '<div class="hint tight" style="margin:-8px 0 18px;">Sorties = ventes « depuis le stock ». Les commandes spéciales ne touchent pas le stock.</div>';
+
+    return bandeau +
+      '<div class="section-title">Mouvements du mois</div>' +
+      renderNavPeriode("stock-nav", "mois", ui.stockMoisRef) +
+      table +
+      renderStockSection("Stock actuel (aujourd’hui)");
   }
 
   function renderDetailAchat(){
@@ -1552,7 +2484,12 @@
       drow("Prix d’achat unitaire", formatFCFA(a.prixAchatUnitaire)) +
       drow("Prix de vente estimé", formatFCFA(a.prixVenteUnitaireEstime)) +
       drow("Charges", formatFCFA(a.charges||0)) +
-      drow("Total dépensé", formatFCFA(a.quantite*a.prixAchatUnitaire + (a.charges||0)));
+      drow("Total dépensé", formatFCFA(a.quantite*a.prixAchatUnitaire + (a.charges||0))) +
+      drow("Payé avec", achatPayeParCaisse(a) ? "La caisse" : "Une autre source");
+    if(!achatPayeParCaisse(a)){
+      rows += '<div class="hint tight" style="margin-top:8px;">Compté dans les achats du mois, mais pas dans les sorties de caisse.</div>';
+    }
+    rows += renderModifieLe(a);
     return detailShell(rows, "achat", a.id);
   }
 
@@ -1560,7 +2497,7 @@
 
   var VENTE_FIELDS = ["f-date","f-produitSel","f-produitNouveauNom","f-quantite","f-montant","f-typeVente","f-prixRevendeur"];
 
-  function renderFormVente(){
+  function renderFormVente(modif){
     var d = ui.draft;
     var produitSel = d["f-produitSel"] || "";
     var isNew = produitSel === "__new__";
@@ -1597,12 +2534,16 @@
             '<div class="field-note">La marge se calcule automatiquement (montant encaissé − prix payé au revendeur).</div>' +
             fieldErr("prixRevendeur") +
           '</div>' : '') +
-        '<button type="button" class="btn btn-primary" data-action="enregistrer-vente">Enregistrer</button>' +
+        (modif ? renderNoteMoisPasse() : '') +
+        (modif
+          ? '<button type="button" class="btn btn-primary" data-action="enregistrer-modif-vente">Enregistrer les modifications</button>'
+          : '<button type="button" class="btn btn-primary" data-action="enregistrer-vente">Enregistrer</button>') +
       '</div>'
     );
   }
 
-  function enregistrerVente(){
+  // Lecture + contrôles du formulaire de vente (saisie et modification).
+  function lireFormulaireVente(){
     captureDraft(VENTE_FIELDS);
     var d = ui.draft;
     var errors = {};
@@ -1620,19 +2561,229 @@
     if(!(montant >= 0) || d["f-montant"]==="") errors.montant = "Indiquez le montant encaissé.";
     if(typeVente === "commande_speciale" && (d["f-prixRevendeur"]==="" || !(prixRevendeur >= 0))) errors.prixRevendeur = "Indiquez le prix payé au revendeur.";
 
-    if(Object.keys(errors).length){ ui.errors = errors; render(); return; }
+    return {
+      errors: errors, date: date, produitSel: produitSel, produitNomNouveau: produitNomNouveau,
+      quantite: quantite, montant: montant, typeVente: typeVente, prixRevendeur: prixRevendeur
+    };
+  }
 
-    var produit = produitSel === "__new__" ? findOrCreateProduit(produitNomNouveau) : findProduitById(produitSel);
+  function enregistrerVente(){
+    var f = lireFormulaireVente();
+    if(Object.keys(f.errors).length){ ui.errors = f.errors; render(); return; }
+
+    var produit = f.produitSel === "__new__" ? findOrCreateProduit(f.produitNomNouveau) : findProduitById(f.produitSel);
 
     state.ventes.push({
-      id: uid("vente"), date: date,
+      id: uid("vente"), date: f.date,
       produitId: produit ? produit.id : null,
-      produitNom: produit ? produit.nom : produitNomNouveau,
-      quantite: quantite, montantEncaisse: montant, typeVente: typeVente,
-      prixPayeRevendeur: typeVente==="commande_speciale" ? prixRevendeur : null,
+      produitNom: produit ? produit.nom : f.produitNomNouveau,
+      quantite: f.quantite, montantEncaisse: f.montant, typeVente: f.typeVente,
+      prixPayeRevendeur: f.typeVente==="commande_speciale" ? f.prixRevendeur : null,
       ts: Date.now()
     });
     saveState();
+    closeModal();
+  }
+
+  /* ================= Sprint Revente-E : modifier un achat ou une vente ================= */
+  // Règle retenue (piste d'audit, adaptée à un carnet personnel) : on CORRIGE
+  // l'enregistrement au lieu de le supprimer puis le ressaisir, et on garde la
+  // trace de la correction dans l'enregistrement lui-même :
+  //  - modifieLe : horodatage (ms) de la dernière correction ;
+  //  - versionsPrecedentes : les anciennes valeurs, une entrée par correction,
+  //    la plus récente en dernier (jamais affichées en détail, conservées à
+  //    l'export et à la restauration).
+  // id, ts et date de saisie d'origine ne changent jamais. Un enregistrement
+  // sans ces champs n'a simplement jamais été modifié (aucune migration).
+  // Mêmes contrôles qu'à la saisie ; les mois passés ne sont pas verrouillés
+  // (la suppression reste possible) — un message doux prévient seulement que
+  // leurs chiffres et la caisse à date seront recalculés.
+
+  function estFormulaireModification(){
+    return !!ui.modal && (ui.modal.type === "edit-achat" || ui.modal.type === "edit-vente");
+  }
+  function trouverEnregistrement(kind, id){
+    var liste = kind === "achat" ? state.achats : (kind === "vente" ? state.ventes : []);
+    for(var i=0;i<liste.length;i++) if(liste[i] && liste[i].id === id) return liste[i];
+    return null;
+  }
+  function valeurChamp(n){ return (n === null || n === undefined || n === "") ? "" : String(n); }
+  // Produit à présélectionner : celui de l'enregistrement, sinon un produit du
+  // même nom, sinon « + Nouveau produit… » avec le nom déjà rempli.
+  function produitSelPourEdition(rec){
+    if(rec.produitId && findProduitById(rec.produitId)) return rec.produitId;
+    var nom = String(rec.produitNom || "").trim().toLowerCase();
+    var memeNom = state.config.produits.filter(function(p){ return p.nom.toLowerCase() === nom; })[0];
+    return memeNom ? memeNom.id : "__new__";
+  }
+  function brouillonDepuisAchat(a){
+    var sel = produitSelPourEdition(a);
+    return {
+      "f-date": a.date || todayStr(),
+      "f-produitSel": sel,
+      "f-produitNouveauNom": sel === "__new__" ? (a.produitNom || "") : "",
+      "f-quantite": valeurChamp(a.quantite),
+      "f-prixAchat": valeurChamp(a.prixAchatUnitaire),
+      "f-prixVente": valeurChamp(a.prixVenteUnitaireEstime),
+      "f-charges": a.charges ? valeurChamp(a.charges) : "",
+      "f-sourcePaiement": achatPayeParCaisse(a) ? "caisse" : "autre"
+    };
+  }
+  function brouillonDepuisVente(v){
+    var sel = produitSelPourEdition(v);
+    var commande = estCommandeSpeciale(v);
+    return {
+      "f-date": v.date || todayStr(),
+      "f-produitSel": sel,
+      "f-produitNouveauNom": sel === "__new__" ? (v.produitNom || "") : "",
+      "f-quantite": valeurChamp(v.quantite),
+      "f-montant": valeurChamp(v.montantEncaisse),
+      "f-typeVente": commande ? "commande_speciale" : "stock",
+      "f-prixRevendeur": commande ? valeurChamp(v.prixPayeRevendeur) : ""
+    };
+  }
+  // La modale ouverte devient le niveau « retour » de la suivante (pile) :
+  // fermer ou revenir ramène à elle, à jour.
+  function empilerModale(){
+    if(!ui.modal) return;
+    var extra = {};
+    if(ui.modal.id !== undefined) extra.id = ui.modal.id;
+    ui.modalReturnTo = { type: ui.modal.type, extra: extra, returnTo: ui.modalReturnTo || null };
+  }
+  function ouvrirModification(kind, id){
+    var rec = trouverEnregistrement(kind, id);
+    if(!rec || !ui.modal) return;
+    empilerModale();
+    ui.modal = { type: kind === "achat" ? "edit-achat" : "edit-vente", id: id };
+    ui.draft = kind === "achat" ? brouillonDepuisAchat(rec) : brouillonDepuisVente(rec);
+    ui.errors = {};
+    render();
+  }
+
+  function renderModifieLe(rec){
+    if(!rec || !rec.modifieLe) return "";
+    var d = new Date(rec.modifieLe);
+    if(isNaN(d.getTime())) return "";
+    return '<div class="modifie-le" data-test="modifie-le">✏️ Modifié le ' + formatDateFr(dateKey(d)) + '</div>';
+  }
+
+  // Message doux (jamais bloquant) quand l'ancienne ou la nouvelle date tombe
+  // dans un mois civil passé.
+  function moisPassesConcernes(ancienne, nouvelle){
+    var debutMoisCourant = getMonthRange(new Date()).start;
+    var liste = [];
+    [ancienne, nouvelle].forEach(function(ds){
+      if(!ds || ds >= debutMoisCourant) return;
+      var d = parseDateStr(ds);
+      if(!d) return;
+      var lib = moisLabelFor(d);
+      if(liste.indexOf(lib) < 0) liste.push(lib);
+    });
+    return liste;
+  }
+  function messageCorrectionMoisPasse(){
+    if(!estFormulaireModification()) return "";
+    var rec = trouverEnregistrement(ui.modal.type === "edit-achat" ? "achat" : "vente", ui.modal.id);
+    var liste = moisPassesConcernes(rec ? rec.date : null, ui.draft["f-date"] || todayStr());
+    if(!liste.length) return "";
+    var de = function(lib){ return /^[aeiouyàâéèêîïôû]/i.test(lib) ? "d’" + lib : "de " + lib; };
+    return "Cette correction change aussi les chiffres " + liste.map(de).join(" et ") + " ; la caisse à date sera recalculée.";
+  }
+  function renderNoteMoisPasse(){
+    var msg = messageCorrectionMoisPasse();
+    return '<div class="note-douce" id="note-mois-passe" data-test="msg-mois-passe" role="status"' + (msg ? '' : ' hidden') + '>' + esc(msg) + '</div>';
+  }
+  // Mise à jour du seul message quand la date change (sans redessiner le
+  // formulaire : le champ suivant garde le focus).
+  function majNoteMoisPasse(){
+    var el = byId("note-mois-passe");
+    if(!el) return;
+    var msg = messageCorrectionMoisPasse();
+    el.textContent = msg;
+    el.hidden = !msg;
+  }
+
+  function memeValeur(cle, a, b){
+    if(cle === "charges"){ a = Number(a) || 0; b = Number(b) || 0; }
+    var videA = (a === null || a === undefined), videB = (b === null || b === undefined);
+    if(videA || videB) return videA && videB;
+    return a === b;
+  }
+  // Copie des valeurs actuelles (sans l'historique lui-même).
+  function instantane(rec){
+    var copie = {};
+    for(var k in rec){
+      if(Object.prototype.hasOwnProperty.call(rec, k) && k !== "versionsPrecedentes") copie[k] = rec[k];
+    }
+    return copie;
+  }
+  // Applique une correction ; renvoie false si rien n'a réellement changé
+  // (aucune trace ajoutée dans ce cas).
+  function appliquerModification(rec, nouveau){
+    var change = Object.keys(nouveau).some(function(k){ return !memeValeur(k, rec[k], nouveau[k]); });
+    if(!change) return false;
+    var historique = Array.isArray(rec.versionsPrecedentes) ? rec.versionsPrecedentes.slice()
+      : (rec.versionsPrecedentes ? [rec.versionsPrecedentes] : []);
+    historique.push(instantane(rec));
+    Object.keys(nouveau).forEach(function(k){ rec[k] = nouveau[k]; });
+    rec.modifieLe = Date.now();
+    rec.versionsPrecedentes = historique;
+    return true;
+  }
+  // L'achat est-il le plus récent de son produit ? (date d'achat, puis heure de
+  // saisie, puis ordre d'enregistrement)
+  function estAchatLePlusRecent(a){
+    var plusRecent = null, rang = -1;
+    state.achats.forEach(function(x, i){
+      if(!x || x.produitId !== a.produitId) return;
+      var plus = !plusRecent || x.date > plusRecent.date ||
+        (x.date === plusRecent.date && ((x.ts||0) > (plusRecent.ts||0) || ((x.ts||0) === (plusRecent.ts||0) && i > rang)));
+      if(plus){ plusRecent = x; rang = i; }
+    });
+    return plusRecent === a;
+  }
+
+  function enregistrerModifAchat(){
+    var a = trouverEnregistrement("achat", ui.modal && ui.modal.id);
+    if(!a){ closeModal(); return; }
+    var f = lireFormulaireAchat();
+    if(Object.keys(f.errors).length){ ui.errors = f.errors; render(); return; }
+    var produit = f.produitSel === "__new__" ? findOrCreateProduit(f.produitNom) : findProduitById(f.produitSel);
+    var modifie = appliquerModification(a, {
+      date: f.date,
+      produitId: produit ? produit.id : null,
+      produitNom: produit ? produit.nom : f.produitNom,
+      quantite: f.quantite, prixAchatUnitaire: f.prixAchat, prixVenteUnitaireEstime: f.prixVente,
+      charges: f.charges, sourcePaiement: f.sourcePaiement
+    });
+    // Prix mémorisés du produit : seulement si cet achat est le plus récent
+    // de ce produit (corriger un vieil achat ne change pas le pré-remplissage).
+    if(modifie && produit && estAchatLePlusRecent(a)){
+      produit.dernierPrixAchat = f.prixAchat;
+      produit.dernierPrixVenteEstime = f.prixVente;
+    }
+    if(modifie) saveState();
+    ui.errors = {};
+    closeModal();
+  }
+
+  function enregistrerModifVente(){
+    var v = trouverEnregistrement("vente", ui.modal && ui.modal.id);
+    if(!v){ closeModal(); return; }
+    var f = lireFormulaireVente();
+    if(Object.keys(f.errors).length){ ui.errors = f.errors; render(); return; }
+    var produit = f.produitSel === "__new__" ? findOrCreateProduit(f.produitNomNouveau) : findProduitById(f.produitSel);
+    var modifie = appliquerModification(v, {
+      date: f.date,
+      produitId: produit ? produit.id : null,
+      produitNom: produit ? produit.nom : f.produitNomNouveau,
+      quantite: f.quantite, montantEncaisse: f.montant, typeVente: f.typeVente,
+      // « Commande spéciale » → « Depuis le stock » : plus de prix revendeur
+      // (l'ancienne valeur reste dans versionsPrecedentes).
+      prixPayeRevendeur: f.typeVente === "commande_speciale" ? f.prixRevendeur : null
+    });
+    if(modifie) saveState();
+    ui.errors = {};
     closeModal();
   }
 
@@ -1646,12 +2797,12 @@
       var badge = v.typeVente === "commande_speciale" ? '<span class="badge">Commande spéciale</span>' : "";
       return (
         '<button type="button" class="entry-card entry-card-lg" data-action="voir-vente" data-id="' + v.id + '">' +
-          '<div class="entry-ico">🛍️</div>' +
+          '<div class="entry-ico ico-vente">🛍️</div>' +
           '<div class="entry-main">' +
-            '<div class="entry-title">' + esc(v.produitNom) + badge + '</div>' +
-            '<div class="entry-sub">' + formatDateFr(v.date) + ' · ' + v.quantite + ' vendu(s)</div>' +
+            '<div class="entry-title et-flex"><span class="et-nom">' + esc(v.produitNom) + '</span>' + badge + '</div>' +
+            '<div class="entry-sub">' + formatDateFr(v.date) + ' · ' + v.quantite + ' vendu(s)' + sousTitreTransit(v) + '</div>' +
           '</div>' +
-          '<div class="entry-amount">' + formatFCFA(v.montantEncaisse) + '</div>' +
+          '<div class="entry-amount pos">' + formatFCFA(montantComptabiliseVente(v)) + '</div>' +
         '</button>'
       );
     }).join("");
@@ -1669,8 +2820,10 @@
       drow("Type de vente", v.typeVente==="commande_speciale" ? "Commande spéciale" : "Depuis le stock");
     if(v.typeVente === "commande_speciale"){
       rows += drow("Prix payé au revendeur", formatFCFA(v.prixPayeRevendeur||0));
-      rows += drow("Marge", formatFCFA(v.montantEncaisse - (v.prixPayeRevendeur||0)));
+      rows += drow("Marge (comptée dans les ventes)", formatFCFA(montantComptabiliseVente(v)));
+      rows += '<div class="hint tight" style="margin-top:8px;">Les ' + formatFCFA(v.prixPayeRevendeur||0) + ' payés au revendeur sont de l’argent en transit : ils viennent de la cliente et repartent chez le revendeur. Seule la marge entre dans vos ventes, votre bénéfice et votre caisse.</div>';
     }
+    rows += renderModifieLe(v);
     return detailShell(rows, "vente", v.id);
   }
 
@@ -1774,6 +2927,15 @@
 
   function detailShell(rowsHtml, kind, id){
     var confirming = ui.modal.confirmDelete;
+    // Sprint Revente-E : « ✏️ Modifier » à côté de « Supprimer » pour les
+    // achats et les ventes (les charges communes restent en suppression seule).
+    var modifiable = (kind === "achat" || kind === "vente");
+    var boutons = modifiable
+      ? '<div class="btn-row detail-actions">' +
+          '<button type="button" class="btn btn-secondary" data-action="modifier-enregistrement" data-kind="' + kind + '" data-id="' + id + '">✏️ Modifier</button>' +
+          '<button type="button" class="btn btn-danger" data-action="demander-suppression">🗑️ Supprimer</button>' +
+        '</div>'
+      : '<button type="button" class="btn btn-danger" style="margin-top:14px;" data-action="demander-suppression">🗑️ Supprimer</button>';
     return (
       '<div>' + rowsHtml +
       (confirming ?
@@ -1783,7 +2945,7 @@
             '<button type="button" class="btn btn-danger" data-action="confirmer-suppression" data-kind="' + kind + '" data-id="' + id + '">Oui, supprimer</button>' +
           '</div></div>'
         :
-        '<button type="button" class="btn btn-danger" style="margin-top:14px;" data-action="demander-suppression">🗑️ Supprimer</button>'
+        boutons
       ) +
       '</div>'
     );
@@ -1794,13 +2956,17 @@
     var body = "";
     var title = "";
     switch(m.type){
-      case "add-achat": title = "Nouvel achat"; body = renderFormAchat(); break;
-      case "add-vente": title = "Nouvelle vente"; body = renderFormVente(); break;
+      case "add-achat": title = "Nouvel achat"; body = renderFormAchat(false); break;
+      case "add-vente": title = "Nouvelle vente"; body = renderFormVente(false); break;
+      case "edit-achat": title = "Modifier l’achat"; body = renderFormAchat(true); break;
+      case "edit-vente": title = "Modifier la vente"; body = renderFormVente(true); break;
+      case "ce-mois": title = "Ce mois-ci · " + moisLabelMaj(new Date()); body = renderCeMois(); break;
       case "detail-achat": title = "Détail de l’achat"; body = renderDetailAchat(); break;
       case "detail-vente": title = "Détail de la vente"; body = renderDetailVente(); break;
       case "jour-achats": title = "Achats d’aujourd’hui"; body = renderJourAchatsModal(); break;
       case "jour-ventes": title = "Ventes d’aujourd’hui"; body = renderJourVentesModal(); break;
       case "detail-charges-jour": title = "Charges communes"; body = renderDetailChargesJour(); break;
+      case "detail-caisse": title = "Caisse à date"; body = renderDetailCaisse(); break;
       case "add-autre-charge": title = "Nouvelle charge"; body = renderFormAutreCharge(); break;
       case "detail-autre-charge": title = "Détail de la charge"; body = renderDetailAutreCharge(); break;
       case "confirmer-suppression-rubrique": title = "Supprimer la rubrique"; body = renderConfirmSuppressionRubrique(); break;
@@ -1812,7 +2978,7 @@
     }
     return (
       '<div class="modal-overlay" data-action="fermer-modal-overlay">' +
-        '<div class="modal" data-stop-close="1">' +
+        '<div class="modal' + (m.type === "ce-mois" ? " mois-sheet" : "") + '" data-stop-close="1" data-modal="' + esc(m.type) + '">' +
           '<div class="modal-head">' +
             '<div class="modal-title">' + esc(title) + '</div>' +
             '<button type="button" class="modal-close" data-action="fermer-modal">✕</button>' +
@@ -1831,56 +2997,18 @@
     if(!ui.etatMoisRef) ui.etatMoisRef = todayStr();
   }
   function shiftRef(refName, delta){
-    if(refName === "semaine"){
-      var d = dateFromStr(ui.etatSemaineRef);
-      d.setDate(d.getDate() + 7*delta);
-      var nouveau = dateKey(d);
-      var refAujourdhui = getWeekRange(new Date()).start;
-      if(nouveau > refAujourdhui) nouveau = refAujourdhui;
-      var refPlusAncienne = earliestActivityWeekStart();
-      if(nouveau < refPlusAncienne) nouveau = refPlusAncienne;
-      ui.etatSemaineRef = nouveau;
-    } else if(refName === "mois"){
-      var d2 = dateFromStr(ui.etatMoisRef);
-      d2.setDate(1);
-      d2.setMonth(d2.getMonth() + delta);
-      var nouveau2 = dateKey(d2);
-      var refAujourdhuiM = getMonthRange(new Date()).start;
-      if(nouveau2 > refAujourdhuiM) nouveau2 = refAujourdhuiM;
-      var refPlusAncienM = earliestActivityMonthStart();
-      if(nouveau2 < refPlusAncienM) nouveau2 = refPlusAncienM;
-      ui.etatMoisRef = nouveau2;
-    }
+    if(refName === "semaine") ui.etatSemaineRef = decalerPeriode("semaine", ui.etatSemaineRef, delta);
+    else if(refName === "mois") ui.etatMoisRef = decalerPeriode("mois", ui.etatMoisRef, delta);
   }
 
   function renderEtatBack(){
-    return '<button type="button" class="btn btn-ghost" style="padding:8px 0; margin-bottom:6px;" data-action="etat-back">‹ Retour</button>';
+    return '<button type="button" class="btn btn-ghost" style="padding:8px 0; margin-bottom:6px; width:auto;" data-action="etat-back">‹ Retour</button>';
   }
   function renderEtatSemaineNav(){
-    var range = getWeekRange(dateFromStr(ui.etatSemaineRef));
-    var label = formatDateFr(range.start) + " – " + formatDateFr(range.end);
-    var estActuelle = ui.etatSemaineRef >= getWeekRange(new Date()).start;
-    var estPlusAncienne = ui.etatSemaineRef <= earliestActivityWeekStart();
-    return (
-      '<div class="etat-nav">' +
-        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="-1" data-periode="semaine"' + (estPlusAncienne?" disabled":"") + '>‹</button>' +
-        '<div class="en-label">' + esc(label) + '</div>' +
-        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="1" data-periode="semaine"' + (estActuelle?" disabled":"") + '>›</button>' +
-      '</div>'
-    );
+    return renderNavPeriode("etat-nav", "semaine", ui.etatSemaineRef);
   }
   function renderEtatMoisNav(){
-    var ref = dateFromStr(ui.etatMoisRef);
-    var label = moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1);
-    var estActuelle = ui.etatMoisRef >= getMonthRange(new Date()).start;
-    var estPlusAncien = ui.etatMoisRef <= earliestActivityMonthStart();
-    return (
-      '<div class="etat-nav">' +
-        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="-1" data-periode="mois"' + (estPlusAncien?" disabled":"") + '>‹</button>' +
-        '<div class="en-label">' + esc(label) + '</div>' +
-        '<button type="button" class="en-btn" data-action="etat-nav" data-sens="1" data-periode="mois"' + (estActuelle?" disabled":"") + '>›</button>' +
-      '</div>'
-    );
+    return renderNavPeriode("etat-nav", "mois", ui.etatMoisRef);
   }
 
   var JOURS_NOMS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
@@ -1966,7 +3094,7 @@
         return (
           '<button type="button" class="entry-card" style="width:100%; text-align:left;" data-action="voir-achat" data-id="' + a.id + '">' +
             '<div class="entry-ico">📦</div>' +
-            '<div class="entry-main"><div class="entry-title">' + esc(a.produitNom) + '</div>' +
+            '<div class="entry-main"><div class="entry-title et-flex"><span class="et-nom">' + esc(a.produitNom) + '</span>' + badgeAutreSource(a) + '</div>' +
             '<div class="entry-sub">' + formatDateFr(a.date) + ' · achat · ' + a.quantite + ' u.</div></div>' +
             '<div class="entry-amount">' + formatFCFA(a.quantite * a.prixAchatUnitaire + (a.charges||0)) + '</div>' +
           '</button>'
@@ -1975,10 +3103,10 @@
       var v = it.ref;
       return (
         '<button type="button" class="entry-card" style="width:100%; text-align:left;" data-action="voir-vente" data-id="' + v.id + '">' +
-          '<div class="entry-ico">🛍️</div>' +
-          '<div class="entry-main"><div class="entry-title">' + esc(v.produitNom) + '</div>' +
-          '<div class="entry-sub">' + formatDateFr(v.date) + ' · vente · ' + v.quantite + ' u.</div></div>' +
-          '<div class="entry-amount">' + formatFCFA(v.montantEncaisse) + '</div>' +
+          '<div class="entry-ico ico-vente">🛍️</div>' +
+          '<div class="entry-main"><div class="entry-title et-flex"><span class="et-nom">' + esc(v.produitNom) + '</span>' + (estCommandeSpeciale(v) ? ' <span class="badge">Commande spéciale</span>' : '') + '</div>' +
+          '<div class="entry-sub">' + formatDateFr(v.date) + ' · vente · ' + v.quantite + ' u.' + sousTitreTransit(v) + '</div></div>' +
+          '<div class="entry-amount pos">' + formatFCFA(montantComptabiliseVente(v)) + '</div>' +
         '</button>'
       );
     }).join("");
@@ -2075,26 +3203,8 @@
     if(!ui.habitudesMoisRef) ui.habitudesMoisRef = todayStr();
   }
   function shiftHabitudesRef(periode, delta){
-    if(periode === "semaine"){
-      var d = dateFromStr(ui.habitudesSemaineRef);
-      d.setDate(d.getDate() + 7*delta);
-      var nouveau = dateKey(d);
-      var refAujourdhui = getWeekRange(new Date()).start;
-      if(nouveau > refAujourdhui) nouveau = refAujourdhui;
-      var refPlusAncienne = earliestActivityWeekStart();
-      if(nouveau < refPlusAncienne) nouveau = refPlusAncienne;
-      ui.habitudesSemaineRef = nouveau;
-    } else if(periode === "mois"){
-      var d2 = dateFromStr(ui.habitudesMoisRef);
-      d2.setDate(1);
-      d2.setMonth(d2.getMonth() + delta);
-      var nouveau2 = dateKey(d2);
-      var refAujourdhuiM = getMonthRange(new Date()).start;
-      if(nouveau2 > refAujourdhuiM) nouveau2 = refAujourdhuiM;
-      var refPlusAncienM = earliestActivityMonthStart();
-      if(nouveau2 < refPlusAncienM) nouveau2 = refPlusAncienM;
-      ui.habitudesMoisRef = nouveau2;
-    }
+    if(periode === "semaine") ui.habitudesSemaineRef = decalerPeriode("semaine", ui.habitudesSemaineRef, delta);
+    else if(periode === "mois") ui.habitudesMoisRef = decalerPeriode("mois", ui.habitudesMoisRef, delta);
   }
 
   function groupSum(arr, labelFn, valFn){
@@ -2122,12 +3232,11 @@
       var ventesP = filterRange(state.ventes.filter(function(v){ return v.produitId === p.id; }), range);
       if(!ventesP.length) return null;
       var qte = sumBy(ventesP, function(v){ return v.quantite; });
-      var ca = sumBy(ventesP, function(v){ return v.montantEncaisse; });
+      // Sprint Revente-D : chiffre d'affaires et bénéfice via la fonction de
+      // comptabilisation (commande spéciale = marge seulement).
+      var ca = sumBy(ventesP, montantComptabiliseVente);
       var coutMoyen = computeStockProduit(p).coutMoyen;
-      var benefice = sumBy(ventesP, function(v){
-        if(v.typeVente === "commande_speciale") return v.montantEncaisse - (v.prixPayeRevendeur||0);
-        return v.montantEncaisse - v.quantite * coutMoyen;
-      });
+      var benefice = sumBy(ventesP, function(v){ return beneficeVente(v, coutMoyen); });
       return { nom: p.nom, qte: qte, ca: ca, benefice: benefice };
     }).filter(Boolean).sort(function(a,b){ return b.ca - a.ca; });
     return rows;
@@ -2153,7 +3262,9 @@
       return '<div class="eb-row"><div class="eb-nom">' + esc(r.nom) + ' <span class="eb-sub">(' + r.qte + ' vendu(s))</span></div>' +
         '<div class="eb-val">' + formatFCFA(r.ca) + ' <span class="eb-sub">(bénéf. ' + formatFCFA(r.benefice) + ')</span></div></div>';
     }).join("");
-    return '<div class="etat-breakdown"><div class="eb-title">Par produit — quantités &amp; chiffre d’affaires</div>' + body + '</div>';
+    var noteCommande = filterRange(state.ventes, range).some(estCommandeSpeciale)
+      ? '<div class="hint tight" style="margin:-10px 0 18px;">Commandes spéciales : seule la marge est comptée dans le chiffre d’affaires.</div>' : '';
+    return '<div class="etat-breakdown"><div class="eb-title">Par produit — quantités &amp; chiffre d’affaires</div>' + body + '</div>' + noteCommande;
   }
 
   function renderBreakdownAutresCharges(range){
@@ -2175,18 +3286,7 @@
 
     var navHtml = "";
     if(periode === "semaine" || periode === "mois"){
-      var label = periode === "semaine" ? (formatDateFr(range.start) + " – " + formatDateFr(range.end)) : (moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1));
-      var refAujourdhui = periode === "semaine" ? getWeekRange(new Date()).start : getMonthRange(new Date()).start;
-      var estPeriodeActuelle = (periode === "semaine" ? ui.habitudesSemaineRef : ui.habitudesMoisRef) >= refAujourdhui;
-      var refPlusAncienneH = periode === "semaine" ? earliestActivityWeekStart() : earliestActivityMonthStart();
-      var estPeriodePlusAncienne = (periode === "semaine" ? ui.habitudesSemaineRef : ui.habitudesMoisRef) <= refPlusAncienneH;
-      navHtml = (
-        '<div class="etat-nav">' +
-          '<button type="button" class="en-btn" data-action="habitudes-nav" data-sens="-1" data-periode="' + periode + '"' + (estPeriodePlusAncienne?" disabled":"") + '>‹</button>' +
-          '<div class="en-label">' + esc(label) + '</div>' +
-          '<button type="button" class="en-btn" data-action="habitudes-nav" data-sens="1" data-periode="' + periode + '"' + (estPeriodeActuelle?" disabled":"") + '>›</button>' +
-        '</div>'
-      );
+      navHtml = renderNavPeriode("habitudes-nav", periode, periode === "semaine" ? ui.habitudesSemaineRef : ui.habitudesMoisRef);
     } else {
       navHtml = '<div class="etat-nav"><div class="en-label">' + esc(formatDateFr(todayStr())) + '</div></div>';
     }
@@ -2203,15 +3303,6 @@
       navHtml +
       topCard +
       breakdowns
-    );
-  }
-
-  function renderHabitudesOverlay(){
-    return (
-      '<div class="overlay-back">' +
-        '<button type="button" class="btn btn-ghost" data-action="fermer-overlay">‹ Retour</button>' +
-      '</div>' +
-      '<div class="overlay-body">' + renderHabitudes() + '</div>'
     );
   }
 
@@ -2432,26 +3523,8 @@
     if(!ui.telechargerMoisRef) ui.telechargerMoisRef = todayStr();
   }
   function shiftTelechargerRef(periode, delta){
-    if(periode === "semaine"){
-      var d = dateFromStr(ui.telechargerSemaineRef);
-      d.setDate(d.getDate() + 7*delta);
-      var nouveau = dateKey(d);
-      var refAujourdhui = getWeekRange(new Date()).start;
-      if(nouveau > refAujourdhui) nouveau = refAujourdhui;
-      var refPlusAncienne = earliestActivityWeekStart();
-      if(nouveau < refPlusAncienne) nouveau = refPlusAncienne;
-      ui.telechargerSemaineRef = nouveau;
-    } else if(periode === "mois"){
-      var d2 = dateFromStr(ui.telechargerMoisRef);
-      d2.setDate(1);
-      d2.setMonth(d2.getMonth() + delta);
-      var nouveau2 = dateKey(d2);
-      var refAujourdhuiM = getMonthRange(new Date()).start;
-      if(nouveau2 > refAujourdhuiM) nouveau2 = refAujourdhuiM;
-      var refPlusAncienM = earliestActivityMonthStart();
-      if(nouveau2 < refPlusAncienM) nouveau2 = refPlusAncienM;
-      ui.telechargerMoisRef = nouveau2;
-    }
+    if(periode === "semaine") ui.telechargerSemaineRef = decalerPeriode("semaine", ui.telechargerSemaineRef, delta);
+    else if(periode === "mois") ui.telechargerMoisRef = decalerPeriode("mois", ui.telechargerMoisRef, delta);
   }
 
   function renderTelechargerOverlay(){
@@ -2476,18 +3549,7 @@
 
     var navHtml = "";
     if(periode === "semaine" || periode === "mois"){
-      var label = periode === "semaine" ? (formatDateFr(range.start) + " – " + formatDateFr(range.end)) : (moisLabelFor(ref).charAt(0).toUpperCase() + moisLabelFor(ref).slice(1));
-      var refAujourdhui = periode === "semaine" ? getWeekRange(new Date()).start : getMonthRange(new Date()).start;
-      var estPeriodeActuelle = (periode === "semaine" ? ui.telechargerSemaineRef : ui.telechargerMoisRef) >= refAujourdhui;
-      var refPlusAncienneT = periode === "semaine" ? earliestActivityWeekStart() : earliestActivityMonthStart();
-      var estPeriodePlusAncienneT = (periode === "semaine" ? ui.telechargerSemaineRef : ui.telechargerMoisRef) <= refPlusAncienneT;
-      navHtml = (
-        '<div class="etat-nav">' +
-          '<button type="button" class="en-btn" data-action="telecharger-nav" data-sens="-1" data-periode="' + periode + '"' + (estPeriodePlusAncienneT?" disabled":"") + '>‹</button>' +
-          '<div class="en-label">' + esc(label) + '</div>' +
-          '<button type="button" class="en-btn" data-action="telecharger-nav" data-sens="1" data-periode="' + periode + '"' + (estPeriodeActuelle?" disabled":"") + '>›</button>' +
-        '</div>'
-      );
+      navHtml = renderNavPeriode("telecharger-nav", periode, periode === "semaine" ? ui.telechargerSemaineRef : ui.telechargerMoisRef);
     } else {
       navHtml = '<div class="etat-nav"><div class="en-label">' + esc(formatDateFr(todayStr())) + '</div></div>';
     }
@@ -2738,6 +3800,7 @@
           '<div class="onb-title" style="margin:0;">Réglages</div>' +
           '<button type="button" class="icon-btn" data-action="fermer-overlay">✕</button>' +
         '</div>' +
+        renderReglagesCaisse() +
         '<div class="reglages-section">' +
           '<div class="rs-title">Charges communes</div>' +
           rubRows +
@@ -2773,6 +3836,45 @@
     );
   }
 
+  // Sprint Revente-D : fonds de départ de la caisse (facultatif, 0 par défaut,
+  // modifiable à tout moment — la caisse à date est recalculée aussitôt).
+  function renderReglagesCaisse(){
+    var fonds = fondsDepartCaisse();
+    var valeur = ui.draft["f-fondsDepart"] !== undefined ? ui.draft["f-fondsDepart"] : (fonds > 0 ? String(fonds) : "");
+    return (
+      '<div class="reglages-section" id="reglages-caisse">' +
+        '<div class="rs-title">Caisse</div>' +
+        '<div class="field" style="margin-bottom:8px;"><div class="label">Fonds de départ de la caisse (FCFA)</div>' +
+          '<div class="inline-new" style="margin-top:0;">' +
+            '<input type="number" inputmode="numeric" step="1" min="0" class="input" id="f-fondsDepart" placeholder="0" value="' + esc(valeur) + '" data-action-change="capture-fonds-depart">' +
+            '<button type="button" class="btn btn-secondary" data-action="enregistrer-fonds-depart">Enregistrer</button>' +
+          '</div>' +
+          (ui.fondsErreur ? '<div class="field-error">' + esc(ui.fondsErreur) + '</div>' : '') +
+        '</div>' +
+        (ui.fondsMsg ? '<div class="hint tight" style="margin-bottom:6px; color:var(--green);" data-test="fonds-msg">' + esc(ui.fondsMsg) + '</div>' : '') +
+        '<div class="hint tight">Facultatif : l’argent qui était déjà dans la caisse quand vous avez commencé. Laissez vide (0) si vous partez de rien.</div>' +
+      '</div>'
+    );
+  }
+  function enregistrerFondsDepart(){
+    var champ = byId("f-fondsDepart");
+    var brut = champ ? String(champ.value || "").trim() : String(ui.draft["f-fondsDepart"] || "").trim();
+    var n = brut === "" ? 0 : toNum(brut);
+    if(!isFinite(n) || n < 0 || (brut !== "" && isNaN(parseFloat(brut.replace(",", "."))))){
+      ui.fondsErreur = "Indiquez un montant positif, ou laissez vide pour 0.";
+      ui.fondsMsg = "";
+      ui.draft["f-fondsDepart"] = brut;
+      render();
+      return;
+    }
+    state.config.fondsDepartCaisse = Math.round(n);
+    saveState();
+    ui.fondsErreur = "";
+    ui.fondsMsg = "Fonds de départ enregistré : " + formatFCFA(state.config.fondsDepartCaisse) + ".";
+    ui.draft["f-fondsDepart"] = undefined;
+    render();
+  }
+
   function renderApropos(){
     return (
       '<div class="onb">' +
@@ -2784,12 +3886,34 @@
         '<div class="about-line">MonDjai/Revente vous aide à suivre vos achats, vos ventes et votre stock, sans jugement et sans calcul compliqué.</div>' +
         '<div class="about-line">Vos données restent uniquement sur ce téléphone — rien n’est envoyé sur internet.</div>' +
         '<div class="about-line">Le bénéfice réalisé est calculé produit par produit, à partir du coût moyen d’achat — c’est lui qui sert de base à votre épargne automatique, pas le montant total encaissé.</div>' +
+        '<div class="about-line">Pour une commande spéciale, seule la marge est comptée (montant encaissé − prix payé au revendeur) : le reste ne fait que passer de la cliente au revendeur.</div>' +
+        '<div class="about-line">La caisse à date part de votre fonds de départ, ajoute les ventes et retire les sorties de caisse : achats payés avec la caisse, charges communes et épargne mise de côté. Elle se reporte toute seule d’un mois à l’autre.</div>' +
         '<div class="about-line">Troisième application de la famille, après Coiffure : Pédicure/Manicure arrivera plus tard en application indépendante, avec une fusion prévue par la suite.</div>' +
         '<div class="about-line">Le code PIN est un verrou de confort, pas un chiffrement fort — à ne jamais présenter comme une sécurité absolue.</div>' +
         '<div class="about-line">Votre accès est valable jusqu’à la fin du mois en cours ; le renouvellement se fait localement, sans connexion, à l’aide d’un code que l’on vous communique.</div>' +
-        '<div class="about-line">Version : Sprint Revente-B — accès mensuel calendaire et choix du dossier de sauvegarde.</div>' +
+        '<div class="about-line">Les mises à jour de l’application s’installent toutes seules à l’ouverture, sans rien désinstaller et sans toucher à vos données.</div>' +
+        '<div class="about-line" data-test="version-app">Version : <b style="color:var(--text);">' + esc(VERSION_APP) + '</b></div>' +
+        '<div class="about-line" id="apropos-cache" style="font-size:12px;">Hors ligne : vérification…</div>' +
       '</div>'
     );
+  }
+
+  // Affiche le nom du cache hors ligne réellement actif sur ce téléphone (lu
+  // localement, aucun appel réseau) : permet de vérifier que sw.js a bien été
+  // remplacé en même temps qu'index.html.
+  function afficherCacheActifApropos(){
+    var el = byId("apropos-cache");
+    if(!el) return;
+    if(!("caches" in window)){ el.textContent = "Hors ligne : non disponible sur ce navigateur."; return; }
+    caches.keys().then(function(keys){
+      var miens = keys.filter(function(k){ return k.indexOf("mondjai-revente-") === 0; }).sort();
+      var cible = byId("apropos-cache");
+      if(!cible) return;
+      cible.textContent = miens.length ? ("Hors ligne : prêt (" + miens.join(", ") + ")") : "Hors ligne : en préparation (ouvrez l’application une fois connectée).";
+    }).catch(function(){
+      var cible = byId("apropos-cache");
+      if(cible) cible.textContent = "Hors ligne : état inconnu.";
+    });
   }
 
   /* ================= Actions ================= */
@@ -2801,9 +3925,11 @@
     render();
   }
   function closeModal(){
+    // Sprint Revente-E : les niveaux « retour » forment une pile (ex. liste du
+    // jour → détail → modification ; « Ce mois-ci » → détail de la caisse).
     if(ui.modalReturnTo){
       var back = ui.modalReturnTo;
-      ui.modalReturnTo = null;
+      ui.modalReturnTo = back.returnTo || null;
       openModal(back.type, back.extra);
       return;
     }
@@ -2826,11 +3952,40 @@
     if(action === "fermer-modal"){ closeModal(); return; }
 
     switch(action){
-      case "ouvrir-reglages": ui.overlay = "reglages"; ui.reglagesMsg = ""; render(); return;
+      case "maj-recharger": rechargerPourMaj(false); return;
+      case "ouvrir-reglages": ui.overlay = "reglages"; ui.reglagesMsg = ""; ui.fondsMsg = ""; ui.fondsErreur = ""; ui.draft["f-fondsDepart"] = undefined; render(); return;
+      // Sprint Revente-D : caisse
+      // Sprint Revente-E : ouvert depuis « Ce mois-ci », le détail de la caisse
+      // y ramène quand on le ferme (2 niveaux pour le bouton retour).
+      case "voir-detail-caisse": {
+        if(ui.modal && ui.modal.type === "ce-mois") empilerModale();
+        openModal("detail-caisse");
+        return;
+      }
+      case "voir-ce-mois": ui.modalReturnTo = null; openModal("ce-mois"); return;
+      // Sprint Revente-E : modification d'un achat / d'une vente
+      case "modifier-enregistrement": ouvrirModification(el.getAttribute("data-kind"), el.getAttribute("data-id")); return;
+      case "enregistrer-modif-achat": enregistrerModifAchat(); return;
+      case "enregistrer-modif-vente": enregistrerModifVente(); return;
+      case "modifier-fonds-depuis-caisse": {
+        ui.modal = null; ui.modalReturnTo = null; ui.draft = {}; ui.errors = {};
+        ui.overlay = "reglages"; ui.reglagesMsg = ""; ui.fondsMsg = ""; ui.fondsErreur = "";
+        ui.pendingAutofocus = false;
+        render();
+        var champFonds = byId("f-fondsDepart");
+        if(champFonds){ try{ champFonds.scrollIntoView({ block:"center" }); }catch(eScroll){} }
+        return;
+      }
+      case "enregistrer-fonds-depart": enregistrerFondsDepart(); return;
+      case "set-source-paiement": {
+        captureDraft(ACHAT_FIELDS);
+        ui.draft["f-sourcePaiement"] = el.getAttribute("data-val") === "autre" ? "autre" : "caisse";
+        render();
+        return;
+      }
       case "fermer-overlay": ui.overlay = null; ui.objDraft = null; render(); return;
       case "ouvrir-apropos": ui.overlay = "apropos"; render(); return;
       case "fermer-apropos": ui.overlay = "reglages"; render(); return;
-      case "ouvrir-habitudes": ui.overlay = "habitudes"; render(); return;
       case "ouvrir-telecharger": ui.overlay = "telecharger"; render(); return;
 
       case "ouvrir-objectif": ui.overlay = "objectif"; render(); return;
@@ -3036,6 +4191,31 @@
         return;
       }
 
+      // Sprint Revente-C : onglet Achats (sous-vues + Jour/Semaine/Mois).
+      // Sprint Revente-E : plus de drill-down ; mois propre à « Stock & réappro ».
+      case "achats-vue": ui.achatsVue = el.getAttribute("data-val") === "stock" ? "stock" : "details"; render(); return;
+      case "achats-set-periode": {
+        ensureAchatsRefs();
+        ui.achatsPeriode = el.getAttribute("data-val");
+        render();
+        return;
+      }
+      case "achats-nav": {
+        var asens = parseInt(el.getAttribute("data-sens"), 10);
+        var aper = el.getAttribute("data-periode");
+        ensureAchatsRefs();
+        if(aper === "semaine") ui.achatsSemaineRef = decalerPeriode("semaine", ui.achatsSemaineRef, asens);
+        else if(aper === "mois") ui.achatsMoisRef = decalerPeriode("mois", ui.achatsMoisRef, asens);
+        render();
+        return;
+      }
+      case "stock-nav": {
+        ensureStockMoisRef();
+        ui.stockMoisRef = decalerPeriode("mois", ui.stockMoisRef, parseInt(el.getAttribute("data-sens"), 10));
+        render();
+        return;
+      }
+
       case "habitudes-set-periode": ensureHabitudesRefs(); ui.habitudesPeriode = el.getAttribute("data-val"); render(); return;
       case "habitudes-nav": {
         var hsens = parseInt(el.getAttribute("data-sens"), 10);
@@ -3119,14 +4299,18 @@
     if(!action) return;
     switch(action){
       case "capture-achat": {
+        // Sprint Revente-C : on ne redessine plus le formulaire à chaque champ
+        // quitté (comme pour Ventes) — sinon le champ suivant touché perdait le
+        // focus et il fallait le toucher deux fois.
         captureDraft(ACHAT_FIELDS);
-        if(el.id === "f-produitSel"){ onProduitAchatChange(); }
-        render();
+        if(el.id === "f-produitSel"){ onProduitAchatChange(); render(); }
+        if(el.id === "f-date") majNoteMoisPasse();   // Sprint Revente-E (modification)
         return;
       }
       case "capture-vente": {
         captureDraft(VENTE_FIELDS);
         if(el.id === "f-produitSel"){ render(); }
+        if(el.id === "f-date") majNoteMoisPasse();   // Sprint Revente-E (modification)
         return;
       }
       case "produit-achat-change": {
@@ -3164,6 +4348,7 @@
       }
       case "capture-autre-charge": captureDraft(["f-montantAutreCharge"]); return;
       case "capture-nouvelle-rubrique": ui.draft["f-nouvelleRubrique"] = el.value; return;
+      case "capture-fonds-depart": ui.draft["f-fondsDepart"] = el.value; ui.fondsMsg = ""; return;
       case "importer-json": case "importer-json-lock": {
         var file = el.files && el.files[0];
         importerJsonDepuisFichier(file, function(ok){
@@ -3179,32 +4364,279 @@
     }
   }
 
+  /* ================= Sprint Revente-C : bouton retour du téléphone ================= */
+  // Chaque niveau de navigation au-dessus de l'écran d'accueil (Aujourd'hui,
+  // rien d'ouvert) correspond à une entrée d'historique (history.pushState).
+  // Le bouton retour d'Android déclenche « popstate » : on remonte alors d'UN
+  // niveau dans l'application — fermer la modale, remonter le drill-down,
+  // quitter l'écran secondaire, revenir de l'onglet courant à Aujourd'hui.
+  // Depuis Aujourd'hui sans rien d'ouvert, aucune entrée n'est empilée : le
+  // bouton retour quitte alors l'application, comme attendu. Rien n'est empilé
+  // sur l'écran Code d'accès ni sur le verrouillage PIN.
+  // La profondeur est recalculée à chaque rendu (profondeurUi) et l'historique
+  // est aligné dessus : les boutons « ‹ Retour » / ✕ de l'application et le
+  // bouton retour du téléphone restent ainsi toujours cohérents.
+
+  var navHist = { actif:false, profondeur:0, popsIgnores:0 };
+
+  function estEcranPorte(){
+    return !state.config.codeAccesOk || accesMensuelExpire() || ui.locked;
+  }
+  function profondeurDrill(){
+    if(ui.tab === "etat"){
+      if(ui.etatPeriode === "semaine") return ui.etatSelJour ? 1 : 0;
+      if(ui.etatPeriode === "mois") return (ui.etatSelSemaine ? 1 : 0) + (ui.etatSelJour ? 1 : 0);
+      return 0;
+    }
+    // Sprint Revente-E : l'onglet Achats n'a plus de drill-down.
+    return 0;
+  }
+  function objectifEnCreationEtape2(){
+    return ui.overlay === "objectif" && !state.objectifEpargne && !!ui.objDraft && ui.objDraft.step === "form";
+  }
+  function profondeurUi(){
+    if(estEcranPorte()) return 0;
+    var p = 0;
+    if(ui.tab !== "aujourdhui") p += 1;
+    p += profondeurDrill();
+    if(ui.overlay){
+      p += 1;
+      if(ui.overlay === "apropos") p += 1;          // À propos s'ouvre depuis Réglages
+      if(objectifEnCreationEtape2()) p += 1;        // 2e étape de création d'objectif
+    }
+    if(ui.modal){
+      p += 1;
+      // Une modale ouverte depuis une autre compte un niveau de plus par
+      // niveau empilé (Sprint Revente-E : liste du jour → détail →
+      // modification ; « Ce mois-ci » → détail de la caisse).
+      for(var r = ui.modalReturnTo; r; r = r.returnTo) p += 1;
+      if(ui.modal.confirmDelete || ui.modal.confirmErase) p += 1;
+    }
+    return p;
+  }
+
+  // Remonte d'UN niveau (appelé par le bouton retour du téléphone).
+  function retourUnNiveau(){
+    if(ui.modal){
+      if(ui.modal.confirmDelete){ ui.modal.confirmDelete = false; render(); return; }
+      if(ui.modal.confirmErase){ ui.modal.confirmErase = false; render(); return; }
+      closeModal();
+      return;
+    }
+    if(ui.overlay){
+      if(ui.overlay === "apropos"){ ui.overlay = "reglages"; render(); return; }
+      if(objectifEnCreationEtape2()){ ui.objDraft.step = "modele"; render(); return; }
+      ui.overlay = null; ui.objDraft = null;
+      render();
+      return;
+    }
+    if(ui.tab === "etat" && (ui.etatSelJour || ui.etatSelSemaine)){
+      if(ui.etatSelJour){ ui.etatSelJour = null; ui.etatSelJourFrom = null; }
+      else ui.etatSelSemaine = null;
+      render();
+      return;
+    }
+    if(ui.tab !== "aujourdhui"){ ui.tab = "aujourdhui"; render(); return; }
+    render();
+  }
+
+  function synchroniserHistorique(){
+    if(!navHist.actif || navHist.popsIgnores > 0) return;
+    var cible = profondeurUi();
+    if(cible > navHist.profondeur){
+      while(navHist.profondeur < cible){
+        navHist.profondeur++;
+        try{ history.pushState({ mdjRevente:1, profondeur:navHist.profondeur }, ""); }
+        catch(e){ navHist.actif = false; return; }
+      }
+    } else if(cible < navHist.profondeur){
+      var n = navHist.profondeur - cible;
+      navHist.profondeur = cible;
+      navHist.popsIgnores++;
+      try{ history.go(-n); }catch(e){ navHist.popsIgnores--; }
+    }
+  }
+
+  function initialiserHistorique(){
+    try{
+      if(!window.history || typeof history.pushState !== "function") return;
+      var st = history.state;
+      if(st && st.mdjRevente && typeof st.profondeur === "number"){
+        // Rechargement de la page : des entrées existent déjà, l'interface
+        // repart de l'accueil → elles seront retirées au premier rendu.
+        navHist.profondeur = st.profondeur;
+      } else {
+        history.replaceState({ mdjRevente:1, profondeur:0 }, "");
+        navHist.profondeur = 0;
+      }
+      navHist.actif = true;
+    }catch(e){ navHist.actif = false; return; }
+
+    window.addEventListener("popstate", function(e){
+      if(!navHist.actif) return;
+      var st = e.state;
+      var prof = (st && st.mdjRevente && typeof st.profondeur === "number") ? st.profondeur : 0;
+      if(navHist.popsIgnores > 0){
+        // Retour déclenché par l'application elle-même (synchronisation).
+        navHist.popsIgnores--;
+        navHist.profondeur = prof;
+        synchroniserHistorique();
+        return;
+      }
+      navHist.profondeur = prof;
+      if(estEcranPorte()){ synchroniserHistorique(); return; }
+      retourUnNiveau();
+    });
+  }
+
+  /* ================= Sprint Revente-C : mise à jour automatique ================= */
+  // Quand Hamadou remplace index.html ET sw.js sur GitHub (en changeant le
+  // numéro VERSION_CACHE de sw.js), le téléphone le détecte tout seul :
+  //  - vérification à chaque ouverture et à chaque retour au premier plan
+  //    (registration.update(), silencieux, ignoré hors ligne) ;
+  //  - le nouveau service worker s'installe, prend le contrôle
+  //    (« controllerchange ») et la page se recharge UNE seule fois, seulement
+  //    si c'est sans risque : Aujourd'hui sans rien d'ouvert, aucun formulaire,
+  //    aucune saisie de code d'accès / PIN en cours ;
+  //  - sinon, une petite bannière non bloquante propose « Mettre à jour », et
+  //    le rechargement se fait quand la personne revient sur Aujourd'hui.
+  // Les données (localStorage, clé mondjai_revente_state_v1) ne sont jamais
+  // touchées : l'application enregistre à chaque action, et on vérifie avant
+  // tout rechargement qu'aucune écriture n'est en attente.
+
+  var MAJ_CLE_SESSION = "mondjai_revente_maj_auto";
+  var maj = { prete:false, rechargementLance:false };
+  var swRegistration = null;
+  var swControleurAuDemarrage = false;
+  // Garde-fou anti-boucle : une page elle-même issue d'un rechargement
+  // automatique ne se recharge plus automatiquement pendant 10 secondes
+  // (la bannière prend le relais).
+  var pageIssueDunRechargementAuto = false;
+  try{ pageIssueDunRechargementAuto = sessionStorage.getItem(MAJ_CLE_SESSION) === "1"; }catch(e){}
+  if(pageIssueDunRechargementAuto){
+    setTimeout(function(){
+      try{ sessionStorage.removeItem(MAJ_CLE_SESSION); }catch(e){}
+      pageIssueDunRechargementAuto = false;
+    }, 10000);
+  }
+
+  function assurerEtatEnregistre(){
+    // saveState() est synchrone et appelé à chaque action : en pratique rien
+    // n'est jamais en attente. Par sécurité, si l'état en mémoire diffère de
+    // celui enregistré (ex. migration non encore écrite), on l'écrit.
+    try{
+      var stocke = localStorage.getItem(STORAGE_KEY);
+      if(stocke !== null && stocke !== JSON.stringify(state)) saveState();
+    }catch(e){}
+  }
+  function rechargementSansRisque(){
+    var actif = document.activeElement;
+    if(actif && /^(INPUT|TEXTAREA|SELECT)$/.test(actif.tagName) && actif.value) return false;
+    if(!state.config.codeAccesOk || accesMensuelExpire()){
+      var champ = byId("f-codeAcces");
+      return !((champ && champ.value) || "").trim() && !(ui.codeAccesInput || "").trim();
+    }
+    if(ui.locked) return !ui.modal && !(ui.pinLockInput || "");
+    return !ui.modal && !ui.overlay && ui.tab === "aujourdhui";
+  }
+  function rechargerPourMaj(automatique){
+    if(maj.rechargementLance) return;
+    maj.rechargementLance = true;
+    assurerEtatEnregistre();
+    try{ if(automatique) sessionStorage.setItem(MAJ_CLE_SESSION, "1"); }catch(e){}
+    location.reload();
+  }
+  function afficherBanniereMaj(){
+    if(byId("maj-banner")) return;
+    var b = document.createElement("div");
+    b.id = "maj-banner";
+    b.setAttribute("role", "status");
+    b.innerHTML = '<div class="mb-text">Une nouvelle version est prête</div>' +
+      '<button type="button" class="mb-btn" data-action="maj-recharger">Mettre à jour</button>';
+    document.body.appendChild(b);
+    try{ document.body.classList.add("maj-visible"); }catch(e){}
+  }
+  // Appelée après chaque rendu et à la prise de contrôle d'une nouvelle version.
+  function verifierMajEnAttente(){
+    if(!maj.prete || maj.rechargementLance) return;
+    if(!pageIssueDunRechargementAuto && rechargementSansRisque()){
+      rechargerPourMaj(true);
+      return;
+    }
+    afficherBanniereMaj();
+  }
+  function verifierMiseAJourSw(){
+    if(!swRegistration) return;
+    if(navigator.onLine === false) return;   // hors ligne : rien à vérifier, aucune erreur
+    try{
+      var p = swRegistration.update();
+      if(p && typeof p.catch === "function") p.catch(function(){});
+    }catch(e){}
+  }
+  function enregistrerServiceWorker(){
+    if(!("serviceWorker" in navigator)) return;
+    // Premier lancement (aucun service worker ne contrôlait la page) : la prise
+    // de contrôle qui suit l'installation ne doit PAS recharger la page.
+    swControleurAuDemarrage = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", function(){
+      if(!swControleurAuDemarrage){ swControleurAuDemarrage = true; return; }
+      maj.prete = true;
+      verifierMajEnAttente();
+    });
+    var demarrer = function(){
+      navigator.serviceWorker.register("sw.js").then(function(reg){
+        swRegistration = reg;
+        if(swControleurAuDemarrage) verifierMiseAJourSw();
+      }).catch(function(){});
+    };
+    if(document.readyState === "complete") demarrer();
+    else window.addEventListener("load", demarrer);
+    document.addEventListener("visibilitychange", function(){
+      if(document.visibilityState === "visible") verifierMiseAJourSw();
+    });
+  }
+
   /* ================= Démarrage ================= */
 
   document.addEventListener("click", handleClick);
   document.addEventListener("change", handleChange);
+  window.addEventListener("resize", mesurerBarreDuBas);
 
   state = loadState();
   ui.locked = !!(state.config.pinActif && state.config.pinCode);
+  initialiserHistorique();
   render();
-
-  if("serviceWorker" in navigator){
-    window.addEventListener("load", function(){
-      navigator.serviceWorker.register("sw.js").catch(function(){});
-    });
-  }
+  enregistrerServiceWorker();
 
   window.__mondjaiRevente = {
     getState: function(){ return state; },
     setState: function(s){ state = s; saveState(); render(); },
     render: render,
     STORAGE_KEY: STORAGE_KEY,
+    VERSION_APP: VERSION_APP,
     normaliserEtatImporte: normaliserEtatImporte,
     defaultState: defaultState,
     codeAccesDuMois: codeAccesDuMois,
     codeAccesDuMoisAttenduAujourdhui: codeAccesDuMoisAttenduAujourdhui,
     accesMensuelExpire: accesMensuelExpire,
-    finEssaiPourInstallation: finEssaiPourInstallation
+    finEssaiPourInstallation: finEssaiPourInstallation,
+    profondeurUi: profondeurUi,
+    mouvementsStock: mouvementsStock,
+    // Sprint Revente-D (lecture seule, pour les tests)
+    montantComptabiliseVente: montantComptabiliseVente,
+    caisseADate: caisseADate,
+    syntheseCaisseMois: syntheseCaisseMois,
+    beneficeReventePeriode: beneficeReventePeriode,
+    beneficeReventeTotal: beneficeReventeTotal,
+    computeStockProduit: computeStockProduit,
+    // Sprint Revente-E (lecture seule, pour les tests)
+    etatUi: function(){
+      var pile = [];
+      for(var r = ui.modalReturnTo; r; r = r.returnTo) pile.push(r.type);
+      return { tab: ui.tab, overlay: ui.overlay, modale: ui.modal ? ui.modal.type : null, pile: pile,
+        achatsVue: ui.achatsVue, achatsPeriode: ui.achatsPeriode, stockMoisRef: ui.stockMoisRef };
+    },
+    etatMaj: function(){ return { prete: maj.prete, rechargementLance: maj.rechargementLance, banniere: !!byId("maj-banner") }; }
   };
 })();
 </script>

@@ -1,18 +1,32 @@
 {
-  "name": "MonDjai / Revente",
+  "name": "MonDjai/Revente",
   "short_name": "Revente",
-  "description": "Suivi des achats, ventes, stock, épargne et charges pour une activité de revente.",
-  "start_url": "./index.html",
+  "description": "Achats, ventes, stock et caisse — revente de mèches, 100 % hors ligne.",
+  "lang": "fr",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#11141a",
   "theme_color": "#11141a",
-  "lang": "fr",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

@@ -1,14 +1,23 @@
-// MonDjai/Revente — service worker minimal.
-// Met en cache l'app shell (index.html, manifest, icônes) pour permettre une
-// ouverture hors ligne une fois la PWA installée. Stratégie : cache d'abord,
-// réseau en secours, puis repli sur index.html si tout échoue (navigation).
-// Aucune requête vers un service tiers : seuls les fichiers de l'app elle-même
-// sont mis en cache.
+// MonDjai/Revente — service worker (Sprint Revente-E ; mécanisme inchangé depuis le Sprint C).
+//
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  POUR PUBLIER UNE NOUVELLE VERSION : remplacer index.html ET sw.js    ║
+// ║  sur GitHub, en changeant seulement ce numéro (3 → 4 → 5…).          ║
+// ║  Les téléphones se mettent à jour seuls à l'ouverture suivante,       ║
+// ║  sans installation ni désinstallation, sans toucher aux données.      ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+var VERSION_CACHE = "5";
 
-var CACHE_NAME = "mondjai-revente-v1";
-var APP_SHELL = [
-  "./",
-  "./index.html",
+// Tous les caches de cette application commencent par ce préfixe. Seuls
+// ceux-là sont supprimés lors d'une mise à jour : jamais les caches d'une
+// autre application MonDjai hébergée à la même adresse (Coiffure, Salon F…).
+var PREFIXE_CACHE = "mondjai-revente-";
+var CACHE_NAME = PREFIXE_CACHE + "v" + VERSION_CACHE;
+
+// Fichier indispensable : l'application elle-même.
+var URL_INDEX = new URL("./index.html", self.location.href).href;
+// Fichiers facultatifs : un fichier absent ne fait jamais échouer l'installation.
+var FICHIERS_OPTIONNELS = [
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
@@ -16,50 +25,111 @@ var APP_SHELL = [
   "./favicon.ico"
 ];
 
+// Rappel : un service worker n'a pas accès au localStorage. Ce fichier ne lit,
+// n'écrit ni n'efface donc jamais les données de l'utilisatrice
+// (clé mondjai_revente_state_v1) — seulement le cache des fichiers de l'appli.
+
+/* ---------- Installation ---------- */
 self.addEventListener("install", function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(APP_SHELL);
+      // index.html : toujours redemandé au serveur (cache:"reload" contourne le
+      // cache HTTP de GitHub Pages, qui peut garder l'ancien fichier ~10 min).
+      // S'il est injoignable, l'installation échoue et l'ancienne version reste
+      // en place, intacte — le navigateur réessaiera à l'ouverture suivante.
+      return cache.add(new Request(URL_INDEX, { cache: "reload" })).then(function () {
+        return Promise.all(FICHIERS_OPTIONNELS.map(function (chemin) {
+          var url = new URL(chemin, self.location.href).href;
+          return fetch(new Request(url, { cache: "reload" })).then(function (rep) {
+            if (rep && rep.ok) return cache.put(url, rep);
+          }).catch(function () { /* fichier absent ou réseau capricieux : on continue */ });
+        }));
+      });
     }).then(function () {
+      // La nouvelle version prend la main tout de suite (pas d'attente que
+      // toutes les fenêtres soient fermées) ; la page se recharge ensuite d'elle-
+      // même, une seule fois, quand c'est sans risque (voir index.html).
       return self.skipWaiting();
     })
   );
 });
 
+/* ---------- Activation ---------- */
 self.addEventListener("activate", function (event) {
   event.waitUntil(
-    caches.keys().then(function (keys) {
-      return Promise.all(
-        keys.filter(function (k) { return k !== CACHE_NAME; })
-          .map(function (k) { return caches.delete(k); })
-      );
+    caches.keys().then(function (cles) {
+      return Promise.all(cles.filter(function (cle) {
+        return cle.indexOf(PREFIXE_CACHE) === 0 && cle !== CACHE_NAME;
+      }).map(function (cle) {
+        return caches.delete(cle);
+      }));
     }).then(function () {
       return self.clients.claim();
     })
   );
 });
 
+/* ---------- Requêtes ---------- */
+
+// La page de l'application elle-même : le dossier (…/revente/) ou index.html.
+function estPageApplication(url) {
+  var dossier = new URL("./", self.location.href).pathname;
+  return url.pathname === dossier || url.pathname === dossier + "index.html";
+}
+
+// Rafraîchissement silencieux en arrière-plan : si index.html (ou une icône)
+// a changé sur GitHub, la copie en cache est remplacée pour l'ouverture
+// suivante — filet de sécurité si sw.js n'a pas été remplacé en même temps.
+function rafraichir(cache, cle, urlReseau) {
+  return fetch(new Request(urlReseau, { cache: "no-cache" })).then(function (rep) {
+    if (rep && rep.ok && rep.type === "basic") {
+      return cache.put(cle, rep.clone()).then(function () { return rep; }, function () { return rep; });
+    }
+    return rep;
+  });
+}
+
 self.addEventListener("fetch", function (event) {
-  if (event.request.method !== "GET") return;
+  var req = event.request;
+  if (req.method !== "GET") return;
+  var url = new URL(req.url);
+  // Même adresse uniquement : ce service worker ne contacte jamais un autre domaine.
+  if (url.origin !== self.location.origin) return;
+
+  var navigation = req.mode === "navigate";
+  var pageApp = navigation && estPageApplication(url);
+  var cle = pageApp ? URL_INDEX : req;
+  var urlReseau = pageApp ? URL_INDEX : req.url;
+
+  // Le rafraîchissement en arrière-plan doit pouvoir se terminer après la
+  // réponse : on prolonge la vie du service worker jusqu'à sa fin.
+  var finArrierePlan;
+  event.waitUntil(new Promise(function (resolve) { finArrierePlan = resolve; }));
 
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      var networkFetch = fetch(event.request).then(function (response) {
-        if (response && response.status === 200) {
-          var copy = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
-            cache.put(event.request, copy);
-          });
+    caches.open(CACHE_NAME).then(function (cache) {
+      return cache.match(cle).then(function (enCache) {
+        if (enCache) {
+          // Cache d'abord : ouverture instantanée, même hors ligne.
+          if (self.navigator.onLine !== false) {
+            rafraichir(cache, cle, urlReseau).catch(function () {}).then(finArrierePlan);
+          } else {
+            finArrierePlan();
+          }
+          return enCache;
         }
-        return response;
-      }).catch(function () {
-        if (event.request.mode === "navigate") {
-          return caches.match("./index.html");
-        }
-        return cached;
+        finArrierePlan();
+        // Pas encore en cache : réseau, puis repli hors ligne.
+        return rafraichir(cache, cle, urlReseau).catch(function () {
+          if (navigation) {
+            return cache.match(URL_INDEX).then(function (index) { return index || Response.error(); });
+          }
+          return Response.error();
+        });
       });
-
-      return cached || networkFetch;
+    }).catch(function () {
+      finArrierePlan();
+      return fetch(req);
     })
   );
 });
