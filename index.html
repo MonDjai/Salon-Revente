@@ -9,7 +9,40 @@
 <link rel="icon" href="favicon.ico" sizes="any" />
 <link rel="icon" href="icon-192.png" type="image/png" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<script>
+  // Sprint Revente-F — thème posé AVANT le premier affichage (aucun éclair
+  // sombre ou blanc au démarrage, au rechargement de mise à jour ni à l'écran
+  // du code d'accès). Lit seulement le choix enregistré (state.config.theme :
+  // 'clair' | 'auto' | 'sombre' ; absent = 'clair'). Aucun appel réseau.
+  // Même méthode que MonDjai/Coiffure (Sprint 8D).
+  (function(){
+    var t = "clair", porte = true;
+    try{
+      var s = JSON.parse(localStorage.getItem("mondjai_revente_state_v1") || "null");
+      var c = s && s.config ? s.config : null;
+      var choix = c ? c.theme : null;
+      if(choix === "sombre") t = "sombre";
+      else if(choix === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) t = "sombre";
+      // Écran de départ sans bandeau (code d'accès, code PIN) ?
+      porte = !(c && c.codeAccesOk) || !!(c.pinActif && c.pinCode);
+    }catch(e){}
+    var html = document.documentElement;
+    html.setAttribute("data-theme", t);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute("content", t === "sombre" ? "#11141a" : (porte ? "#eff1f4" : "#141922"));
+  })();
+</script>
 <style>
+  /* =====================================================================
+     Sprint Revente-F — thème clair « bandeau MonDjai » (variante B validée
+     le 17/10/2026, livrée dans Coiffure au Sprint 8D) et thème sombre (rendu
+     du Sprint Revente-E conservé). UNE seule source de couleurs : les
+     variables ci-dessous, en deux jeux de valeurs. :root = sombre (valeurs
+     exactes de Revente-E) ; html[data-theme="clair"] = clair (contraste des
+     textes ≥ 4,5:1). L'attribut data-theme est posé sur <html> avant le
+     premier affichage par le petit script de <head> (aucun éclair).
+     Noms de variables identiques à MonDjai/Coiffure (Sprint 8D).
+     ===================================================================== */
   :root{
     --bg:#11141a;
     --card:#1b2029;
@@ -17,8 +50,13 @@
     --border:#2a303c;
     --text:#eef1f6;
     --text-dim:#b7bfcc;
+    /* Ambre « texte » (liens, pourcentages, onglet actif, montants) et ambre
+       « remplissage » (bouton « + », boutons principaux, interrupteurs,
+       pastilles du PIN, coches), toujours avec --on-accent dessus. */
     --accent:#f5a623;
+    --accent-fill:#f5a623;
     --accent-dark:#c9840f;
+    --on-accent:#1b1200;
     --green:#34b37e;
     --red:#ff6b5e;
     --blue:#5b8def;
@@ -26,8 +64,8 @@
     --pink:#e8788c;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
-    /* Sprint Revente-E : finitions visuelles (« chic, sobre ») — bordures
-       fines et discrètes, léger dégradé + ombre douce, rayons harmonisés. */
+    /* Sprint Revente-E : bordures fines et discrètes, léger dégradé + ombre
+       douce, rayons harmonisés. */
     --line:rgba(255,255,255,.075);
     --card-grad:linear-gradient(180deg,#1f252f 0%,#1a1f28 100%);
     --shadow:inset 0 1px 0 rgba(255,255,255,.035), 0 8px 18px -10px rgba(0,0,0,.65);
@@ -35,11 +73,185 @@
     --r-lg:18px;
     --r-md:14px;
     --r-sm:11px;
+    --filet:linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,0));
+
+    /* Bandeau MonDjai (en-tête) : sombre dans les deux thèmes. */
+    --bandeau:#141922;
+    --bandeau-text:#eef1f6;
+    --bandeau-text-dim:#b7bfcc;
+    --bandeau-line:rgba(255,255,255,.075);
+    --bandeau-card-grad:linear-gradient(180deg,#1f252f 0%,#1a1f28 100%);
+    --bandeau-card-2:#20262f;
+    --bandeau-shadow-sm:inset 0 1px 0 rgba(255,255,255,.03), 0 3px 8px -4px rgba(0,0,0,.5);
+    --bandeau-filet:linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,0));
+    --header-bg:linear-gradient(180deg,#181d26,#12161d);
+    --header-border:1px solid rgba(255,255,255,.075);
+    --header-shadow:0 10px 18px -16px rgba(0,0,0,.9);
+
+    /* Barre du bas, feuilles du bas, bannière de mise à jour */
+    --tabbar-bg:linear-gradient(180deg,#171c24,#13171e);
+    --tabbar-shadow:0 -10px 22px -16px rgba(0,0,0,.9);
+    --tab-actif-bg:rgba(245,166,35,.17);
+    --tab-actif-ring:rgba(245,166,35,.42);
+    --overlay:rgba(5,7,10,.62);
+    --modal-bg:linear-gradient(180deg,#171c24 0px,#11141a 160px);
+    --modal-border:rgba(255,255,255,.1);
+    --modal-shadow:0 -14px 34px rgba(0,0,0,.5);
+    --modal-poignee:#3c4352;
+    --maj-bg:#1f2632;
+    --maj-shadow:0 8px 24px rgba(0,0,0,.45);
+
+    /* Boutons et contrôles */
+    --btn2-border:rgba(255,255,255,.1);
+    --fab-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 10px 22px -6px rgba(245,166,35,.5);
+    --seg-shadow:inset 0 1px 3px rgba(0,0,0,.35);
+    --choice-sel-bg:linear-gradient(135deg,#241d10,#1c2029);
+    --switch-knob:#fff;
+
+    /* Cartes particulières */
+    --dash-solde-bg:radial-gradient(120% 90% at 50% 0%, rgba(245,166,35,.07), rgba(245,166,35,0) 60%), linear-gradient(180deg,#1f252f 0%,#1a1f28 100%);
+    --carte-bandeau-shadow:inset 0 1px 0 rgba(255,255,255,.035), 0 8px 18px -10px rgba(0,0,0,.65);
+    --carte-bandeau-border:rgba(255,255,255,.075);
+    --pointilles-border:rgba(255,255,255,.12);
+    --pointilles-bg:rgba(255,255,255,.018);
+    --vide-border:rgba(255,255,255,.1);
+    --vide-bg:rgba(255,255,255,.012);
+    --mois-btn-bg:linear-gradient(120deg, rgba(245,166,35,.22) 0%, rgba(245,166,35,.08) 48%, rgba(245,166,35,.03) 100%), #1b2029;
+    --mois-btn-border:rgba(245,166,35,.6);
+    --mois-btn-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 10px 22px -12px rgba(245,166,35,.55);
+    --pastille-ring:#1d1f22;
+    /* Revente : carte « Caisse à date » (Ce mois-ci) */
+    --caisse-bg:radial-gradient(120% 120% at 0% 0%, rgba(245,166,35,.2), rgba(245,166,35,0) 60%), linear-gradient(135deg,#221c12,#1b2029);
+    --caisse-border:rgba(245,166,35,.6);
+    --caisse-neg-bg:radial-gradient(120% 120% at 0% 0%, rgba(255,107,94,.18), rgba(255,107,94,0) 60%), linear-gradient(135deg,#271716,#1b2029);
+    --caisse-neg-border:rgba(255,107,94,.6);
+
+    /* Sélections ambre (choix actif, rubrique, modèle, puce) et badges ambre ;
+       bouton « danger » ; badge « Autre source » ; texte indicatif des champs. */
+    --sel-bg-12:rgba(245,166,35,.12);
+    --sel-bg-10:rgba(245,166,35,.1);
+    --badge-ambre-bg:rgba(245,166,35,.14);
+    --danger-bg:rgba(255,107,94,.1);
+    --danger-border:rgba(255,107,94,.38);
+    /* Sombre : 4,5:1 atteint avec un fond de badge un peu plus léger qu'en E (.15),
+       comme pour le badge « Crédit » de Coiffure 8D. */
+    --badge-autre-bg:rgba(232,120,140,.12);
+    /* Sprint Revente-F : badge bleu « Commande spéciale » porté à 4,5:1 (il
+       était à 3,9:1 en E) : bleu un peu plus clair, fond un peu plus léger. */
+    --badge-bleu-bg:rgba(91,141,239,.12);
+    --badge-bleu-texte:#7aa3f5;
+    /* « Bientôt fini » dans le bandeau d'alerte du stock ; libellé et montant
+       de la caisse quand elle est négative. */
+    --alerte-texte:var(--accent);
+    --caisse-neg-texte:var(--red);
+    --placeholder:#8b93a1;
+
+    /* Pastilles teintées des icônes (ambre = achats, vert = ventes,
+       turquoise = bénéfice, bleu = épargne, rouge = sorties) */
+    --t-ambre-bg:radial-gradient(circle at 30% 25%, rgba(245,166,35,.32), rgba(245,166,35,.08));
+    --t-ambre-ring:inset 0 0 0 1px rgba(245,166,35,.26);
+    --t-vert-bg:radial-gradient(circle at 30% 25%, rgba(52,179,126,.32), rgba(52,179,126,.08));
+    --t-vert-ring:inset 0 0 0 1px rgba(52,179,126,.28);
+    --t-turq-bg:radial-gradient(circle at 30% 25%, rgba(79,209,197,.28), rgba(79,209,197,.07));
+    --t-turq-ring:inset 0 0 0 1px rgba(79,209,197,.24);
+    --t-bleu-bg:radial-gradient(circle at 30% 25%, rgba(91,141,239,.32), rgba(91,141,239,.08));
+    --t-bleu-ring:inset 0 0 0 1px rgba(91,141,239,.28);
+    --t-rouge-bg:radial-gradient(circle at 30% 25%, rgba(255,107,94,.3), rgba(255,107,94,.08));
+    --t-rouge-ring:inset 0 0 0 1px rgba(255,107,94,.26);
+  }
+
+  /* ---------- Thème clair : corps clair, cartes blanches, bandeau sombre ---------- */
+  html[data-theme="clair"]{
+    --bg:#eff1f4;
+    --card:#ffffff;
+    --card-2:#f1f3f6;
+    --border:#d9dde4;
+    --text:#151a22;          /* 17,5:1 sur blanc */
+    --text-dim:#5a6372;      /* 6,1:1 */
+    --accent:#9a5a00;        /* ambre « texte » : 5,5:1 */
+    --accent-fill:#f5a623;   /* ambre « remplissage » : inchangé */
+    --accent-dark:#c9840f;
+    --on-accent:#1b1200;
+    --green:#137a52;         /* 5,3:1 */
+    --red:#c4382c;           /* 5,3:1 */
+    --blue:#2b5bc0;          /* 6,3:1 */
+    --turquoise:#0b766e;
+    --pink:#b03d5a;          /* 5,7:1 */
+    --line:#e3e6eb;
+    --card-grad:linear-gradient(180deg,#ffffff 0%,#fcfcfd 100%);
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 10px 22px -14px rgba(16,24,40,.28);
+    --shadow-sm:0 1px 2px rgba(16,24,40,.07);
+    --filet:linear-gradient(90deg, rgba(21,26,34,.16), rgba(21,26,34,0));
+
+    --bandeau-card-grad:linear-gradient(180deg,#232a35 0%,#1c222c 100%);
+    --bandeau-shadow-sm:inset 0 1px 0 rgba(255,255,255,.04), 0 3px 8px -4px rgba(0,0,0,.5);
+    --bandeau-filet:linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,0));
+    --header-bg:#141922;
+    --header-border:none;
+    --header-shadow:none;
+
+    --tabbar-bg:#ffffff;
+    --tabbar-shadow:0 -8px 20px -16px rgba(16,24,40,.35);
+    --tab-actif-bg:rgba(245,166,35,.22);
+    --tab-actif-ring:rgba(201,132,15,.45);
+    --overlay:rgba(16,20,28,.45);
+    --modal-bg:#ffffff;
+    --modal-border:#e3e6eb;
+    --modal-shadow:0 -14px 34px rgba(16,24,40,.18);
+    --modal-poignee:#d0d4db;
+    --maj-bg:#ffffff;
+    --maj-shadow:0 8px 24px rgba(16,24,40,.18);
+
+    --btn2-border:#d9dde4;
+    --fab-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 10px 20px -8px rgba(201,132,15,.55);
+    --seg-shadow:inset 0 1px 2px rgba(16,24,40,.08);
+    --choice-sel-bg:#fff8ec;
+
+    --dash-solde-bg:radial-gradient(120% 90% at 50% 0%, rgba(245,166,35,.10), rgba(245,166,35,0) 60%), #ffffff;
+    --carte-bandeau-shadow:0 14px 28px -16px rgba(16,24,40,.45);
+    --carte-bandeau-border:#ffffff;
+    --pointilles-border:#c9ced7;
+    --pointilles-bg:#fafbfc;
+    --vide-border:#cfd4dc;
+    --vide-bg:#fafbfc;
+    --mois-btn-bg:linear-gradient(120deg, rgba(245,166,35,.22) 0%, rgba(245,166,35,.08) 48%, rgba(245,166,35,.03) 100%), #ffffff;
+    --mois-btn-border:rgba(201,132,15,.6);
+    --mois-btn-shadow:0 10px 22px -14px rgba(201,132,15,.6);
+    --pastille-ring:#ffffff;
+    --caisse-bg:radial-gradient(120% 120% at 0% 0%, rgba(245,166,35,.22), rgba(245,166,35,0) 60%), linear-gradient(135deg,#fff6e6,#ffffff);
+    --caisse-border:rgba(201,132,15,.6);
+    --caisse-neg-bg:radial-gradient(120% 120% at 0% 0%, rgba(255,107,94,.18), rgba(255,107,94,0) 60%), linear-gradient(135deg,#fdeeec,#ffffff);
+    --caisse-neg-border:rgba(196,56,44,.5);
+
+    --sel-bg-12:#fff5e3;
+    --sel-bg-10:#fff5e3;
+    --badge-ambre-bg:#fff1d9;
+    --danger-bg:#fdf2f0;
+    --danger-border:rgba(196,56,44,.38);
+    --badge-autre-bg:rgba(232,120,140,.15);
+    --badge-bleu-bg:rgba(91,141,239,.15);
+    --badge-bleu-texte:var(--blue);
+    --alerte-texte:#8c5100;     /* 5,2:1 sur le fond ambre du bandeau d'alerte */
+    --caisse-neg-texte:#b02c20; /* 4,9:1 sur le fond rosé de la caisse négative */
+    --placeholder:#5f6776;
+
+    --t-ambre-bg:radial-gradient(circle at 30% 25%, rgba(245,166,35,.42), rgba(245,166,35,.14));
+    --t-ambre-ring:inset 0 0 0 1px rgba(201,132,15,.30);
+    --t-vert-bg:radial-gradient(circle at 30% 25%, rgba(52,179,126,.36), rgba(52,179,126,.12));
+    --t-vert-ring:inset 0 0 0 1px rgba(19,122,82,.24);
+    --t-turq-bg:radial-gradient(circle at 30% 25%, rgba(79,209,197,.38), rgba(79,209,197,.12));
+    --t-turq-ring:inset 0 0 0 1px rgba(11,118,110,.22);
+    --t-bleu-bg:radial-gradient(circle at 30% 25%, rgba(91,141,239,.34), rgba(91,141,239,.12));
+    --t-bleu-ring:inset 0 0 0 1px rgba(43,91,192,.22);
+    --t-rouge-bg:radial-gradient(circle at 30% 25%, rgba(255,107,94,.34), rgba(255,107,94,.12));
+    --t-rouge-ring:inset 0 0 0 1px rgba(196,56,44,.22);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     height:100%; overscroll-behavior-y:none; color-scheme:dark;}
+  /* Dates, listes et champs natifs lisibles dans le thème choisi. */
+  html[data-theme="clair"], html[data-theme="clair"] body{color-scheme:light;}
   /* Sprint Revente-E : chiffres à chasse fixe sur tous les montants (ils
      s'alignent et ne « dansent » pas). Pas sur le texte courant : dans la
      police système Android, l'option élargit aussi les traits d'union
@@ -57,11 +269,16 @@
 
   /* ---------- Header ---------- */
   .header{
+    /* Sprint Revente-F : l'en-tête garde l'identité MonDjai (bandeau sombre)
+       dans les deux thèmes — ses éléments lisent les couleurs du bandeau. */
+    --text:var(--bandeau-text); --text-dim:var(--bandeau-text-dim); --line:var(--bandeau-line);
+    --card-grad:var(--bandeau-card-grad); --card-2:var(--bandeau-card-2); --shadow-sm:var(--bandeau-shadow-sm);
+    color:var(--text);
     display:flex; align-items:center; justify-content:space-between; gap:8px;
     padding:calc(15px + var(--safe-top)) 16px 13px;
-    background:linear-gradient(180deg,#181d26,#12161d);
-    border-bottom:1px solid var(--line);
-    box-shadow:0 10px 18px -16px rgba(0,0,0,.9);
+    background:var(--header-bg);
+    border-bottom:var(--header-border);
+    box-shadow:var(--header-shadow);
     position:sticky; top:0; z-index:5;
   }
   .brand{display:flex; align-items:center; gap:9px; min-width:0;}
@@ -97,7 +314,7 @@
   .section-title{display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase;
     letter-spacing:.06em; margin:4px 0 10px;}
   .section-title::after{content:""; flex:1 1 auto; min-width:16px; height:1px;
-    background:linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,0));}
+    background:var(--filet);}
   .hint{font-size:12.5px; color:var(--text-dim); line-height:1.5;}
   .hint.tight{margin-top:4px;}
 
@@ -115,7 +332,7 @@
     background:var(--card); border:1.5px solid var(--border); border-radius:16px;
     padding:16px 14px; text-align:left;
   }
-  .choice-card.selected{border-color:var(--accent); background:linear-gradient(135deg,#241d10,#1c2029);}
+  .choice-card.selected{border-color:var(--accent-fill); background:var(--choice-sel-bg);}
   .choice-card .emoji{font-size:30px; width:40px; text-align:center; flex:none;}
   .choice-card .cc-text{flex:1; min-width:0;}
   .choice-card .cc-title{font-size:15.5px; font-weight:700;}
@@ -125,7 +342,7 @@
     display:flex; align-items:center; justify-content:center; flex:none; font-size:14px;
     color:transparent; background:var(--card-2);
   }
-  .choice-card.selected .cc-check{background:var(--accent); border-color:var(--accent); color:#1b1200;}
+  .choice-card.selected .cc-check{background:var(--accent-fill); border-color:var(--accent-fill); color:var(--on-accent);}
 
   .error-text{color:var(--red); font-size:12.5px; margin-top:10px; line-height:1.4;}
 
@@ -134,11 +351,11 @@
     border:none; border-radius:14px; padding:14px 16px; font-size:15px; font-weight:700;
     width:100%;
   }
-  .btn-primary{background:linear-gradient(135deg,#f7b443,var(--accent-dark)); color:#1b1200;
+  .btn-primary{background:linear-gradient(135deg,#f7b443,var(--accent-dark)); color:var(--on-accent);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 10px 20px -12px rgba(245,166,35,.75);}
-  .btn-secondary{background:var(--card-grad); color:var(--text); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow-sm);}
+  .btn-secondary{background:var(--card-grad); color:var(--text); border:1px solid var(--btn2-border); box-shadow:var(--shadow-sm);}
   .btn-ghost{background:transparent; color:var(--accent); border:none; padding:10px;}
-  .btn-danger{background:rgba(255,107,94,.1); color:var(--red); border:1px solid rgba(255,107,94,.38);}
+  .btn-danger{background:var(--danger-bg); color:var(--red); border:1px solid var(--danger-border);}
   .btn:active{opacity:.88;}
   .btn:disabled{opacity:.4; pointer-events:none;}
   .btn-row{display:flex; gap:10px; margin-top:14px;}
@@ -147,8 +364,8 @@
   /* ---------- Tab bar ---------- */
   .tabbar{
     position:fixed; left:0; right:0; bottom:0; z-index:6;
-    display:flex; background:linear-gradient(180deg,#171c24,#13171e); border-top:1px solid var(--line);
-    box-shadow:0 -10px 22px -16px rgba(0,0,0,.9);
+    display:flex; background:var(--tabbar-bg); border-top:1px solid var(--line);
+    box-shadow:var(--tabbar-shadow);
     padding:7px 4px calc(8px + var(--safe-bottom));
   }
   .tab{
@@ -162,7 +379,7 @@
   /* Sprint Revente-C : 5 onglets — libellés un peu plus serrés sur les petits écrans */
   @media (max-width:380px){ .tab .tab-label{font-size:9.8px; letter-spacing:-.01em;} }
   .tab.active{color:var(--accent);}
-  .tab.active .tab-emoji{background:rgba(245,166,35,.17); box-shadow:inset 0 0 0 1px rgba(245,166,35,.42);}
+  .tab.active .tab-emoji{background:var(--tab-actif-bg); box-shadow:inset 0 0 0 1px var(--tab-actif-ring);}
   .tab.active .tab-label{font-weight:800;}
 
   /* ---------- List cards ---------- */
@@ -205,14 +422,14 @@
   .entry-card-lg .entry-amount{font-size:21px; margin-top:2px;}
   .badge{
     display:inline-block; vertical-align:1px; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px;
-    background:rgba(91,141,239,.15); color:var(--blue); margin-left:6px;
+    background:var(--badge-bleu-bg); color:var(--badge-bleu-texte); margin-left:6px;
   }
 
   /* Sprint Revente-E : états vides plus soignés (pastille, cadre en pointillés discret) */
   .empty-state{
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:28px 16px; color:var(--text-dim); gap:8px;
-    border:1px dashed rgba(255,255,255,.1); border-radius:var(--r-lg); background:rgba(255,255,255,.012);
+    border:1px dashed var(--vide-border); border-radius:var(--r-lg); background:var(--vide-bg);
   }
   .empty-state .es-emoji{width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     font-size:29px; margin-bottom:4px;
@@ -225,9 +442,9 @@
     position:fixed; right:18px; bottom:calc(92px + var(--safe-bottom)); z-index:7;
     width:56px; height:56px; border-radius:18px; border:none;
     background:linear-gradient(135deg,#f7b443,var(--accent-dark));
-    color:#1b1200; font-size:26px; font-weight:800;
+    color:var(--on-accent); font-size:26px; font-weight:800;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 10px 22px -6px rgba(245,166,35,.5);
+    box-shadow:var(--fab-shadow);
   }
   .fab:active{transform:scale(.96);}
 
@@ -243,6 +460,8 @@
     background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
     padding-right:36px;}
   .input:focus, .select:focus, .textarea:focus{outline:2px solid var(--accent); outline-offset:0;}
+  /* Texte indicatif des champs lisible (≥ 4,5:1 sur le fond du champ). */
+  .input::placeholder{color:var(--placeholder); opacity:1;}
   .field-error{color:var(--red); font-size:12px; margin-top:6px;}
   .field-note{color:var(--text-dim); font-size:11.5px; margin-top:6px; line-height:1.4;}
   .inline-new{margin-top:10px; display:flex; gap:8px;}
@@ -254,7 +473,7 @@
     flex:1; text-align:center; background:var(--card-2); border:1px solid var(--border); color:var(--text-dim);
     border-radius:12px; padding:12px 8px; font-size:13px; font-weight:700;
   }
-  .radio-opt.active{border-color:rgba(245,166,35,.85); color:var(--accent); background:rgba(245,166,35,.12);
+  .radio-opt.active{border-color:rgba(245,166,35,.85); color:var(--accent); background:var(--sel-bg-12);
     box-shadow:inset 0 0 0 1px rgba(245,166,35,.35);}
 
   .chip-wrap{display:flex; flex-wrap:wrap; gap:8px;}
@@ -262,22 +481,22 @@
     background:var(--card-2); border:1.5px solid var(--border); color:var(--text-dim);
     border-radius:999px; padding:9px 14px; font-size:13px; font-weight:600;
   }
-  .chip.active{border-color:var(--accent); color:var(--accent); background:rgba(245,166,35,.1);}
+  .chip.active{border-color:var(--accent-fill); color:var(--accent); background:var(--sel-bg-10);}
   .chip.dashed{border-style:dashed;}
 
   /* ---------- Modal ---------- */
   .modal-overlay{
-    position:fixed; inset:0; background:rgba(5,7,10,.62); z-index:20;
+    position:fixed; inset:0; background:var(--overlay); z-index:20;
     display:flex; align-items:flex-end;
   }
   /* Sprint Revente-E : feuille du bas avec une poignée grise */
   .modal{
-    width:100%; max-height:88vh; overflow-y:auto; background:linear-gradient(180deg,#171c24 0px,#11141a 160px);
-    border-radius:22px 22px 0 0; border-top:1px solid rgba(255,255,255,.1);
-    box-shadow:0 -14px 34px rgba(0,0,0,.5);
+    width:100%; max-height:88vh; overflow-y:auto; background:var(--modal-bg);
+    border-radius:22px 22px 0 0; border-top:1px solid var(--modal-border);
+    box-shadow:var(--modal-shadow);
     padding:10px 18px calc(20px + var(--safe-bottom));
   }
-  .modal::before{content:""; display:block; width:40px; height:4px; border-radius:999px; background:#3c4352; margin:0 auto 12px;}
+  .modal::before{content:""; display:block; width:40px; height:4px; border-radius:999px; background:var(--modal-poignee); margin:0 auto 12px;}
   .modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px;}
   .modal-title{font-size:17px; font-weight:800; min-width:0;}
   .modal-close{background:var(--card-grad); border:1px solid var(--line); color:var(--text-dim); flex:none;
@@ -295,7 +514,7 @@
   .reglages-section{margin-bottom:22px;}
   .reglages-section .rs-title{display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
   .reglages-section .rs-title::after{content:""; flex:1 1 auto; min-width:16px; height:1px;
-    background:linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,0));}
+    background:var(--filet);}
   .profil-row{
     display:flex; align-items:center; gap:12px; background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow);
     border-radius:var(--r-md); padding:13px 14px; margin-bottom:10px;
@@ -307,28 +526,31 @@
   .profil-row .pr-desc{font-size:11.5px; color:var(--text-dim); margin-top:2px;}
   .badge-soon{
     display:inline-block; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;
-    background:rgba(245,166,35,.14); color:var(--accent); text-transform:uppercase; letter-spacing:.03em;
+    background:var(--badge-ambre-bg); color:var(--accent); text-transform:uppercase; letter-spacing:.03em;
   }
   .switch{
     width:46px; height:28px; border-radius:999px; background:var(--card-2); border:1px solid var(--border);
     position:relative; flex:none;
   }
-  .switch.on{background:var(--accent); border-color:var(--accent);}
-  .switch .knob{position:absolute; top:2px; left:2px; width:22px; height:22px; border-radius:50%; background:#fff; transition:left .15s;}
-  .switch.on .knob{left:20px; background:#1b1200;}
+  .switch.on{background:var(--accent-fill); border-color:var(--accent-fill);}
+  .switch .knob{position:absolute; top:2px; left:2px; width:22px; height:22px; border-radius:50%; background:var(--switch-knob); transition:left .15s;}
+  html[data-theme="clair"] .switch:not(.on) .knob{box-shadow:0 1px 2px rgba(16,24,40,.25);}
+  .switch.on .knob{left:20px; background:var(--on-accent);}
 
   .about-line{font-size:14px; color:var(--text-dim); line-height:1.6; margin-bottom:10px;}
   .mission{font-size:15.5px; font-weight:700; color:var(--text); margin:18px 0 8px;}
 
   /* ---------- Aujourd'hui ---------- */
   .dash-solde{
-    background:radial-gradient(120% 90% at 50% 0%, rgba(245,166,35,.07), rgba(245,166,35,0) 60%), var(--card-grad);
+    background:var(--dash-solde-bg);
     border:1px solid var(--line); box-shadow:var(--shadow);
     border-radius:var(--r-lg); padding:18px 18px; text-align:center; margin-bottom:14px;
   }
   .dash-solde .ds-label{font-size:11.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em;}
   .dash-solde .ds-amount{font-size:31px; font-weight:800; margin-top:6px; letter-spacing:-.01em;}
   .dash-solde .ds-amount.neg{color:var(--red);}
+  .dash-solde .ds-amount.pos{color:var(--green);}
+  .dash-solde .ds-note{font-size:12px; color:var(--text-dim); margin-top:10px; line-height:1.4;}
   .dash-perte{
     margin-top:12px; background:rgba(255,107,94,.12); border:1px solid rgba(255,107,94,.35);
     border-radius:12px; padding:9px 12px; font-size:12.5px; color:var(--red); font-weight:600; line-height:1.4;
@@ -347,16 +569,16 @@
   .dash-block .db-amount{font-size:24px; font-weight:800; margin-top:10px; letter-spacing:-.01em;}
   .dash-block .db-amount.pos{color:var(--green);}
   .dash-block.charges .db-amount{color:var(--red);}
-  .dash-block.info{border-style:dashed; border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.018); box-shadow:none;}
+  .dash-block.info{border-style:dashed; border-color:var(--pointilles-border); background:var(--pointilles-bg); box-shadow:none;}
   .charges-card-wrap{margin-top:26px;}
   /* Sprint Revente-E : icônes dans des pastilles teintées (ambre = achats,
      vert = ventes, turquoise = bénéfice, bleu = épargne, rouge = sorties). */
   .db-ico{width:52px; height:52px; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; line-height:1;}
-  .t-ambre{background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.32), rgba(245,166,35,.08)); box-shadow:inset 0 0 0 1px rgba(245,166,35,.26);}
-  .t-vert{background:radial-gradient(circle at 30% 25%, rgba(52,179,126,.32), rgba(52,179,126,.08)); box-shadow:inset 0 0 0 1px rgba(52,179,126,.28);}
-  .t-turq{background:radial-gradient(circle at 30% 25%, rgba(79,209,197,.28), rgba(79,209,197,.07)); box-shadow:inset 0 0 0 1px rgba(79,209,197,.24);}
-  .t-bleu{background:radial-gradient(circle at 30% 25%, rgba(91,141,239,.32), rgba(91,141,239,.08)); box-shadow:inset 0 0 0 1px rgba(91,141,239,.28);}
-  .t-rouge{background:radial-gradient(circle at 30% 25%, rgba(255,107,94,.3), rgba(255,107,94,.08)); box-shadow:inset 0 0 0 1px rgba(255,107,94,.26);}
+  .t-ambre{background:var(--t-ambre-bg); box-shadow:var(--t-ambre-ring);}
+  .t-vert{background:var(--t-vert-bg); box-shadow:var(--t-vert-ring);}
+  .t-turq{background:var(--t-turq-bg); box-shadow:var(--t-turq-ring);}
+  .t-bleu{background:var(--t-bleu-bg); box-shadow:var(--t-bleu-ring);}
+  .t-rouge{background:var(--t-rouge-bg); box-shadow:var(--t-rouge-ring);}
   /* Sprint Revente-C : écran Aujourd'hui plein écran — la grille s'étire entre
      l'en-tête et la barre du bas (--tabbar-h, mesurée après chaque rendu), sans
      espace vide en dessous. Pas de bouton flottant « + » sur cet écran. */
@@ -380,24 +602,31 @@
   /* ---------- Sprint Revente-E : bouton « Ce mois-ci » (accent ambre, plus haut que Charges communes) ---------- */
   .mois-btn{position:relative; flex:none; width:100%; display:flex; align-items:center; gap:12px; text-align:left;
     padding:12px 14px 12px 12px; border-radius:var(--r-lg); color:var(--text); font:inherit; appearance:none; -webkit-appearance:none;
-    background:linear-gradient(120deg, rgba(245,166,35,.22) 0%, rgba(245,166,35,.08) 48%, rgba(245,166,35,.03) 100%), #1b2029;
-    border:1px solid rgba(245,166,35,.6);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 10px 22px -12px rgba(245,166,35,.55);}
+    background:var(--mois-btn-bg);
+    border:1px solid var(--mois-btn-border);
+    box-shadow:var(--mois-btn-shadow);}
   .mois-btn .cm-ico{position:relative; flex:none; width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center;
     font-size:22px; line-height:1; background:radial-gradient(circle at 30% 25%, rgba(245,166,35,.42), rgba(245,166,35,.14));
     box-shadow:inset 0 0 0 1px rgba(245,166,35,.45);}
   .mois-btn .cm-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px;}
   .mois-btn .cm-titre{font-size:clamp(14px, 4.1vw, 16px); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .mois-btn .cm-titre .mb-mois{color:var(--accent);}
+  .mois-btn .cm-titre .cm-mois{color:var(--accent);}
   .mois-btn .cm-sous{font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .mois-btn .cm-chev{flex:none; font-size:26px; line-height:1; color:var(--accent); margin-top:-2px;}
+  /* Sprint Revente-F (2) — bouton « + » aussi sur Aujourd'hui (saisie rapide
+     d'une vente). Comme chez Coiffure, il se pose dans un couloir laissé
+     libre à droite du dernier élément (le bouton « Ce mois-ci »), juste
+     au-dessus de la barre du bas et centré sur ce bouton : il ne masque
+     jamais un texte ni un montant. Le chevron › laisse sa place au « + ». */
+  .main.ecran-aujourdhui .mois-btn{padding-right:68px;}
+  .fab.fab-aujourdhui{bottom:calc(var(--tabbar-h, 74px) + 7px);}
+  body.maj-visible .fab.fab-aujourdhui{bottom:calc(var(--tabbar-h, 74px) + 62px + 7px);}
   /* Caisse à date négative : petite pastille rouge (le message doux reste dans le contenu). */
   .mois-btn .cm-pastille{position:absolute; top:-4px; right:-4px; width:13px; height:13px; border-radius:50%;
-    background:var(--red); box-shadow:0 0 0 2.5px #1d1f22;}
+    background:var(--red); box-shadow:0 0 0 2.5px var(--pastille-ring);}
 
   /* ---------- Contenu de « Ce mois-ci » (feuille du bas) ---------- */
   .mois-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .mois-tile{position:relative; background:rgba(255,255,255,.018); border:1px dashed rgba(255,255,255,.12); border-radius:var(--r-md); padding:12px 13px;
+  .mois-tile{position:relative; background:var(--pointilles-bg); border:1px dashed var(--pointilles-border); border-radius:var(--r-md); padding:12px 13px;
     display:flex; flex-direction:column; justify-content:center; align-items:flex-start; min-height:78px; min-width:0;
     text-align:left; color:var(--text); font:inherit; appearance:none; -webkit-appearance:none;}
   .mois-tile.mois-tile-btn{border-style:solid; border-color:var(--line); background:var(--card-grad); box-shadow:var(--shadow);}
@@ -410,20 +639,20 @@
   .mois-tile .mt-val.neg{color:var(--red);}
   .mois-tile .mt-note{font-size:10.5px; color:var(--text-dim); margin-top:3px; white-space:nowrap;}
   .caisse-bloc{margin-top:12px; width:100%; display:flex; align-items:center; gap:14px; text-align:left;
-    background:radial-gradient(120% 120% at 0% 0%, rgba(245,166,35,.2), rgba(245,166,35,0) 60%), linear-gradient(135deg,#221c12,#1b2029);
-    border:1px solid rgba(245,166,35,.6); border-radius:var(--r-lg); box-shadow:var(--shadow);
+    background:var(--caisse-bg);
+    border:1px solid var(--caisse-border); border-radius:var(--r-lg); box-shadow:var(--shadow);
     padding:14px 16px; color:var(--text); font:inherit; appearance:none; -webkit-appearance:none; flex:none;}
   .caisse-bloc:active{opacity:.92;}
-  .caisse-bloc.caisse-neg{border-color:rgba(255,107,94,.6);
-    background:radial-gradient(120% 120% at 0% 0%, rgba(255,107,94,.18), rgba(255,107,94,0) 60%), linear-gradient(135deg,#271716,#1b2029);}
+  .caisse-bloc.caisse-neg{border-color:var(--caisse-neg-border);
+    background:var(--caisse-neg-bg);}
   .caisse-bloc .cb-emoji{flex:none; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:25px; line-height:1;}
   .caisse-bloc .cb-main{flex:1; min-width:0;}
   .caisse-bloc .cb-label{font-size:11.5px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.06em;}
-  .caisse-bloc.caisse-neg .cb-label{color:var(--red);}
+  .caisse-bloc.caisse-neg .cb-label{color:var(--caisse-neg-texte);}
   .caisse-bloc .cb-amount{font-size:32px; font-weight:800; line-height:1.12; white-space:nowrap; letter-spacing:-.01em; margin-top:2px;}
-  .caisse-bloc .cb-amount.neg{color:var(--red);}
+  .caisse-bloc .cb-amount.neg{color:var(--caisse-neg-texte);}
   .caisse-bloc .cb-chev{font-size:24px; color:var(--accent); flex:none;}
-  .caisse-negative{font-size:12px; font-weight:600; color:var(--red); margin-top:4px; line-height:1.35;}
+  .caisse-negative{font-size:12px; font-weight:600; color:var(--caisse-neg-texte); margin-top:4px; line-height:1.35;}
   .mois-aide{font-size:12px; color:var(--text-dim); text-align:center; margin-top:12px;}
   /* Petits écrans (ex. 360×640) : marges resserrées pour que l'écran
      Aujourd'hui tienne sans défilement. */
@@ -435,6 +664,8 @@
     .mois-btn{padding:9px 12px 9px 10px; gap:10px;}
     .mois-btn .cm-ico{width:38px; height:38px; font-size:19px; border-radius:12px;}
     .mois-btn .cm-sous{font-size:11.5px;}
+    .fab.fab-aujourdhui{bottom:calc(var(--tabbar-h, 74px) + 1px);}
+    body.maj-visible .fab.fab-aujourdhui{bottom:calc(var(--tabbar-h, 74px) + 62px + 1px);}
     .mois-tile{min-height:70px; padding:10px 12px;}
     .caisse-bloc{padding:12px 14px;}
   }
@@ -454,7 +685,7 @@
   .cd-row.cd-total.cd-total-neg .cd-v{color:var(--red);}
   /* Onglets Achats et Ventes : la fin de la page s'arrête au-dessus du bouton
      « + », qui ne masque jamais un montant ni un champ. */
-  .main.ecran-achats, .main.ecran-ventes{padding-bottom:calc(164px + var(--safe-bottom));}
+  .main.ecran-achatvente{padding-bottom:calc(164px + var(--safe-bottom));}
   .charges-row{
     display:flex; align-items:center; gap:11px; width:100%; text-align:left;
     background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md);
@@ -465,7 +696,7 @@
     text-transform:uppercase; letter-spacing:.05em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .charges-row .cr-amount{font-size:16px; font-weight:800; color:var(--red); flex:none; white-space:nowrap;}
   .charges-row .cr-chev{flex:none; font-size:18px; line-height:1; color:var(--text-dim);}
-  .charges-row.charges-row-vide{border-style:dashed; border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.018); box-shadow:none;}
+  .charges-row.charges-row-vide{border-style:dashed; border-color:var(--pointilles-border); background:var(--pointilles-bg); box-shadow:none;}
   .charges-row.charges-row-vide .cr-label{color:var(--text-dim);}
 
   .caisse-zone{margin-bottom:22px;}
@@ -475,7 +706,7 @@
   .stock-card{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md); padding:13px 14px; margin-bottom:10px;}
   .stock-card .sc-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;}
   .stock-card .sc-nom{font-size:14.5px; font-weight:800; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .stock-card .sc-alerte{flex:none; font-size:10.5px; font-weight:800; color:var(--accent); background:rgba(245,166,35,.14);
+  .stock-card .sc-alerte{flex:none; font-size:10.5px; font-weight:800; color:var(--accent); background:var(--badge-ambre-bg);
     box-shadow:inset 0 0 0 1px rgba(245,166,35,.3); padding:3px 9px; border-radius:999px;}
   .stock-card .sc-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:12.5px;}
   .stock-card .sc-grid .sk{color:var(--text-dim);}
@@ -529,16 +760,16 @@
   .code-acces-field{width:100%; margin-top:22px; margin-bottom:0;}
   .code-acces-input{
     text-align:center; letter-spacing:.2em; text-transform:uppercase;
-    font-size:19px; font-weight:800; border:2px solid var(--accent);
+    font-size:19px; font-weight:800; border:2px solid var(--accent-fill);
     background:rgba(245,166,35,.07);
   }
-  .code-acces-input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .code-acces-input:focus{outline:2px solid var(--accent-fill); outline-offset:1px;}
   .code-acces-mention{
     margin-top:16px; font-size:11px; color:var(--text-dim); text-align:center; line-height:1.5;
   }
   .pin-dots{display:flex; justify-content:center; gap:14px; margin:18px 0 22px;}
   .pin-dot{width:16px; height:16px; border-radius:50%; border:1.5px solid var(--border); background:var(--card-2);}
-  .pin-dot.filled{background:var(--accent); border-color:var(--accent);}
+  .pin-dot.filled{background:var(--accent-fill); border-color:var(--accent-fill);}
   .pin-dot.filled.err{background:var(--red); border-color:var(--red);}
   .pin-keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:280px; margin:0 auto;}
   .pin-key{
@@ -568,7 +799,7 @@
   .objectif-slot-vide .osv-ghost-icons{font-size:26px; letter-spacing:12px; opacity:.35; filter:blur(0.5px);}
   .objectif-slot-vide .osv-badge{
     display:inline-block; margin-top:10px; font-size:11.5px; font-weight:800; color:var(--accent);
-    background:rgba(245,166,35,.14); border:1px solid rgba(245,166,35,.4); border-radius:999px; padding:5px 12px;
+    background:var(--badge-ambre-bg); border:1px solid rgba(245,166,35,.4); border-radius:999px; padding:5px 12px;
   }
 
   /* ---------- étape « Vous mettez de côté pour quoi ? » (modèles) ---------- */
@@ -577,7 +808,7 @@
     background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg); padding:18px 10px;
     text-align:center; appearance:none; -webkit-appearance:none; font:inherit; color:var(--text);
   }
-  .modele-tile.active{border-color:rgba(245,166,35,.85); background:rgba(245,166,35,.1); box-shadow:inset 0 0 0 1px rgba(245,166,35,.35);}
+  .modele-tile.active{border-color:rgba(245,166,35,.85); background:var(--sel-bg-10); box-shadow:inset 0 0 0 1px rgba(245,166,35,.35);}
   .modele-tile .mt-emoji{font-size:30px; margin-bottom:8px;}
   .modele-tile .mt-nom{font-size:14px; font-weight:800;}
   .modele-tile .mt-desc{font-size:11px; color:var(--text-dim); margin-top:4px; line-height:1.3;}
@@ -585,15 +816,18 @@
   /* ---------- Télécharger ---------- */
   .partager-canvas-wrap{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-lg); padding:10px; margin-bottom:16px; overflow:hidden;}
   .partager-canvas-wrap canvas{width:100%; height:auto; display:block; border-radius:10px;}
+  .partager-canvas-wrap canvas.tc-blur-layer{width:calc(100% - 20px);}
+  /* Sprint Revente-F : calque flou posé exactement sur l'aperçu et rogné à ses
+     bords (en clair, le flou débordait en traînée grise sur le cadre blanc). */
   .tc-blur-layer{
-    position:absolute; left:0; top:0; right:0;
-    filter:blur(16px);
+    position:absolute; left:10px; top:10px;
+    filter:blur(16px); clip-path:inset(0 round 10px);
     -webkit-mask-image:linear-gradient(to bottom, transparent 0%, transparent 28%, black 36%, black 100%);
     mask-image:linear-gradient(to bottom, transparent 0%, transparent 28%, black 36%, black 100%);
   }
   .partager-overlay-abo{
     position:absolute; left:50%; top:74%; transform:translate(-50%,-50%);
-    background:rgba(17,20,26,.75); border:1px solid rgba(245,166,35,.5); color:var(--accent);
+    background:rgba(17,20,26,.75); border:1px solid rgba(245,166,35,.5); color:var(--accent-fill);
     font-size:14px; font-weight:800; text-align:center; padding:12px 20px; border-radius:14px;
     max-width:80%; line-height:1.4;
   }
@@ -604,7 +838,7 @@
     display:flex; flex-direction:column; align-items:center; gap:6px; background:var(--card-2);
     border:1.5px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center;
   }
-  .rub-tile.selected{border-color:var(--accent); background:rgba(245,166,35,.1);}
+  .rub-tile.selected{border-color:var(--accent-fill); background:var(--sel-bg-10);}
   .rub-tile .rub-icon{font-size:20px;}
   .rub-tile .rub-nom{font-size:11px; font-weight:600; line-height:1.25;}
   .rub-manage-row{
@@ -622,16 +856,16 @@
 
   /* ---------- Sprint Revente-C : onglet Achats (sous-vues) ---------- */
   .seg{display:flex; gap:4px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-md); padding:4px; margin-bottom:14px;
-    box-shadow:inset 0 1px 3px rgba(0,0,0,.35);}
+    box-shadow:var(--seg-shadow);}
   .seg-btn{flex:1; background:transparent; border:none; color:var(--text-dim); border-radius:11px; padding:10px 6px; font-size:13px; font-weight:700;}
-  .seg-btn.active{background:linear-gradient(135deg,#f7b443,var(--accent-dark)); color:#1b1200; font-weight:800;
+  .seg-btn.active{background:linear-gradient(135deg,#f7b443,var(--accent-dark)); color:var(--on-accent); font-weight:800;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 4px 12px -6px rgba(245,166,35,.8);}
   /* Sprint Revente-E : sous-vue de l'onglet Achats (garde la chaîne flex pour les cartes agrandies) */
   .sous-vue{display:flex; flex-direction:column; flex:1 1 auto; min-height:0;}
   .periode-titre{font-size:13px; font-weight:700; color:var(--text); margin:0 0 10px;}
   .stock-alerte-bandeau{background:linear-gradient(135deg, rgba(245,166,35,.14), rgba(245,166,35,.05)); border:1px solid rgba(245,166,35,.38); color:var(--text);
     border-radius:var(--r-md); padding:11px 14px; font-size:12.5px; line-height:1.45; margin-bottom:14px;}
-  .stock-alerte-bandeau b{color:var(--accent);}
+  .stock-alerte-bandeau b{color:var(--alerte-texte);}
   .mvt-table{background:var(--card-grad); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:var(--r-md); padding:2px 14px 0; margin-bottom:16px; overflow:hidden;}
   .mvt-row{display:grid; grid-template-columns:minmax(0,1fr) 58px 58px 62px; gap:6px; padding:10px 0;
     border-bottom:1px solid var(--line); font-size:13px; align-items:center;}
@@ -654,21 +888,21 @@
   /* ---------- Sprint Revente-C : bannière « nouvelle version » (non bloquante) ---------- */
   #maj-banner{
     position:fixed; left:12px; right:12px; bottom:calc(12px + var(--safe-bottom)); z-index:40;
-    display:flex; align-items:center; gap:10px; background:#1f2632; border:1px solid rgba(245,166,35,.45);
-    border-radius:14px; padding:10px 10px 10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.45);
+    display:flex; align-items:center; gap:10px; background:var(--maj-bg); border:1px solid rgba(245,166,35,.45);
+    border-radius:14px; padding:10px 10px 10px 14px; box-shadow:var(--maj-shadow);
     font-size:13px; color:var(--text);
   }
   body.avec-tabbar #maj-banner{bottom:calc(var(--tabbar-h, 74px) + 8px);}
   body.modale-ouverte #maj-banner{bottom:calc(12px + var(--safe-bottom));}
   #maj-banner .mb-text{flex:1; line-height:1.35;}
   #maj-banner .mb-btn{flex:none; border:none; border-radius:10px; padding:9px 12px; font-size:13px; font-weight:800;
-    background:linear-gradient(135deg,var(--accent),var(--accent-dark)); color:#1b1200;}
+    background:linear-gradient(135deg,var(--accent-fill),var(--accent-dark)); color:var(--on-accent);}
   body.maj-visible .fab{bottom:calc(92px + 62px + var(--safe-bottom));}
   body.maj-visible .modal{padding-bottom:calc(20px + 72px + var(--safe-bottom));}
   body.maj-visible .main.with-tabbar{padding-bottom:calc(96px + 62px + var(--safe-bottom));}
   body.maj-visible .main.ecran-aujourdhui{padding-bottom:calc(var(--tabbar-h, 74px) + 62px);}
-  .badge.badge-autre{background:rgba(232,120,140,.15); color:var(--pink);}
-  body.maj-visible .main.ecran-achats, body.maj-visible .main.ecran-ventes{padding-bottom:calc(164px + 62px + var(--safe-bottom));}
+  .badge.badge-autre{background:var(--badge-autre-bg); color:var(--pink);}
+  body.maj-visible .main.ecran-achatvente{padding-bottom:calc(164px + 62px + var(--safe-bottom));}
   body.maj-visible .onb, body.maj-visible .overlay-body{padding-bottom:calc(28px + 72px + var(--safe-bottom));}
 
   /* ---------- Sprint Revente-E : modifier un achat / une vente ---------- */
@@ -678,6 +912,33 @@
   .note-douce{background:rgba(91,141,239,.1); border:1px solid rgba(91,141,239,.32); color:var(--text);
     border-radius:12px; padding:10px 12px; font-size:12.5px; line-height:1.45; margin:0 0 14px;}
   .note-douce[hidden]{display:none;}
+
+  /* ---------- Sprint Revente-F : Réglages › Affichage (choix du thème, comme Coiffure 8D) ---------- */
+  .radio-row.choix-theme{gap:8px;}
+  .choix-theme .radio-opt{display:flex; flex-direction:column; align-items:center; gap:2px; padding:10px 4px; min-width:0;}
+  .choix-theme .ct-emoji{font-size:18px; line-height:1.2;}
+  .choix-theme .ct-nom{font-size:13px; font-weight:800;}
+  .choix-theme .ct-sous{font-size:11px; font-weight:600; line-height:1.25;}
+
+  /* ---------- Sprint Revente-F : bandeau MonDjai sur Aujourd'hui ----------
+     Le titre et le haut des deux premières tuiles se posent sur le bandeau
+     MonDjai (sombre). Thème clair : le bandeau descend derrière le titre et
+     ~60 px dans les tuiles du haut (hauteur mesurée après chaque rendu et
+     redimensionnement : --bandeau-h), bas arrondi à 26 px. */
+  .main.ecran-aujourdhui > .section-title{color:var(--bandeau-text-dim);}
+  .main.ecran-aujourdhui > .section-title::after{background:var(--bandeau-filet);}
+  .main.ecran-aujourdhui > .dash-grid > .dash-block:not(.info){box-shadow:var(--carte-bandeau-shadow); border-color:var(--carte-bandeau-border);}
+  html[data-theme="clair"] .main.ecran-aujourdhui{position:relative; isolation:isolate;}
+  html[data-theme="clair"] .main.ecran-aujourdhui::before{content:""; position:absolute; z-index:-1; left:0; right:0; top:0;
+    height:var(--bandeau-h, 110px); background:var(--bandeau); border-radius:0 0 26px 26px; pointer-events:none;}
+
+  /* ---------- Sprint Revente-F : onglet Réglages ---------- */
+  .main.ecran-reglages > .section-title:first-child{margin-bottom:18px;}
+
+  /* ---------- Sprint Revente-F : onglet Achat/Vente (Achats · Ventes · Stock) ---------- */
+  .seg.seg-3 .seg-btn{padding:10px 2px; min-width:0; white-space:nowrap;}
+  .seg-btn .sb-emoji{margin-right:4px;}
+  @media (max-width:380px){ .seg.seg-3 .seg-btn{font-size:12.5px;} .seg-btn .sb-emoji{margin-right:3px;} }
 
   /* ---------- Sprint Revente-E : retour visuel au toucher (léger enfoncement) ---------- */
   .btn, .entry-card, .dash-block, .charges-row, .mois-btn, .mois-tile-btn, .caisse-bloc, .seg-btn, .etat-tab, .en-btn,
@@ -816,13 +1077,33 @@
   //  - Finitions visuelles (cartes, pastilles, chiffres à chasse fixe,
   //    transitions courtes seulement lors d'un vrai changement d'écran, de
   //    feuille ou d'onglet ; rien si « mouvement réduit » est demandé).
+  //
+  // Sprint Revente-F (observations d'Hamadou du 18/10/2026, après le E) :
+  //  - Thème clair « bandeau MonDjai » par défaut, calqué sur MonDjai/Coiffure
+  //    (Sprint 8D) : mêmes variables CSS en deux jeux (sombre = rendu du E),
+  //    script dans <head> qui pose data-theme avant le premier affichage,
+  //    Réglages › Affichage : Clair (par défaut) / Automatique / Sombre
+  //    (config.theme, absent = clair : rien n'est réécrit au chargement).
+  //  - Mêmes rubriques que les autres applications : la barre du bas devient
+  //    Aujourd'hui · Achat/Vente · Mon état · Mes habitudes · Réglages.
+  //    Achats et Ventes sont réunis dans « Achat/Vente » (Achats · Ventes ·
+  //    Stock, contenus inchangés) ; Réglages passe dans la barre du bas et
+  //    Télécharger prend sa place en haut. Pas de section « Installer
+  //    l'application » (propre à Coiffure).
+  //  - Aucun calcul ne change.
+  //
+  // Sprint Revente-F2 (retours d'Hamadou du 18/10/2026 sur le F) :
+  //  - Bouton « + » aussi sur Aujourd'hui : saisie rapide d'une vente.
+  //  - Achat/Vente › Ventes présentée comme les achats : Jour / Semaine / Mois
+  //    (même période que la vue Achats), carte du total, liste de la période.
+  //    Pas de charges sur une vente.
 
   var STORAGE_KEY = "mondjai_revente_state_v1";
 
   // Version affichée dans Réglages → À propos, pour vérifier d'un coup d'œil
   // quelle version tourne sur un téléphone. Le numéro de cache doit être le
   // même que VERSION_CACHE dans sw.js.
-  var VERSION_APP = "Revente-E · cache 5";
+  var VERSION_APP = "Revente-F2 · cache 7";
 
   /* ================= Helpers ================= */
 
@@ -1094,7 +1375,9 @@
     // « Stock & réappro ». Sprint Revente-E : Jour / Semaine / Mois seulement
     // dans « Détails achats » (plus de drill-down) ; « Stock & réappro » a son
     // propre mois affiché (mois civil en cours par défaut), indépendant.
-    achatsVue: "details",  // 'details' | 'stock'
+    // Sprint Revente-F : onglet Achat/Vente — 'achats' (Détails achats),
+    // 'ventes' (liste des ventes) ou 'stock' (Stock & réappro).
+    achatsVue: "achats",
     achatsPeriode: "jour",
     achatsSemaineRef: null,
     achatsMoisRef: null,
@@ -1105,12 +1388,15 @@
     abonnementToggles: {}
   };
 
+  // Sprint Revente-F : mêmes rubriques que les autres applications MonDjai.
   var TAB_DEFS = [
     { key:"aujourdhui", label:"Aujourd’hui", emoji:"🏠" },
-    { key:"achats", label:"Achats", emoji:"📦" },
-    { key:"ventes", label:"Ventes", emoji:"🛍️" },
+    { key:"achatvente", label:"Achat/Vente", emoji:"🛍️" },
     { key:"etat", label:"Mon état", emoji:"📊" },
-    { key:"habitudes", label:"Habitudes", emoji:"📈" }
+    // « Mes habitudes » ne tient pas sur 5 onglets (déjà constaté au Sprint C) :
+    // libellé court dans la barre, titre complet sur l'écran.
+    { key:"habitudes", label:"Habitudes", emoji:"📈" },
+    { key:"reglages", label:"Réglages", emoji:"⚙️" }
   ];
 
   /* ================= Produits ================= */
@@ -1137,10 +1423,74 @@
     return null;
   }
 
+  /* ================= Sprint Revente-F : thème clair / automatique / sombre ================= */
+  // Repris de MonDjai/Coiffure (Sprint 8D). Le choix est lu à la volée
+  // (absent ou inconnu = « clair ») : charger un état du Sprint E ne réécrit
+  // rien ; seul un choix dans Réglages l'enregistre. Le thème appliqué
+  // (data-theme="clair" | "sombre" sur <html>) est déjà posé par le script de
+  // <head> avant le premier affichage ; il est ensuite tenu à jour ici (choix
+  // dans Réglages, réglage du téléphone en Automatique), sans rechargement.
+  var CHOIX_THEMES = ["clair", "auto", "sombre"];
+  function choixTheme(){
+    var t = state && state.config ? state.config.theme : null;
+    return CHOIX_THEMES.indexOf(t) !== -1 ? t : "clair";
+  }
+  function telephoneEnSombre(){
+    try{ return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }catch(e){ return false; }
+  }
+  function themeApplique(){
+    var c = choixTheme();
+    return (c === "sombre" || (c === "auto" && telephoneEnSombre())) ? "sombre" : "clair";
+  }
+  function appliquerTheme(){
+    var t = themeApplique();
+    var html = document.documentElement;
+    if(html.getAttribute("data-theme") !== t) html.setAttribute("data-theme", t);
+    majCouleurBarreSysteme();
+  }
+  // meta theme-color (barre d'état du téléphone) : sombre en thème sombre ;
+  // en clair, la couleur du bandeau MonDjai quand l'écran en a un, sinon le
+  // fond clair (code d'accès, PIN, Objectif, À propos, Télécharger).
+  function majCouleurBarreSysteme(){
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if(!meta) return;
+    var c = document.documentElement.getAttribute("data-theme") === "sombre" ? "#11141a"
+      : (document.querySelector("#app > .header") ? "#141922" : "#eff1f4");
+    if(meta.getAttribute("content") !== c) meta.setAttribute("content", c);
+  }
+  // Automatique : suit en direct le réglage clair / sombre du téléphone.
+  function suivreThemeTelephone(){
+    try{
+      if(!window.matchMedia) return;
+      var mq = window.matchMedia("(prefers-color-scheme: dark)");
+      var surChangement = function(){ if(choixTheme() === "auto") appliquerTheme(); };
+      if(mq.addEventListener) mq.addEventListener("change", surChangement);
+      else if(mq.addListener) mq.addListener(surChangement);
+    }catch(e){}
+  }
+  // Bandeau MonDjai d'Aujourd'hui (thème clair) : il descend derrière le titre
+  // et ~60 px dans les deux tuiles du haut (au plus la moitié d'une tuile) —
+  // hauteur recalculée après chaque rendu et à chaque changement de taille.
+  function majBandeauAujourdhui(){
+    var main = document.querySelector("#app > .main.ecran-aujourdhui");
+    if(!main) return;
+    var grille = null;
+    for(var i = 0; i < main.children.length; i++){
+      if(main.children[i].classList.contains("dash-grid")){ grille = main.children[i]; break; }
+    }
+    var tuile = grille ? grille.querySelector(".dash-block") : null;
+    if(!tuile) return;
+    var h = Math.round(tuile.getBoundingClientRect().top - main.getBoundingClientRect().top + Math.min(60, tuile.offsetHeight / 2));
+    if(h > 0) main.style.setProperty("--bandeau-h", h + "px");
+  }
+
   /* ================= Rendu racine ================= */
 
   function render(){
     var app = byId("app");
+    // Sprint Revente-F : thème à jour (choix modifié, sauvegarde restaurée,
+    // données effacées…) — sans effet si rien n'a changé.
+    appliquerTheme();
     if(!state.config.codeAccesOk){
       app.innerHTML = renderCodeAcces("initial");
       afterRender();
@@ -1159,9 +1509,9 @@
       return;
     }
     var html = "";
-    if(ui.overlay === "reglages"){
-      html = renderReglages();
-    } else if(ui.overlay === "apropos"){
+    // Sprint Revente-F : Réglages est un onglet de la barre du bas (plus un
+    // écran superposé) ; À propos s'ouvre par-dessus.
+    if(ui.overlay === "apropos"){
       html = renderApropos();
     } else if(ui.overlay === "objectif"){
       html = renderObjectifOverlay();
@@ -1193,6 +1543,10 @@
       afficherCacheActifApropos();
     }
     mesurerBarreDuBas();
+    // Sprint Revente-F : bandeau d'Aujourd'hui et couleur de la barre d'état.
+    ajusterTitreCeMois();
+    majBandeauAujourdhui();
+    majCouleurBarreSysteme();
     // Sprint Revente-C : bouton retour du téléphone (historique synchronisé
     // avec la profondeur de navigation) puis mise à jour en attente éventuelle.
     synchroniserHistorique();
@@ -1216,7 +1570,7 @@
         modale: ui.modal ? ui.modal.type + ":" + (ui.modal.id || "") : null };
     }
     var ecran = ui.overlay ? "overlay:" + ui.overlay : "onglet:" + ui.tab;
-    var vue = (!ui.overlay && ui.tab === "achats") ? (ui.achatsVue === "stock" ? "stock" : "details") : "";
+    var vue = (!ui.overlay && ui.tab === "achatvente") ? vueAchatVente() : "";
     return { ecran: ecran, vue: vue, modale: ui.modal ? ui.modal.type + ":" + (ui.modal.id || "") : null };
   }
   function mouvementReduit(){
@@ -1510,10 +1864,11 @@
             '<div class="brand-sub">Achats, ventes &amp; stock</div>' +
           '</div>' +
         '</div>' +
+        // Sprint Revente-F : Réglages passe dans la barre du bas ; Télécharger
+        // prend sa place en haut, à droite du raccourci Épargne.
         '<div class="header-icons">' +
-          '<button type="button" class="icon-btn" data-action="ouvrir-telecharger" aria-label="Télécharger">⬇️</button>' +
           renderEpargneShortcut() +
-          '<button type="button" class="icon-btn" data-action="ouvrir-reglages" aria-label="Réglages">⚙️</button>' +
+          '<button type="button" class="icon-btn" data-action="ouvrir-telecharger" aria-label="Télécharger" data-test="bouton-telecharger">📤</button>' +
         '</div>' +
       '</div>'
     );
@@ -1545,21 +1900,28 @@
     var body = "";
     switch(ui.tab){
       case "aujourdhui": body = renderAujourdhui(); break;
-      case "achats": body = renderAchats(); break;
-      case "ventes": body = renderListeVentes(); break;
+      case "achatvente": body = renderAchatVente(); break;
       case "etat": body = renderMonEtat(); break;
       case "habitudes": body = renderHabitudes(); break;
+      case "reglages": body = renderReglages(); break;
       default: body = "";
     }
     var fab = renderFab();
-    var classe = "main with-tabbar" + (ui.tab === "aujourdhui" ? " ecran-aujourdhui" : "") + (ui.tab === "achats" ? " ecran-achats" : "") + (ui.tab === "ventes" ? " ecran-ventes" : "");
+    var classe = "main with-tabbar" + (ui.tab === "aujourdhui" ? " ecran-aujourdhui" : "") + (ui.tab === "achatvente" ? " ecran-achatvente" : "") + (ui.tab === "reglages" ? " ecran-reglages" : "");
     return '<div class="' + classe + '">' + body + '</div>' + fab;
   }
 
+  // Sprint Revente-F : un seul bouton « + » dans Achat/Vente — nouvelle vente
+  // sur la vue Ventes, nouvel achat sur Achats et Stock (comme au Sprint E).
+  // Sprint Revente-F (2) : aussi sur Aujourd'hui, pour la saisie rapide d'une
+  // vente à une cliente (le formulaire s'ouvre, on reste sur Aujourd'hui).
   function renderFab(){
-    var action = { achats:"add-achat", ventes:"add-vente" }[ui.tab];
-    if(!action) return "";
-    return '<button type="button" class="fab" data-action="' + action + '" aria-label="Ajouter">+</button>';
+    if(ui.tab === "aujourdhui"){
+      return '<button type="button" class="fab fab-aujourdhui" data-action="add-vente" aria-label="Nouvelle vente" data-test="fab-aujourdhui">+</button>';
+    }
+    if(ui.tab !== "achatvente") return "";
+    var vente = vueAchatVente() === "ventes";
+    return '<button type="button" class="fab" data-action="' + (vente ? "add-vente" : "add-achat") + '" aria-label="' + (vente ? "Nouvelle vente" : "Nouvel achat") + '">+</button>';
   }
 
   /* ================= Calculs de dates/périodes ================= */
@@ -1974,6 +2336,35 @@
     );
   }
 
+  // Sprint Revente-F (2) : le « + » se pose à droite du bouton (couloir) ; le
+  // titre doit tenir en entier à côté. S'il déborde, la police est réduite
+  // juste ce qu'il faut (13 px au plus petit) ; en dernier recours, sur un
+  // très petit écran, le mois est abrégé (« Sept. 2026 »).
+  var MOIS_COURTS = ["Janv.","Févr.","Mars","Avr.","Mai","Juin","Juil.","Août","Sept.","Oct.","Nov.","Déc."];
+  function moisLabelCourt(d){ return MOIS_COURTS[d.getMonth()] + " " + d.getFullYear(); }
+  function largeurTexte(el){
+    var r = document.createRange(); r.selectNodeContents(el);
+    return r.getBoundingClientRect().width;
+  }
+  function ajusterTitreCeMois(){
+    var t = document.querySelector(".main.ecran-aujourdhui .mois-btn .cm-titre");
+    if(!t) return;
+    var mois = t.querySelector(".cm-mois");
+    t.style.fontSize = "";
+    if(mois && mois.getAttribute("data-long")) mois.textContent = mois.getAttribute("data-long");
+    var dispo = t.clientWidth;
+    if(!dispo || largeurTexte(t) <= dispo) return;
+    var taille = parseFloat(getComputedStyle(t).fontSize);
+    taille = Math.max(13, Math.floor(taille * dispo / largeurTexte(t) * 10) / 10);
+    t.style.fontSize = taille + "px";
+    // (la largeur ne suit pas exactement la taille : on affine par petits pas)
+    while(largeurTexte(t) > dispo && taille > 13){
+      taille = Math.max(13, Math.round((taille - 0.2) * 10) / 10);
+      t.style.fontSize = taille + "px";
+    }
+    if(largeurTexte(t) > dispo && mois && mois.getAttribute("data-court")) mois.textContent = mois.getAttribute("data-court");
+  }
+
   // Bouton « 📅 Ce mois-ci · <mois civil en cours> » (libellé dynamique).
   // Pastille rouge si la caisse à date est négative (même arrondi que la
   // synthèse) : l'alerte n'est pas cachée derrière le bouton ; le message doux
@@ -1986,10 +2377,9 @@
           (negative ? '<span class="cm-pastille" data-test="pastille-caisse-negative" aria-label="Caisse négative"></span>' : '') +
         '</span>' +
         '<span class="cm-main">' +
-          '<span class="cm-titre">Ce mois-ci · <span class="cm-mois">' + esc(moisLabelMaj(new Date())) + '</span></span>' +
+          '<span class="cm-titre">Ce mois-ci · <span class="cm-mois" data-long="' + esc(moisLabelMaj(new Date())) + '" data-court="' + esc(moisLabelCourt(new Date())) + '">' + esc(moisLabelMaj(new Date())) + '</span></span>' +
           '<span class="cm-sous">Achats, ventes, caisse</span>' +
         '</span>' +
-        '<span class="cm-chev" aria-hidden="true">›</span>' +
       '</button>'
     );
   }
@@ -2319,15 +2709,26 @@
     return { type:"jour", date: todayStr(), range: getDayRange(new Date()) };
   }
 
-  function renderAchats(){
-    var vue = ui.achatsVue === "stock" ? "stock" : "details";
-    var seg =
-      '<div class="seg">' +
-        '<button type="button" class="seg-btn' + (vue==="details"?" active":"") + '" data-action="achats-vue" data-val="details">Détails achats</button>' +
-        '<button type="button" class="seg-btn' + (vue==="stock"?" active":"") + '" data-action="achats-vue" data-val="stock">Stock &amp; réappro</button>' +
-      '</div>';
-    var head = '<div class="section-title">Achats</div>' + seg;
-    return head + '<div class="sous-vue">' + (vue === "stock" ? renderAchatsStock() : renderAchatsDetails()) + '</div>';
+  // Sprint Revente-F : un seul onglet « Achat/Vente » (mêmes rubriques que les
+  // autres applications MonDjai) — trois vues côte à côte : Achats (= « Détails
+  // achats » : Jour / Semaine / Mois), Ventes (présentées comme les achats,
+  // sur la même période) et Stock (= « Stock & réappro »).
+  var VUES_ACHAT_VENTE = [
+    { key:"achats", emoji:"📦", label:"Achats" },
+    { key:"ventes", emoji:"🛍️", label:"Ventes" },
+    { key:"stock", emoji:"🗃️", label:"Stock" }
+  ];
+  function vueAchatVente(){
+    return (ui.achatsVue === "ventes" || ui.achatsVue === "stock") ? ui.achatsVue : "achats";
+  }
+  function renderAchatVente(){
+    var vue = vueAchatVente();
+    var seg = '<div class="seg seg-3" data-test="vues-achat-vente">' + VUES_ACHAT_VENTE.map(function(v){
+      return '<button type="button" class="seg-btn' + (vue === v.key ? " active" : "") + '" data-action="achats-vue" data-val="' + v.key + '">' +
+        '<span class="sb-emoji" aria-hidden="true">' + v.emoji + '</span>' + v.label + '</button>';
+    }).join("") + '</div>';
+    var corps = vue === "stock" ? renderAchatsStock() : (vue === "ventes" ? renderVentesDetails() : renderAchatsDetails());
+    return '<div class="section-title">Achat/Vente</div>' + seg + '<div class="sous-vue">' + corps + '</div>';
   }
 
   function renderAchatsEntete(niv){
@@ -2787,26 +3188,55 @@
     closeModal();
   }
 
-  function renderListeVentes(){
-    var items = sortByDateDesc(state.ventes);
-    var head = '<div class="section-title">Ventes</div>';
-    if(!items.length){
-      return head + emptyState("🛍️","Aucune vente enregistrée","Touchez le bouton + pour enregistrer votre première vente.");
+  /* ---------- Vue « Ventes » ---------- */
+  // Sprint Revente-F (2) : présentée comme les achats — Jour / Semaine / Mois
+  // avec ‹ › bornée, carte du total, liste des ventes de la période. La
+  // période est la même que celle de la vue Achats (on passe de l'une à
+  // l'autre sur la même journée, semaine ou mois). Chaque vente compte comme
+  // partout ailleurs (montantComptabiliseVente : une commande spéciale = sa
+  // marge). Pas de charges sur une vente.
+  function renderVentesDetails(){
+    var niv = niveauAchats();
+    var ventes = sortByDateDesc(filterRange(state.ventes, niv.range));
+    var total = sumBy(ventes, montantComptabiliseVente);
+    var qte = sumBy(ventes, function(v){ return v.quantite; });
+    var nbCommandes = ventes.filter(estCommandeSpeciale).length;
+    var carte =
+      '<div class="dash-solde" style="margin-bottom:16px;">' +
+        '<div class="ds-label">Total des ventes de la période</div>' +
+        '<div class="ds-amount pos" data-test="total-ventes-periode">' + formatFCFA(total) + '</div>' +
+        '<div class="solde-mini-stats">' +
+          '<div class="sms-col"><div class="sms-label">Ventes</div><div class="sms-val" data-test="nb-ventes-periode">' + ventes.length + '</div></div>' +
+          '<div class="sms-col"><div class="sms-label">Paquets</div><div class="sms-val" data-test="paquets-ventes-periode">' + formatQte(qte) + '</div></div>' +
+        '</div>' +
+        (nbCommandes ? '<div class="ds-note" data-test="note-commandes-speciales">' +
+          (nbCommandes > 1 ? "Dont " + nbCommandes + " commandes spéciales" : "Dont 1 commande spéciale") +
+          ' : seule la marge est comptée.</div>' : '') +
+      '</div>';
+
+    var titreListe = '<div class="section-title">' + (niv.type === "jour" ? "Ventes de la journée" : "Ventes de la période") + '</div>';
+    if(!ventes.length){
+      var vide = niv.type === "jour"
+        ? emptyState("🛍️","Aucune vente aujourd’hui","Touchez le bouton + pour enregistrer une vente.")
+        : emptyState("🛍️","Aucune vente sur cette période","Les ventes enregistrées sur cette période apparaîtront ici.");
+      return renderAchatsEntete(niv) + carte + titreListe + vide;
     }
-    var rows = items.map(function(v){
-      var badge = v.typeVente === "commande_speciale" ? '<span class="badge">Commande spéciale</span>' : "";
+    var lg = niv.type === "jour";
+    var rows = ventes.map(function(v){
+      var badge = estCommandeSpeciale(v) ? '<span class="badge">Commande spéciale</span>' : "";
       return (
-        '<button type="button" class="entry-card entry-card-lg" data-action="voir-vente" data-id="' + v.id + '">' +
+        '<button type="button" class="entry-card' + (lg ? " entry-card-lg" : "") + '" style="width:100%;' + (lg ? "" : " text-align:left;") + '" data-action="voir-vente" data-id="' + v.id + '">' +
           '<div class="entry-ico ico-vente">🛍️</div>' +
           '<div class="entry-main">' +
             '<div class="entry-title et-flex"><span class="et-nom">' + esc(v.produitNom) + '</span>' + badge + '</div>' +
-            '<div class="entry-sub">' + formatDateFr(v.date) + ' · ' + v.quantite + ' vendu(s)' + sousTitreTransit(v) + '</div>' +
+            '<div class="entry-sub">' + formatDateFr(v.date) + ' · ' + formatQte(v.quantite) + ' vendu(s)' + sousTitreTransit(v) + '</div>' +
           '</div>' +
           '<div class="entry-amount pos">' + formatFCFA(montantComptabiliseVente(v)) + '</div>' +
         '</button>'
       );
     }).join("");
-    return head + '<div class="entry-list entry-list-lg">' + rows + '</div>';
+    return renderAchatsEntete(niv) + carte + titreListe +
+      '<div class="entry-list' + (lg ? " entry-list-lg" : "") + '" data-test="liste-ventes-periode">' + rows + '</div>';
   }
 
   function renderDetailVente(){
@@ -3794,13 +4224,14 @@
         (ui.reglagesMsg ? '<div class="hint tight" style="margin-top:8px;">' + esc(ui.reglagesMsg) + '</div>' : '') +
       '</div>';
 
+    // Sprint Revente-F : Réglages est un onglet de la barre du bas (avec
+    // l'en-tête MonDjai), plus un écran superposé. Sections dans l'esprit de
+    // Coiffure 8D (Affichage en tête de liste), sans « Installer
+    // l'application » (demande d'Hamadou du 18/10/2026).
     return (
-      '<div class="onb">' +
-        '<div class="onb-head" style="display:flex; align-items:center; justify-content:space-between;">' +
-          '<div class="onb-title" style="margin:0;">Réglages</div>' +
-          '<button type="button" class="icon-btn" data-action="fermer-overlay">✕</button>' +
-        '</div>' +
+      '<div class="section-title">Réglages</div>' +
         renderReglagesCaisse() +
+        renderReglagesAffichage() +
         '<div class="reglages-section">' +
           '<div class="rs-title">Charges communes</div>' +
           rubRows +
@@ -3829,9 +4260,37 @@
           (ui.backupMsg ? '<div class="hint tight">' + esc(ui.backupMsg) + '</div>' : '') +
           (state.meta.derniereSauvegarde ? '<div class="hint tight">Dernière sauvegarde : ' + esc(formatDateFr(state.meta.derniereSauvegarde)) + '</div>' : '') +
         '</div>' +
-        '<div class="reglages-section">' +
+        '<div class="reglages-section" style="margin-bottom:0;">' +
           '<button type="button" class="btn btn-secondary" data-action="ouvrir-apropos">À propos</button>' +
+        '</div>'
+    );
+  }
+
+  // Ouvre l'onglet Réglages (messages de la visite précédente effacés).
+  function ouvrirOngletReglages(){
+    ui.tab = "reglages"; ui.overlay = null;
+    ui.reglagesMsg = ""; ui.fondsMsg = ""; ui.fondsErreur = ""; ui.draft["f-fondsDepart"] = undefined;
+  }
+
+  /* ----- Sprint Revente-F : Réglages › Affichage (thème, repris de Coiffure 8D) ----- */
+  function renderReglagesAffichage(){
+    var c = choixTheme();
+    var opts = [
+      ["clair", "☀️", "Clair", "par défaut"],
+      ["auto", "📱", "Automatique", "comme le téléphone"],
+      ["sombre", "🌙", "Sombre", "fond noir"]
+    ].map(function(o){
+      return '<button type="button" class="radio-opt' + (c === o[0] ? " active" : "") + '" data-action="set-theme" data-val="' + o[0] + '" data-test="theme-' + o[0] + '" aria-pressed="' + (c === o[0] ? "true" : "false") + '">' +
+        '<span class="ct-emoji" aria-hidden="true">' + o[1] + '</span><span class="ct-nom">' + o[2] + '</span><span class="ct-sous">' + o[3] + '</span>' +
+      '</button>';
+    }).join("");
+    return (
+      '<div class="reglages-section" data-test="reglages-affichage">' +
+        '<div class="rs-title">Affichage</div>' +
+        '<div class="field" style="margin-bottom:0;"><div class="label">Thème</div>' +
+          '<div class="radio-row choix-theme">' + opts + '</div>' +
         '</div>' +
+        '<div class="hint tight" style="margin-top:8px;">Le changement est immédiat. « Automatique » suit le réglage clair ou sombre du téléphone.</div>' +
       '</div>'
     );
   }
@@ -3953,7 +4412,8 @@
 
     switch(action){
       case "maj-recharger": rechargerPourMaj(false); return;
-      case "ouvrir-reglages": ui.overlay = "reglages"; ui.reglagesMsg = ""; ui.fondsMsg = ""; ui.fondsErreur = ""; ui.draft["f-fondsDepart"] = undefined; render(); return;
+      // Sprint Revente-F : Réglages est un onglet de la barre du bas.
+      case "ouvrir-reglages": ouvrirOngletReglages(); render(); return;
       // Sprint Revente-D : caisse
       // Sprint Revente-E : ouvert depuis « Ce mois-ci », le détail de la caisse
       // y ramène quand on le ferme (2 niveaux pour le bouton retour).
@@ -3969,7 +4429,7 @@
       case "enregistrer-modif-vente": enregistrerModifVente(); return;
       case "modifier-fonds-depuis-caisse": {
         ui.modal = null; ui.modalReturnTo = null; ui.draft = {}; ui.errors = {};
-        ui.overlay = "reglages"; ui.reglagesMsg = ""; ui.fondsMsg = ""; ui.fondsErreur = "";
+        ouvrirOngletReglages();
         ui.pendingAutofocus = false;
         render();
         var champFonds = byId("f-fondsDepart");
@@ -3985,7 +4445,7 @@
       }
       case "fermer-overlay": ui.overlay = null; ui.objDraft = null; render(); return;
       case "ouvrir-apropos": ui.overlay = "apropos"; render(); return;
-      case "fermer-apropos": ui.overlay = "reglages"; render(); return;
+      case "fermer-apropos": ui.overlay = null; ui.tab = "reglages"; render(); return;
       case "ouvrir-telecharger": ui.overlay = "telecharger"; render(); return;
 
       case "ouvrir-objectif": ui.overlay = "objectif"; render(); return;
@@ -4142,7 +4602,6 @@
         state.config.rubriquesCharges = state.config.rubriquesCharges.filter(function(r){ return r.id !== ridSup; });
         state.autresCharges.forEach(function(c){ if(c.rubriqueId === ridSup) c.rubriqueSupprimee = true; });
         saveState();
-        ui.overlay = "reglages";
         closeModal();
         return;
       }
@@ -4157,7 +4616,25 @@
         return;
       }
 
-      case "go-tab": ui.tab = el.getAttribute("data-tab"); render(); return;
+      case "go-tab": {
+        var ongletVise = el.getAttribute("data-tab");
+        if(ongletVise === "reglages"){ if(ui.tab !== "reglages") ouvrirOngletReglages(); }
+        else ui.tab = ongletVise;
+        render();
+        return;
+      }
+      // Sprint Revente-F : Réglages › Affichage (repris de Coiffure 8D)
+      case "set-theme": {
+        var themeVoulu = el.getAttribute("data-val");
+        if(CHOIX_THEMES.indexOf(themeVoulu) === -1) themeVoulu = "clair";
+        if(state.config.theme !== themeVoulu){
+          state.config.theme = themeVoulu;
+          saveState();
+        }
+        appliquerTheme();
+        render();
+        return;
+      }
 
       case "etat-set-periode": {
         ensureEtatRefs();
@@ -4193,7 +4670,12 @@
 
       // Sprint Revente-C : onglet Achats (sous-vues + Jour/Semaine/Mois).
       // Sprint Revente-E : plus de drill-down ; mois propre à « Stock & réappro ».
-      case "achats-vue": ui.achatsVue = el.getAttribute("data-val") === "stock" ? "stock" : "details"; render(); return;
+      case "achats-vue": {
+        var vueVoulue = el.getAttribute("data-val");
+        ui.achatsVue = (vueVoulue === "ventes" || vueVoulue === "stock") ? vueVoulue : "achats";
+        render();
+        return;
+      }
       case "achats-set-periode": {
         ensureAchatsRefs();
         ui.achatsPeriode = el.getAttribute("data-val");
@@ -4400,8 +4882,7 @@
     if(ui.tab !== "aujourdhui") p += 1;
     p += profondeurDrill();
     if(ui.overlay){
-      p += 1;
-      if(ui.overlay === "apropos") p += 1;          // À propos s'ouvre depuis Réglages
+      p += 1;                                       // (Sprint F : À propos s'ouvre depuis l'onglet Réglages, déjà compté)
       if(objectifEnCreationEtape2()) p += 1;        // 2e étape de création d'objectif
     }
     if(ui.modal){
@@ -4424,7 +4905,7 @@
       return;
     }
     if(ui.overlay){
-      if(ui.overlay === "apropos"){ ui.overlay = "reglages"; render(); return; }
+      if(ui.overlay === "apropos"){ ui.overlay = null; ui.tab = "reglages"; render(); return; }
       if(objectifEnCreationEtape2()){ ui.objDraft.step = "modele"; render(); return; }
       ui.overlay = null; ui.objDraft = null;
       render();
@@ -4600,11 +5081,12 @@
 
   document.addEventListener("click", handleClick);
   document.addEventListener("change", handleChange);
-  window.addEventListener("resize", mesurerBarreDuBas);
+  window.addEventListener("resize", function(){ mesurerBarreDuBas(); ajusterTitreCeMois(); majBandeauAujourdhui(); });
 
   state = loadState();
   ui.locked = !!(state.config.pinActif && state.config.pinCode);
   initialiserHistorique();
+  suivreThemeTelephone();
   render();
   enregistrerServiceWorker();
 
@@ -4629,6 +5111,9 @@
     beneficeReventePeriode: beneficeReventePeriode,
     beneficeReventeTotal: beneficeReventeTotal,
     computeStockProduit: computeStockProduit,
+    // Sprint Revente-F (lecture seule, pour les tests)
+    choixTheme: choixTheme,
+    themeApplique: themeApplique,
     // Sprint Revente-E (lecture seule, pour les tests)
     etatUi: function(){
       var pile = [];

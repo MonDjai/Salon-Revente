@@ -1,4 +1,4 @@
-// MonDjai/Revente — service worker (Sprint Revente-E ; mécanisme inchangé depuis le Sprint C).
+// MonDjai/Revente — service worker (Sprint Revente-F2 ; mécanisme inchangé depuis le Sprint C).
 //
 // ╔══════════════════════════════════════════════════════════════════════╗
 // ║  POUR PUBLIER UNE NOUVELLE VERSION : remplacer index.html ET sw.js    ║
@@ -6,7 +6,7 @@
 // ║  Les téléphones se mettent à jour seuls à l'ouverture suivante,       ║
 // ║  sans installation ni désinstallation, sans toucher aux données.      ║
 // ╚══════════════════════════════════════════════════════════════════════╝
-var VERSION_CACHE = "5";
+var VERSION_CACHE = "7";
 
 // Tous les caches de cette application commencent par ce préfixe. Seuls
 // ceux-là sont supprimés lors d'une mise à jour : jamais les caches d'une
